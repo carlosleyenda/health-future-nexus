@@ -193,6 +193,15 @@ export interface DeliveryService {
   createdAt: string;
 }
 
+export type DeliveryStatus = 
+  | 'requested'
+  | 'assigned'
+  | 'in_transit'
+  | 'arrived'
+  | 'in_progress'
+  | 'completed'
+  | 'cancelled';
+
 export type DeliveryServiceType = 
   | 'home_consultation'
   | 'specialist_visit'
