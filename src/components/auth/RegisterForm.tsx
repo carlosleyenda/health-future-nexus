@@ -13,7 +13,8 @@ import { useAuthStore } from "@/store/auth";
 import { toast } from "sonner";
 
 const registerSchema = z.object({
-  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  firstName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  lastName: z.string().min(2, "El apellido debe tener al menos 2 caracteres"),
   email: z.string().email("Email inválido"),
   phone: z.string().min(10, "Teléfono debe tener al menos 10 dígitos"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
@@ -38,7 +39,8 @@ export const RegisterForm = ({ onToggleMode }: RegisterFormProps) => {
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       phone: "",
       password: "",
@@ -54,21 +56,24 @@ export const RegisterForm = ({ onToggleMode }: RegisterFormProps) => {
       // Simulamos registro (aquí iría la integración con Supabase)
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      const currentTime = new Date().toISOString();
       const newUser = {
         id: Date.now().toString(),
         email: data.email,
-        name: data.name,
+        firstName: data.firstName,
+        lastName: data.lastName,
         role: "patient" as const,
-        avatar: null,
         phone: data.phone,
-        dateOfBirth: "",
-        address: "",
-        medicalId: `PAT${Date.now().toString().slice(-3)}`
+        avatarUrl: null,
+        isActive: true,
+        onboardingCompleted: false,
+        createdAt: currentTime,
+        updatedAt: currentTime
       };
 
       setUser(newUser);
       toast.success("¡Cuenta creada exitosamente!", {
-        description: `Bienvenido ${newUser.name}. Tu cuenta ha sido registrada.`
+        description: `Bienvenido ${newUser.firstName} ${newUser.lastName}. Tu cuenta ha sido registrada.`
       });
     } catch (error) {
       toast.error("Error al crear la cuenta", {
@@ -94,26 +99,49 @@ export const RegisterForm = ({ onToggleMode }: RegisterFormProps) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre completo</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        {...field}
-                        placeholder="Juan Pérez"
-                        className="pl-10"
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          {...field}
+                          placeholder="Juan"
+                          className="pl-10"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Apellido</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          {...field}
+                          placeholder="Pérez"
+                          className="pl-10"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}

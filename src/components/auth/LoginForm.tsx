@@ -46,38 +46,46 @@ export const LoginForm = ({ onToggleMode }: LoginFormProps) => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Simulamos diferentes tipos de usuarios para demostración
+      const currentTime = new Date().toISOString();
       const mockUsers = {
         "paciente@test.com": { 
           id: "1", 
           email: "paciente@test.com", 
-          name: "Juan Pérez", 
+          firstName: "Juan",
+          lastName: "Pérez",
           role: "patient" as const,
-          avatar: null,
           phone: "+52 555 0123",
-          dateOfBirth: "1990-05-15",
-          address: "Ciudad de México",
-          medicalId: "PAT001"
+          avatarUrl: null,
+          isActive: true,
+          onboardingCompleted: true,
+          createdAt: currentTime,
+          updatedAt: currentTime
         },
         "doctor@test.com": { 
           id: "2", 
           email: "doctor@test.com", 
-          name: "Dra. María García", 
+          firstName: "María",
+          lastName: "García",
           role: "doctor" as const,
-          avatar: null,
           phone: "+52 555 0456",
-          specialty: "Cardiología",
-          licenseNumber: "DOC001",
-          experience: 15
+          avatarUrl: null,
+          isActive: true,
+          onboardingCompleted: true,
+          createdAt: currentTime,
+          updatedAt: currentTime
         },
         "admin@test.com": { 
           id: "3", 
           email: "admin@test.com", 
-          name: "Carlos Admin", 
+          firstName: "Carlos",
+          lastName: "Admin",
           role: "admin" as const,
-          avatar: null,
           phone: "+52 555 0789",
-          department: "Administración",
-          permissions: ["all"]
+          avatarUrl: null,
+          isActive: true,
+          onboardingCompleted: true,
+          createdAt: currentTime,
+          updatedAt: currentTime
         }
       };
 
@@ -85,7 +93,7 @@ export const LoginForm = ({ onToggleMode }: LoginFormProps) => {
       
       if (user && data.password === "123456") {
         setUser(user);
-        toast.success(`¡Bienvenido ${user.name}!`, {
+        toast.success(`¡Bienvenido ${user.firstName} ${user.lastName}!`, {
           description: `Has iniciado sesión como ${user.role === 'patient' ? 'Paciente' : user.role === 'doctor' ? 'Doctor' : 'Administrador'}`
         });
       } else {
