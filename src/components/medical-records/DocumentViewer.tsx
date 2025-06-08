@@ -31,25 +31,28 @@ export default function DocumentViewer(props: CombinedProps) {
   // Mock document if only ID is provided
   const mockDocument: MedicalDocument = document || {
     id: documentId || '',
+    patientId: '',
+    doctorId: '',
+    category: 'consultation',
+    type: 'pdf',
     title: 'Documento Médico',
     description: 'Descripción del documento',
-    category: 'consultation',
-    fileType: 'application/pdf',
-    fileSize: 1024000,
+    fileName: 'documento.pdf',
     fileUrl: '/placeholder.svg',
-    patientId: '',
+    fileSize: 1024000,
+    mimeType: 'application/pdf',
+    uploadedAt: new Date().toISOString(),
     uploadedBy: 'Dr. Sistema',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
     tags: [],
-    version: 1,
-    isActive: true
+    isShared: false,
+    sharedWith: [],
+    accessHistory: []
   };
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 200));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 25, 50));
 
-  const isImage = mockDocument.fileType.startsWith('image/');
+  const isImage = mockDocument.mimeType.startsWith('image/');
 
   return (
     <Dialog open onOpenChange={props.onClose}>
@@ -63,7 +66,7 @@ export default function DocumentViewer(props: CombinedProps) {
               <div className="flex items-center space-x-2">
                 <Badge>{mockDocument.category}</Badge>
                 <span className="text-sm text-gray-500">
-                  {new Date(mockDocument.createdAt).toLocaleDateString()}
+                  {new Date(mockDocument.uploadedAt).toLocaleDateString()}
                 </span>
                 <span className="text-sm text-gray-500">
                   por {mockDocument.uploadedBy}
@@ -119,7 +122,7 @@ export default function DocumentViewer(props: CombinedProps) {
                 <div className="text-6xl mb-4">📄</div>
                 <p className="text-gray-500">Vista previa del documento</p>
                 <p className="text-sm text-gray-400 mt-2">
-                  Tipo: {mockDocument.fileType}
+                  Tipo: {mockDocument.mimeType}
                 </p>
               </div>
             )}

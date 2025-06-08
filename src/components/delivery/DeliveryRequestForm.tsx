@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { truck, clock, map } from 'lucide-react';
+import { Truck, Clock, Map } from 'lucide-react';
 import { useRequestDelivery } from '@/hooks/useDelivery';
 import { useAuthStore } from '@/store/auth';
 
@@ -102,7 +101,7 @@ export default function DeliveryRequestForm() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <truck className="h-5 w-5 text-blue-600" />
+          <Truck className="h-5 w-5 text-blue-600" />
           Solicitar Servicio Médico a Domicilio
         </CardTitle>
       </CardHeader>
@@ -134,21 +133,21 @@ export default function DeliveryRequestForm() {
               <CardContent className="p-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center space-x-2">
-                    <truck className="h-4 w-4 text-blue-600" />
+                    <Truck className="h-4 w-4 text-blue-600" />
                     <div>
                       <p className="text-sm font-medium">Precio estimado</p>
                       <p className="text-lg font-bold text-green-600">${selectedService.price}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <clock className="h-4 w-4 text-blue-600" />
+                    <Clock className="h-4 w-4 text-blue-600" />
                     <div>
                       <p className="text-sm font-medium">Tiempo estimado</p>
                       <p className="text-sm text-gray-600">{selectedService.estimatedTime}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <map className="h-4 w-4 text-blue-600" />
+                    <Map className="h-4 w-4 text-blue-600" />
                     <div>
                       <p className="text-sm font-medium">Disponibilidad</p>
                       <Badge variant="outline" className="text-green-600">24/7</Badge>
@@ -172,7 +171,7 @@ export default function DeliveryRequestForm() {
                       !scheduledDate && "text-muted-foreground"
                     )}
                   >
-                    <clock className="mr-2 h-4 w-4" />
+                    <Clock className="mr-2 h-4 w-4" />
                     {scheduledDate ? format(scheduledDate, "PPP p") : "Selecciona fecha y hora"}
                   </Button>
                 </PopoverTrigger>

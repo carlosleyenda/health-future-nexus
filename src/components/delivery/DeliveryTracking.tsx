@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { truck, map, clock } from 'lucide-react';
+import { Truck, Map, Clock } from 'lucide-react';
 import { useDeliveryServices, useDeliveryTracking } from '@/hooks/useDelivery';
 import { useAuthStore } from '@/store/auth';
 
@@ -69,7 +69,7 @@ export default function DeliveryTracking({ selectedDeliveryId }: DeliveryTrackin
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <map className="h-5 w-5 text-blue-600" />
+            <Map className="h-5 w-5 text-blue-600" />
             Seguimiento de Servicio
           </CardTitle>
         </CardHeader>
@@ -152,14 +152,14 @@ export default function DeliveryTracking({ selectedDeliveryId }: DeliveryTrackin
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <truck className="h-5 w-5 text-green-600" />
+                  <Truck className="h-5 w-5 text-green-600" />
                   Ubicación en Tiempo Real
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="bg-gray-100 rounded-lg h-64 flex items-center justify-center mb-4">
                   <div className="text-center">
-                    <map className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+                    <Map className="h-12 w-12 mx-auto text-gray-400 mb-2" />
                     <p className="text-gray-500">Mapa de seguimiento</p>
                     <p className="text-sm text-gray-400">
                       {selectedDelivery.currentLocation || 'Ubicación en tiempo real'}
@@ -170,7 +170,7 @@ export default function DeliveryTracking({ selectedDeliveryId }: DeliveryTrackin
                 {selectedDelivery.estimatedArrival && (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <clock className="h-4 w-4 text-blue-600" />
+                      <Clock className="h-4 w-4 text-blue-600" />
                       <span className="text-sm">Tiempo estimado de llegada</span>
                     </div>
                     <span className="font-semibold text-green-600">
@@ -214,7 +214,7 @@ export default function DeliveryTracking({ selectedDeliveryId }: DeliveryTrackin
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Button variant="outline" className="w-full">
-                  <truck className="h-4 w-4 mr-2" />
+                  <Truck className="h-4 w-4 mr-2" />
                   Contactar Repartidor
                 </Button>
                 <Button variant="outline" className="w-full">
@@ -229,7 +229,7 @@ export default function DeliveryTracking({ selectedDeliveryId }: DeliveryTrackin
       {activeDeliveries.length === 0 && (
         <Card>
           <CardContent className="p-12 text-center">
-            <truck className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+            <Truck className="h-12 w-12 mx-auto text-gray-400 mb-4" />
             <p className="text-gray-500">No tienes servicios activos</p>
             <p className="text-sm text-gray-400 mt-2">
               Solicita un servicio para ver el seguimiento en tiempo real

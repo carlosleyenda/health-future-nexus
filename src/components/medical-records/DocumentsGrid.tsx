@@ -25,8 +25,8 @@ export default function DocumentsGrid({ documents, onDocumentSelect, userRole }:
     return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
-  const getFileIcon = (fileType: string) => {
-    if (fileType.includes('image')) return Image;
+  const getFileIcon = (mimeType: string) => {
+    if (mimeType.includes('image')) return Image;
     return FileText;
   };
 
@@ -42,7 +42,7 @@ export default function DocumentsGrid({ documents, onDocumentSelect, userRole }:
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {documents.map((document) => {
-        const FileIcon = getFileIcon(document.fileType);
+        const FileIcon = getFileIcon(document.mimeType);
         
         return (
           <Card key={document.id} className="hover:shadow-md transition-shadow cursor-pointer">
@@ -55,7 +55,7 @@ export default function DocumentsGrid({ documents, onDocumentSelect, userRole }:
                   </Badge>
                 </div>
                 <span className="text-xs text-gray-500">
-                  {new Date(document.createdAt).toLocaleDateString()}
+                  {new Date(document.uploadedAt).toLocaleDateString()}
                 </span>
               </div>
               

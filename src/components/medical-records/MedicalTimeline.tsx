@@ -48,35 +48,20 @@ export default function MedicalTimeline({ events, onDocumentSelect }: MedicalTim
                   
                   <div className="flex items-center justify-between">
                     <div className="flex space-x-2">
-                      <Badge variant="secondary">{event.eventType}</Badge>
+                      <Badge variant="secondary">{event.type}</Badge>
                       {event.doctorName && (
                         <Badge variant="outline">Dr. {event.doctorName}</Badge>
                       )}
                     </div>
                     
-                    {event.documentId && (
+                    {event.documents.length > 0 && (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          // Create a mock document for the timeline event
-                          const mockDocument: MedicalDocument = {
-                            id: event.documentId!,
-                            title: event.title,
-                            description: event.description,
-                            category: 'consultation',
-                            fileType: 'application/pdf',
-                            fileSize: 0,
-                            fileUrl: '',
-                            patientId: '',
-                            uploadedBy: event.doctorName || 'Unknown',
-                            createdAt: event.date,
-                            updatedAt: event.date,
-                            tags: [],
-                            version: 1,
-                            isActive: true
-                          };
-                          onDocumentSelect(mockDocument);
+                          // Use the first document from the documents array
+                          const firstDocument = event.documents[0];
+                          onDocumentSelect(firstDocument);
                         }}
                       >
                         Ver Documento

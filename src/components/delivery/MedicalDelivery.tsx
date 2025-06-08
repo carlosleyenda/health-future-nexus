@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { truck, map, clock } from 'lucide-react';
+import { Truck, Map, Clock } from 'lucide-react';
 import DeliveryRequestForm from './DeliveryRequestForm';
 import DeliveryTracking from './DeliveryTracking';
 import DeliveryHistory from './DeliveryHistory';
@@ -36,8 +36,7 @@ export default function MedicalDelivery() {
   };
 
   const getServiceIcon = (serviceType: string) => {
-    const Icon = truck; // Using truck as the main icon since it's allowed
-    return <Icon className="h-5 w-5" />;
+    return <Truck className="h-5 w-5" />;
   };
 
   const getServiceName = (serviceType: string) => {
@@ -95,7 +94,7 @@ export default function MedicalDelivery() {
                   
                   {delivery.estimatedArrival && (
                     <div className="flex items-center space-x-1 text-sm text-gray-500">
-                      <clock className="h-4 w-4" />
+                      <Clock className="h-4 w-4" />
                       <span>
                         Llega en {Math.round((new Date(delivery.estimatedArrival).getTime() - Date.now()) / (1000 * 60))} min
                       </span>
@@ -107,7 +106,7 @@ export default function MedicalDelivery() {
                       ${delivery.estimatedCost}
                     </span>
                     <Button variant="outline" size="sm">
-                      <map className="h-4 w-4 mr-1" />
+                      <Map className="h-4 w-4 mr-1" />
                       Rastrear
                     </Button>
                   </div>
@@ -121,15 +120,15 @@ export default function MedicalDelivery() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="request" className="flex items-center gap-2">
-            <truck className="w-4 h-4" />
+            <Truck className="w-4 h-4" />
             Solicitar Servicio
           </TabsTrigger>
           <TabsTrigger value="tracking" className="flex items-center gap-2">
-            <map className="w-4 h-4" />
+            <Map className="w-4 h-4" />
             Seguimiento
           </TabsTrigger>
           <TabsTrigger value="history" className="flex items-center gap-2">
-            <clock className="w-4 h-4" />
+            <Clock className="w-4 h-4" />
             Historial
           </TabsTrigger>
         </TabsList>

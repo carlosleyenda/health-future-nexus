@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { clock, truck, Star } from 'lucide-react';
+import { Clock, Truck, Star } from 'lucide-react';
 import { useDeliveryServices, useRateService } from '@/hooks/useDelivery';
 import { useAuthStore } from '@/store/auth';
 
@@ -84,7 +84,7 @@ export default function DeliveryHistory() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <clock className="h-5 w-5 text-blue-600" />
+            <Clock className="h-5 w-5 text-blue-600" />
             Historial de Servicios
           </CardTitle>
         </CardHeader>
@@ -114,7 +114,7 @@ export default function DeliveryHistory() {
         {filteredDeliveries.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
-              <clock className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+              <Clock className="h-12 w-12 mx-auto text-gray-400 mb-4" />
               <p className="text-gray-500">No hay servicios completados</p>
             </CardContent>
           </Card>
@@ -125,7 +125,7 @@ export default function DeliveryHistory() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
-                      <truck className="h-5 w-5 text-gray-400" />
+                      <Truck className="h-5 w-5 text-gray-400" />
                       <h3 className="font-semibold">
                         {getServiceName(delivery.serviceType)}
                       </h3>
