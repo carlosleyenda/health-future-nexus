@@ -1,6 +1,5 @@
 
-import { db } from '@/lib/database';
-import type { DeliveryService as DeliveryServiceType } from '@/lib/database';
+import type { DeliveryService as DeliveryServiceType } from '@/types/index';
 
 export interface DeliveryRequest {
   patientId: string;
@@ -19,7 +18,7 @@ export class DeliveryService {
     return [];
   }
 
-  static async scheduleDelivery(request: DeliveryRequest): Promise<DeliveryServiceType> {
+  static async requestDelivery(request: DeliveryRequest): Promise<DeliveryServiceType> {
     await delay(500);
     const newDelivery: DeliveryServiceType = {
       id: crypto.randomUUID(),

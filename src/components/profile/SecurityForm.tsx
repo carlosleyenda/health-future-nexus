@@ -8,10 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
+import { useAsyncOperation } from '@/hooks/useAsyncOperation';
+import { FormErrorDisplay } from '@/components/error/FormErrorDisplay';
 
 const passwordSchema = z.object({
   currentPassword: z.string().min(1, 'La contraseña actual es requerida'),
-  newPassword: z.string().min(8, 'La nueva contraseña debe tener al menos 8 caracteres'),
+  newPassword: z.string()
+    .min(8, 'La nueva contraseña debe tener al menos 8 caracteres')
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Debe contener al menos una mayúscula, una minúscula y un número'),
   confirmPassword: z.string(),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Las contraseñas no coinciden",
@@ -28,17 +32,28 @@ export default function SecurityForm() {
     },
   });
 
+  const { execute, isLoading, error } = useAsyncOperation({
+    successMessage: 'Contraseña actualizada correctamente',
+    errorMessage: 'Error al actualizar la contraseña',
+  });
+
   const onSubmit = async (data: z.infer<typeof passwordSchema>) => {
-    try {
-      // Simular actualización de contraseña
+    await execute(async () => {
+      // Simulate password update with potential failure
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast.success('Contraseña actualizada correctamente');
+      // Simulate validation error
+      if (data.currentPassword === 'wrong') {
+        throw new Error('La contraseña actual es incorrecta');
+      }
+      
       form.reset();
-    } catch (error) {
-      toast.error('Error al actualizar la contraseña');
-    }
+      return true;
+    });
   };
+
+  // Collect form errors for display
+  const formErrors = Object.values(form.formState.errors).map(error => error.message).filter(Boolean) as string[];
 
   return (
     <Card>
@@ -49,6 +64,11 @@ export default function SecurityForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <FormErrorDisplay 
+          errors={formErrors} 
+          onDismiss={() => form.clearErrors()}
+        />
+        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -93,8 +113,8 @@ export default function SecurityForm() {
               )}
             />
 
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? 'Actualizando...' : 'Actualizar Contraseña'}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Actualizando...' : 'Actualizar Contraseña'}
             </Button>
           </form>
         </Form>
