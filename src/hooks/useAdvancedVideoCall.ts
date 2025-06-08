@@ -13,12 +13,24 @@ interface Participant {
   left_at: string | null;
 }
 
+interface VideoCallState {
+  status: 'idle' | 'connecting' | 'connected' | 'ended';
+  sessionId?: string;
+  callDuration?: number;
+  connectionQuality?: 'excellent' | 'good' | 'poor';
+  isConnected?: boolean;
+  isRecording?: boolean;
+  isVideoEnabled?: boolean;
+  isAudioEnabled?: boolean;
+  isScreenSharing?: boolean;
+}
+
 interface UseAdvancedVideoCall {
   participants: Participant[];
   isRecording: boolean;
   transcript: any[];
   medicalNotes: any[];
-  callState: 'idle' | 'connecting' | 'connected' | 'ended';
+  callState: VideoCallState;
   isTranscribing: boolean;
   localVideoRef: React.RefObject<HTMLVideoElement>;
   remoteVideoRef: React.RefObject<HTMLVideoElement>;
@@ -45,7 +57,17 @@ export const useAdvancedVideoCall = (sessionId: string): UseAdvancedVideoCall =>
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState<any[]>([]);
   const [medicalNotes, setMedicalNotes] = useState<any[]>([]);
-  const [callState, setCallState] = useState<'idle' | 'connecting' | 'connected' | 'ended'>('idle');
+  const [callState, setCallState] = useState<VideoCallState>({
+    status: 'idle',
+    sessionId,
+    callDuration: 0,
+    connectionQuality: 'excellent',
+    isConnected: false,
+    isRecording: false,
+    isVideoEnabled: true,
+    isAudioEnabled: true,
+    isScreenSharing: false
+  });
   const [isTranscribing, setIsTranscribing] = useState(false);
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -53,11 +75,13 @@ export const useAdvancedVideoCall = (sessionId: string): UseAdvancedVideoCall =>
 
   const startRecording = () => {
     setIsRecording(true);
+    setCallState(prev => ({ ...prev, isRecording: true }));
     console.log('Recording started');
   };
 
   const stopRecording = () => {
     setIsRecording(false);
+    setCallState(prev => ({ ...prev, isRecording: false }));
     console.log('Recording stopped');
   };
 
@@ -70,23 +94,36 @@ export const useAdvancedVideoCall = (sessionId: string): UseAdvancedVideoCall =>
   };
 
   const startCall = () => {
-    setCallState('connecting');
-    setTimeout(() => setCallState('connected'), 1000);
+    setCallState(prev => ({ 
+      ...prev, 
+      status: 'connecting',
+      isConnected: false
+    }));
+    setTimeout(() => {
+      setCallState(prev => ({ 
+        ...prev, 
+        status: 'connected',
+        isConnected: true
+      }));
+    }, 1000);
   };
 
   const endCall = () => {
-    setCallState('ended');
+    setCallState(prev => ({ ...prev, status: 'ended', isConnected: false }));
   };
 
   const toggleVideo = () => {
+    setCallState(prev => ({ ...prev, isVideoEnabled: !prev.isVideoEnabled }));
     console.log('Video toggled');
   };
 
   const toggleAudio = () => {
+    setCallState(prev => ({ ...prev, isAudioEnabled: !prev.isAudioEnabled }));
     console.log('Audio toggled');
   };
 
   const toggleScreenShare = () => {
+    setCallState(prev => ({ ...prev, isScreenSharing: !prev.isScreenSharing }));
     console.log('Screen share toggled');
   };
 

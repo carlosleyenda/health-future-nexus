@@ -34,14 +34,14 @@ export class ChatService {
     return {
       id: data.id,
       title: data.title,
-      type: data.type,
+      type: data.type as 'direct' | 'group' | 'broadcast' | 'emergency',
       description: data.description,
       isEncrypted: data.is_encrypted,
       createdBy: data.created_by,
       isActive: data.is_active,
       encryptionKeyId: data.encryption_key_id,
       retentionPolicyDays: data.retention_policy_days,
-      metadata: data.metadata,
+      metadata: (data.metadata as Record<string, any>) || {},
       createdAt: data.created_at,
       updatedAt: data.updated_at
     };
@@ -63,14 +63,14 @@ export class ChatService {
     return data.map(conv => ({
       id: conv.id,
       title: conv.title,
-      type: conv.type,
+      type: conv.type as 'direct' | 'group' | 'broadcast' | 'emergency',
       description: conv.description,
       isEncrypted: conv.is_encrypted,
       createdBy: conv.created_by,
       isActive: conv.is_active,
       encryptionKeyId: conv.encryption_key_id,
       retentionPolicyDays: conv.retention_policy_days,
-      metadata: conv.metadata,
+      metadata: (conv.metadata as Record<string, any>) || {},
       createdAt: conv.created_at,
       updatedAt: conv.updated_at
     }));
@@ -80,7 +80,7 @@ export class ChatService {
   static async addParticipant(
     conversationId: string,
     userId: string,
-    role: 'admin' | 'moderator' | 'member' = 'member'
+    role: 'admin' | 'moderator' | 'participant' | 'read_only' = 'participant'
   ): Promise<ChatParticipant> {
     const { data, error } = await supabase
       .from('chat_participants')
@@ -98,11 +98,11 @@ export class ChatService {
       id: data.id,
       conversationId: data.conversation_id,
       userId: data.user_id,
-      role: data.role,
+      role: data.role as 'admin' | 'moderator' | 'participant' | 'read_only',
       joinedAt: data.joined_at,
       leftAt: data.left_at,
       isActive: data.is_active,
-      notificationPreferences: data.notification_preferences
+      notificationPreferences: (data.notification_preferences as { push: boolean; email: boolean; sms: boolean; }) || { push: true, email: true, sms: false }
     };
   }
 
@@ -110,9 +110,9 @@ export class ChatService {
   static async sendMessage(
     conversationId: string,
     content: string,
-    messageType: 'text' | 'image' | 'file' | 'voice' | 'video' | 'location' = 'text',
+    messageType: 'text' | 'image' | 'file' | 'voice' | 'video' | 'system' | 'template' = 'text',
     replyToMessageId?: string,
-    priority: 'low' | 'normal' | 'high' | 'urgent' = 'normal'
+    priority: 'low' | 'normal' | 'high' | 'emergency' = 'normal'
   ): Promise<ChatMessage> {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) throw new Error('Not authenticated');
@@ -137,14 +137,14 @@ export class ChatService {
       conversationId: data.conversation_id,
       senderId: data.sender_id,
       content: data.content,
-      messageType: data.message_type,
+      messageType: data.message_type as 'text' | 'image' | 'file' | 'voice' | 'video' | 'system' | 'template',
       replyToMessageId: data.reply_to_message_id,
       isEdited: data.is_edited,
       isDeleted: data.is_deleted,
-      priority: data.priority,
+      priority: data.priority as 'low' | 'normal' | 'high' | 'emergency',
       encryptedContent: data.encrypted_content,
       expiresAt: data.expires_at,
-      metadata: data.metadata,
+      metadata: (data.metadata as Record<string, any>) || {},
       createdAt: data.created_at,
       updatedAt: data.updated_at
     };
@@ -170,14 +170,14 @@ export class ChatService {
       conversationId: msg.conversation_id,
       senderId: msg.sender_id,
       content: msg.content,
-      messageType: msg.message_type,
+      messageType: msg.message_type as 'text' | 'image' | 'file' | 'voice' | 'video' | 'system' | 'template',
       replyToMessageId: msg.reply_to_message_id,
       isEdited: msg.is_edited,
       isDeleted: msg.is_deleted,
-      priority: msg.priority,
+      priority: msg.priority as 'low' | 'normal' | 'high' | 'emergency',
       encryptedContent: msg.encrypted_content,
       expiresAt: msg.expires_at,
-      metadata: msg.metadata,
+      metadata: (msg.metadata as Record<string, any>) || {},
       createdAt: msg.created_at,
       updatedAt: msg.updated_at
     }));
@@ -203,7 +203,7 @@ export class ChatService {
       title: template.title,
       content: template.content,
       category: template.category,
-      variables: template.variables,
+      variables: (template.variables as string[]) || [],
       isSystemTemplate: template.is_system_template,
       createdBy: template.created_by,
       usageCount: template.usage_count,

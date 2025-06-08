@@ -1,15 +1,17 @@
 
+// Chat-related type definitions
+
 export interface ChatConversation {
   id: string;
+  title: string;
   type: 'direct' | 'group' | 'broadcast' | 'emergency';
-  title?: string;
   description?: string;
-  createdBy: string;
   isEncrypted: boolean;
-  encryptionKeyId?: string;
-  retentionPolicyDays: number;
+  createdBy: string;
   isActive: boolean;
-  metadata: Record<string, any>;
+  encryptionKeyId?: string;
+  retentionPolicyDays?: number;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }
@@ -22,7 +24,7 @@ export interface ChatParticipant {
   joinedAt: string;
   leftAt?: string;
   isActive: boolean;
-  notificationPreferences: {
+  notificationPreferences?: {
     push: boolean;
     email: boolean;
     sms: boolean;
@@ -33,38 +35,50 @@ export interface ChatMessage {
   id: string;
   conversationId: string;
   senderId: string;
-  messageType: 'text' | 'voice' | 'file' | 'image' | 'video' | 'template' | 'system';
   content?: string;
-  encryptedContent?: string;
-  metadata: Record<string, any>;
+  messageType: 'text' | 'image' | 'file' | 'voice' | 'video' | 'system' | 'template';
   replyToMessageId?: string;
   isEdited: boolean;
   isDeleted: boolean;
   priority: 'low' | 'normal' | 'high' | 'emergency';
+  encryptedContent?: string;
   expiresAt?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface MessageTemplate {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  variables: string[];
+  isSystemTemplate: boolean;
+  createdBy: string;
+  usageCount: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface SmartReply {
+  id: string;
+  conversationId: string;
+  replyText: string;
+  confidenceScore: number;
+  contextHash: string;
+  suggestedForUserId: string;
+  isUsed: boolean;
+  expiresAt: string;
+  createdAt: string;
 }
 
 export interface MessageStatus {
   id: string;
   messageId: string;
   userId: string;
-  status: 'sent' | 'delivered' | 'read' | 'failed';
+  status: 'sent' | 'delivered' | 'read';
   timestamp: string;
-}
-
-export interface MessageTemplate {
-  id: string;
-  createdBy: string;
-  category: string;
-  title: string;
-  content: string;
-  variables: string[];
-  isSystemTemplate: boolean;
-  usageCount: number;
-  isActive: boolean;
-  createdAt: string;
 }
 
 export interface ChatAttachment {
@@ -74,53 +88,8 @@ export interface ChatAttachment {
   fileType: string;
   fileSize: number;
   storagePath: string;
-  encryptionKeyId?: string;
-  virusScanStatus: 'pending' | 'clean' | 'infected' | 'failed';
   isMedicalDocument: boolean;
-  createdAt: string;
-}
-
-export interface SmartReply {
-  id: string;
-  conversationId: string;
-  suggestedForUserId: string;
-  replyText: string;
-  confidenceScore?: number;
-  contextHash?: string;
-  isUsed: boolean;
-  createdAt: string;
-  expiresAt: string;
-}
-
-export interface ChatTranslation {
-  id: string;
-  messageId: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-  translatedContent: string;
-  translationService: string;
-  confidenceScore?: number;
-  createdAt: string;
-}
-
-export interface EmergencyEscalationRule {
-  id: string;
-  createdBy: string;
-  ruleName: string;
-  triggerConditions: Record<string, any>;
-  escalationLevels: Record<string, any>;
-  isActive: boolean;
-  createdAt: string;
-}
-
-export interface ChatAuditLog {
-  id: string;
-  userId?: string;
-  action: string;
-  resourceType: string;
-  resourceId?: string;
-  ipAddress?: string;
-  userAgent?: string;
-  details: Record<string, any>;
+  encryptionKeyId?: string;
+  virusScanStatus?: 'pending' | 'clean' | 'infected';
   createdAt: string;
 }

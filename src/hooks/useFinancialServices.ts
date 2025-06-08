@@ -1,101 +1,73 @@
 
-import { useState, useCallback } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AdvancedPaymentService } from '@/services/financial/paymentService';
-import { HealthWallet, FinancialTransaction, PaymentMethod } from '@/types/financial';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { PaymentService } from '@/services/financial/paymentService';
+import { useAuthStore } from '@/store/auth';
 import { toast } from 'sonner';
+import type { 
+  PaymentMethod, 
+  Transaction, 
+  HealthWallet, 
+  Invoice, 
+  InsuranceClaim,
+  Subscription,
+  HealthSavingsGoal
+} from '@/types/financial';
 
-export const useHealthWallet = (userId: string) => {
+export const useHealthWallet = () => {
+  const { user } = useAuthStore();
+  
   return useQuery({
-    queryKey: ['health-wallet', userId],
-    queryFn: () => AdvancedPaymentService.getHealthWallet(userId),
+    queryKey: ['health-wallet', user?.id],
+    queryFn: () => PaymentService.getHealthWallet(user?.id || ''),
+    enabled: !!user,
+  });
+};
+
+export const useTransactions = (userId?: string) => {
+  return useQuery({
+    queryKey: ['transactions', userId],
+    queryFn: () => PaymentService.getTransactions(userId || ''),
     enabled: !!userId,
   });
 };
 
-export const useFinancialTransactions = (userId: string, limit: number = 50) => {
+export const usePaymentMethods = (userId?: string) => {
   return useQuery({
-    queryKey: ['financial-transactions', userId, limit],
-    queryFn: () => AdvancedPaymentService.getUserTransactions(userId, limit),
+    queryKey: ['payment-methods', userId],
+    queryFn: () => PaymentService.getPaymentMethods(userId || ''),
     enabled: !!userId,
   });
 };
 
-export const useCreatePaymentIntent = () => {
-  return useMutation({
-    mutationFn: ({ amount, currency, metadata }: { 
-      amount: number; 
-      currency?: string; 
-      metadata?: any 
-    }) => AdvancedPaymentService.createStripePaymentIntent(amount, currency, metadata),
-    onSuccess: () => {
-      toast.success('Payment intent created successfully');
-    },
-    onError: (error) => {
-      console.error('Payment intent error:', error);
-      toast.error('Failed to create payment intent');
-    },
+export const useInvoices = (userId?: string) => {
+  return useQuery({
+    queryKey: ['invoices', userId],
+    queryFn: () => PaymentService.getInvoices(userId || ''),
+    enabled: !!userId,
   });
 };
 
-export const useUpdateWalletBalance = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: ({ userId, amount, type }: { 
-      userId: string; 
-      amount: number; 
-      type: 'add' | 'subtract' 
-    }) => AdvancedPaymentService.updateWalletBalance(userId, amount, type),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['health-wallet', variables.userId] });
-      queryClient.invalidateQueries({ queryKey: ['financial-transactions', variables.userId] });
-      toast.success('Wallet balance updated successfully');
-    },
-    onError: (error) => {
-      console.error('Wallet update error:', error);
-      toast.error('Failed to update wallet balance');
-    },
+export const useInsuranceClaims = (userId?: string) => {
+  return useQuery({
+    queryKey: ['insurance-claims', userId],
+    queryFn: () => PaymentService.getInsuranceClaims(userId || ''),
+    enabled: !!userId,
   });
 };
 
-export const useAwardHealthCoins = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: ({ userId, coins, reason }: { 
-      userId: string; 
-      coins: number; 
-      reason: string 
-    }) => AdvancedPaymentService.awardHealthCoins(userId, coins, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['health-wallet', variables.userId] });
-      toast.success(`${variables.coins} HealthCoins awarded!`);
-    },
-    onError: (error) => {
-      console.error('HealthCoins award error:', error);
-      toast.error('Failed to award HealthCoins');
-    },
+export const useSubscriptions = (userId?: string) => {
+  return useQuery({
+    queryKey: ['subscriptions', userId],
+    queryFn: () => PaymentService.getSubscriptions(userId || ''),
+    enabled: !!userId,
   });
 };
 
-export const useProcessCashback = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: ({ userId, transactionAmount, percentage }: { 
-      userId: string; 
-      transactionAmount: number; 
-      percentage?: number 
-    }) => AdvancedPaymentService.processCashback(userId, transactionAmount, percentage),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['health-wallet', variables.userId] });
-      toast.success('Cashback processed successfully!');
-    },
-    onError: (error) => {
-      console.error('Cashback processing error:', error);
-      toast.error('Failed to process cashback');
-    },
+export const useHealthSavingsGoals = (userId?: string) => {
+  return useQuery({
+    queryKey: ['health-savings-goals', userId],
+    queryFn: () => PaymentService.getHealthSavingsGoals(userId || ''),
+    enabled: !!userId,
   });
 };
 
@@ -103,15 +75,15 @@ export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (transaction: Omit<FinancialTransaction, 'id' | 'createdAt'>) => 
-      AdvancedPaymentService.createTransaction(transaction),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['financial-transactions', variables.userId] });
-      toast.success('Transaction created successfully');
+    mutationFn: (transaction: Omit<Transaction, 'id' | 'createdAt' | 'completedAt'>) =>
+      PaymentService.createTransaction(transaction),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['health-wallet'] });
+      toast.success('Transacción creada exitosamente');
     },
-    onError: (error) => {
-      console.error('Transaction creation error:', error);
-      toast.error('Failed to create transaction');
+    onError: () => {
+      toast.error('Error al crear la transacción');
     },
   });
 };
@@ -120,81 +92,110 @@ export const useAddPaymentMethod = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (paymentMethod: Omit<PaymentMethod, 'id' | 'createdAt' | 'updatedAt'>) => 
-      AdvancedPaymentService.addPaymentMethod(paymentMethod),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['payment-methods', variables.userId] });
-      toast.success('Payment method added successfully');
+    mutationFn: (paymentMethod: Omit<PaymentMethod, 'id' | 'createdAt' | 'updatedAt'>) =>
+      PaymentService.addPaymentMethod(paymentMethod),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payment-methods'] });
+      toast.success('Método de pago agregado exitosamente');
     },
-    onError: (error) => {
-      console.error('Payment method addition error:', error);
-      toast.error('Failed to add payment method');
+    onError: () => {
+      toast.error('Error al agregar método de pago');
     },
   });
 };
 
-export const useExchangeRate = (from: string, to: string) => {
-  return useQuery({
-    queryKey: ['exchange-rate', from, to],
-    queryFn: () => AdvancedPaymentService.getExchangeRate(from, to),
-    enabled: !!from && !!to,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+export const useCreateInvoice = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (invoice: Omit<Invoice, 'id' | 'createdAt' | 'updatedAt'>) =>
+      PaymentService.createInvoice(invoice),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      toast.success('Factura creada exitosamente');
+    },
+    onError: () => {
+      toast.error('Error al crear la factura');
+    },
   });
 };
 
 export const useSubmitInsuranceClaim = () => {
+  const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: (claim: any) => AdvancedPaymentService.submitInsuranceClaim(claim),
+    mutationFn: (claim: Omit<InsuranceClaim, 'id' | 'createdAt' | 'updatedAt'>) =>
+      PaymentService.submitInsuranceClaim(claim),
     onSuccess: () => {
-      toast.success('Insurance claim submitted successfully');
+      queryClient.invalidateQueries({ queryKey: ['insurance-claims'] });
+      toast.success('Reclamo de seguro enviado exitosamente');
     },
-    onError: (error) => {
-      console.error('Insurance claim error:', error);
-      toast.error('Failed to submit insurance claim');
+    onError: () => {
+      toast.error('Error al enviar el reclamo de seguro');
     },
   });
 };
 
-export const useFraudCheck = () => {
+export const useCreateSubscription = () => {
+  const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: (transaction: any) => AdvancedPaymentService.checkForFraud(transaction),
-    onSuccess: (result) => {
-      if (result.isHighRisk) {
-        toast.warning('Transaction flagged for review due to high risk score');
-      }
+    mutationFn: (subscription: Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>) =>
+      PaymentService.createSubscription(subscription),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscriptions'] });
+      toast.success('Suscripción creada exitosamente');
     },
-    onError: (error) => {
-      console.error('Fraud check error:', error);
+    onError: () => {
+      toast.error('Error al crear la suscripción');
     },
   });
 };
 
-// Cryptocurrency payment hooks
-export const useCryptoPayment = () => {
+export const useCreateHealthSavingsGoal = () => {
+  const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: ({ amount, currency }: { amount: number; currency?: string }) => 
-      AdvancedPaymentService.createCryptoPayment(amount, currency),
+    mutationFn: (goal: Omit<HealthSavingsGoal, 'id' | 'createdAt' | 'updatedAt'>) =>
+      PaymentService.createHealthSavingsGoal(goal),
     onSuccess: () => {
-      toast.success('Crypto payment initiated');
+      queryClient.invalidateQueries({ queryKey: ['health-savings-goals'] });
+      toast.success('Meta de ahorro creada exitosamente');
     },
-    onError: (error) => {
-      console.error('Crypto payment error:', error);
-      toast.error('Failed to initiate crypto payment');
+    onError: () => {
+      toast.error('Error al crear la meta de ahorro');
     },
   });
 };
 
-// PayPal payment hooks
-export const usePayPalPayment = () => {
-  return useMutation({
-    mutationFn: ({ amount, currency }: { amount: number; currency?: string }) => 
-      AdvancedPaymentService.createPayPalOrder(amount, currency),
-    onSuccess: () => {
-      toast.success('PayPal payment initiated');
-    },
-    onError: (error) => {
-      console.error('PayPal payment error:', error);
-      toast.error('Failed to initiate PayPal payment');
-    },
+export const useExchangeRates = () => {
+  return useQuery({
+    queryKey: ['exchange-rates'],
+    queryFn: () => PaymentService.getExchangeRates(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: 5 * 60 * 1000,
+  });
+};
+
+export const useKycVerification = (userId?: string) => {
+  return useQuery({
+    queryKey: ['kyc-verification', userId],
+    queryFn: () => PaymentService.getKycVerification(userId || ''),
+    enabled: !!userId,
+  });
+};
+
+export const useFraudAlerts = () => {
+  return useQuery({
+    queryKey: ['fraud-alerts'],
+    queryFn: () => PaymentService.getFraudAlerts(),
+  });
+};
+
+export const useTaxDocuments = (userId?: string) => {
+  return useQuery({
+    queryKey: ['tax-documents', userId],
+    queryFn: () => PaymentService.getTaxDocuments(userId || ''),
+    enabled: !!userId,
   });
 };

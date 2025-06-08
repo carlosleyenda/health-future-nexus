@@ -1,66 +1,10 @@
 
-export interface HealthWallet {
-  id: string;
-  userId: string;
-  balance: number;
-  currency: string;
-  healthCoins: number;
-  cashbackEarned: number;
-  loyaltyTier: LoyaltyTier;
-  hsaConnected?: boolean;
-  cryptoEnabled?: boolean;
-  autoPayEnabled?: boolean;
-}
-
-export type LoyaltyTier = 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
-
-export interface FinancialTransaction {
-  id: string;
-  userId: string;
-  type: TransactionType;
-  amount: number;
-  currency: string;
-  status: PaymentStatus;
-  description: string;
-  appointmentId?: string;
-  deliveryServiceId?: string;
-  pharmacyOrderId?: string;
-  createdAt: string;
-  completedAt?: string;
-  paymentMethod: PaymentMethod;
-  healthCoinsEarned?: number;
-  cashbackAmount?: number;
-}
-
-export type TransactionType = 
-  | 'consultation'
-  | 'prescription'
-  | 'delivery_service'
-  | 'pharmacy_order'
-  | 'insurance_claim'
-  | 'refund'
-  | 'cashback'
-  | 'health_coins'
-  | 'subscription'
-  | 'medical_loan';
-
-export type PaymentMethod = 
-  | 'credit_card'
-  | 'debit_card'
-  | 'bank_transfer'
-  | 'digital_wallet'
-  | 'cryptocurrency'
-  | 'health_coins'
-  | 'insurance'
-  | 'hsa_fsa'
-  | 'medical_financing';
-
-export type PaymentStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+// Financial system types
 
 export interface PaymentMethod {
   id: string;
   userId: string;
-  type: PaymentMethodType;
+  type: 'credit_card' | 'debit_card' | 'bank_account' | 'digital_wallet' | 'crypto_wallet' | 'hsa_fsa';
   provider: string;
   externalId: string;
   isDefault: boolean;
@@ -70,20 +14,50 @@ export interface PaymentMethod {
   expiryYear?: number;
   country?: string;
   currency: string;
-  billingAddress?: any;
+  billingAddress?: Record<string, any>;
   isVerified: boolean;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-export type PaymentMethodType = 
-  | 'credit_card'
-  | 'debit_card'
-  | 'bank_account'
-  | 'digital_wallet'
-  | 'crypto_wallet'
-  | 'hsa_fsa';
+export interface Transaction {
+  id: string;
+  userId: string;
+  type: 'consultation' | 'prescription' | 'delivery_service' | 'pharmacy_order' | 'insurance_claim' | 'refund' | 'cashback' | 'health_coins' | 'subscription' | 'medical_loan';
+  amount: number;
+  currency: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+  description: string;
+  appointmentId?: string;
+  deliveryServiceId?: string;
+  pharmacyOrderId?: string;
+  paymentMethod: string;
+  paymentProvider?: string;
+  externalTransactionId?: string;
+  healthCoinsEarned: number;
+  cashbackAmount: number;
+  taxAmount: number;
+  insuranceCoveredAmount: number;
+  metadata: Record<string, any>;
+  createdAt: string;
+  completedAt?: string;
+}
+
+export interface HealthWallet {
+  id: string;
+  userId: string;
+  balance: number;
+  currency: string;
+  healthCoins: number;
+  cashbackEarned: number;
+  loyaltyTier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+  hsaConnected: boolean;
+  cryptoEnabled: boolean;
+  autoPayEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Invoice {
   id: string;
@@ -91,30 +65,26 @@ export interface Invoice {
   userId: string;
   doctorId?: string;
   appointmentId?: string;
-  status: InvoiceStatus;
+  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled' | 'refunded';
   subtotal: number;
   taxAmount: number;
-  discountAmount?: number;
+  discountAmount: number;
   totalAmount: number;
   currency: string;
   dueDate?: string;
   paidAt?: string;
   paymentTerms: string;
   notes?: string;
-  billingAddress?: any;
-  lineItems: InvoiceLineItem[];
-  metadata?: any;
+  billingAddress?: Record<string, any>;
+  lineItems: Array<{
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+  }>;
+  metadata: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-}
-
-export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled' | 'refunded';
-
-export interface InvoiceLineItem {
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
 }
 
 export interface InsuranceClaim {
@@ -124,7 +94,7 @@ export interface InsuranceClaim {
   claimNumber: string;
   insuranceProvider: string;
   policyNumber: string;
-  status: ClaimStatus;
+  status: 'draft' | 'submitted' | 'processing' | 'approved' | 'denied' | 'paid';
   claimAmount: number;
   approvedAmount?: number;
   diagnosisCodes: string[];
@@ -132,19 +102,17 @@ export interface InsuranceClaim {
   submittedAt?: string;
   processedAt?: string;
   denialReason?: string;
-  metadata?: any;
+  metadata: Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }
-
-export type ClaimStatus = 'draft' | 'submitted' | 'processing' | 'approved' | 'denied' | 'paid';
 
 export interface Subscription {
   id: string;
   userId: string;
   planName: string;
-  status: SubscriptionStatus;
-  billingCycle: BillingCycle;
+  status: 'active' | 'past_due' | 'cancelled' | 'paused' | 'trial';
+  billingCycle: 'monthly' | 'quarterly' | 'yearly';
   amount: number;
   currency: string;
   trialEndsAt?: string;
@@ -153,14 +121,11 @@ export interface Subscription {
   cancelledAt?: string;
   provider: string;
   externalSubscriptionId: string;
-  paymentMethodId?: string;
-  metadata?: any;
+  paymentMethodId: string;
+  metadata: Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }
-
-export type SubscriptionStatus = 'active' | 'past_due' | 'cancelled' | 'paused' | 'trial';
-export type BillingCycle = 'monthly' | 'quarterly' | 'yearly';
 
 export interface CurrencyRate {
   id: string;
@@ -172,11 +137,11 @@ export interface CurrencyRate {
   createdAt: string;
 }
 
-export interface KYCVerification {
+export interface KycVerification {
   id: string;
   userId: string;
-  status: KYCStatus;
-  verificationLevel: VerificationLevel;
+  status: 'pending' | 'verified' | 'rejected' | 'expired';
+  verificationLevel: 'basic' | 'enhanced' | 'premium';
   identityVerified: boolean;
   addressVerified: boolean;
   phoneVerified: boolean;
@@ -187,39 +152,43 @@ export interface KYCVerification {
   riskScore?: number;
   verificationDate?: string;
   rejectionReason?: string;
-  metadata?: any;
+  metadata: Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }
-
-export type KYCStatus = 'pending' | 'verified' | 'rejected' | 'expired';
-export type VerificationLevel = 'basic' | 'enhanced' | 'premium';
 
 export interface FraudAlert {
   id: string;
   userId?: string;
   transactionId?: string;
-  alertType: FraudAlertType;
+  alertType: 'suspicious_activity' | 'velocity_check' | 'geolocation' | 'device_fingerprint' | 'amount_threshold';
   riskScore: number;
-  status: FraudStatus;
+  status: 'open' | 'investigating' | 'resolved' | 'false_positive';
   description: string;
   triggeredRules: string[];
   ipAddress?: string;
-  deviceInfo?: any;
+  deviceInfo?: Record<string, any>;
   reviewedBy?: string;
   reviewedAt?: string;
   resolutionNotes?: string;
   createdAt: string;
 }
 
-export type FraudAlertType = 
-  | 'suspicious_activity'
-  | 'velocity_check'
-  | 'geolocation'
-  | 'device_fingerprint'
-  | 'amount_threshold';
-
-export type FraudStatus = 'open' | 'investigating' | 'resolved' | 'false_positive';
+export interface TaxDocument {
+  id: string;
+  userId: string;
+  documentType: '1099' | 'invoice' | 'receipt' | 'statement';
+  taxYear: number;
+  totalAmount: number;
+  taxAmount: number;
+  currency: string;
+  jurisdiction: string;
+  documentUrl?: string;
+  status: 'draft' | 'generated' | 'sent' | 'filed';
+  metadata: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface HealthSavingsGoal {
   id: string;
@@ -232,9 +201,7 @@ export interface HealthSavingsGoal {
   category?: string;
   isActive: boolean;
   autoContributeAmount?: number;
-  autoContributeFrequency?: ContributionFrequency;
+  autoContributeFrequency?: 'weekly' | 'monthly' | 'quarterly';
   createdAt: string;
   updatedAt: string;
 }
-
-export type ContributionFrequency = 'weekly' | 'monthly' | 'quarterly';
