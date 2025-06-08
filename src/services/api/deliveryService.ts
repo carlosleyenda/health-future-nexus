@@ -1,6 +1,14 @@
 
 import { db } from '@/lib/database';
-import type { DeliveryService as DeliveryServiceType, DeliveryRequest } from '@/lib/database';
+import type { DeliveryService as DeliveryServiceType } from '@/lib/database';
+
+export interface DeliveryRequest {
+  patientId: string;
+  serviceType: string;
+  scheduledDate: string;
+  address: string;
+  notes?: string;
+}
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 

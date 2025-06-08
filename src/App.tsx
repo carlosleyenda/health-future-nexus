@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ import { PatientDashboard } from "@/components/dashboard/PatientDashboard";
 import { DoctorDashboard } from "@/components/dashboard/DoctorDashboard";
 import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
 import UserProfile from "@/components/profile/UserProfile";
+import HealthMonitoring from "@/components/health/HealthMonitoring";
 
 const queryClient = new QueryClient();
 
@@ -112,7 +112,7 @@ const App = () => (
               <MainLayout />
             </ProtectedRoute>
           }>
-            <Route index element={<div>Health Dashboard</div>} />
+            <Route index element={<HealthMonitoring />} />
           </Route>
           
           <Route path="/medical-history" element={
