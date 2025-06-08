@@ -2,8 +2,13 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, UserPlus, Settings, FileText, Database, TrendingUp, AlertTriangle, Activity, BarChart3, Monitor, Globe, Bot, Shield, Smartphone, TestTube } from "lucide-react";
+import { Users, UserPlus, Settings, FileText, Database, TrendingUp, AlertTriangle, Activity, BarChart3, Monitor, Globe, Bot, Shield, Smartphone, TestTube, Calendar, Package, Stethoscope, Bell } from "lucide-react";
 import UserManagement from '@/components/admin/UserManagement';
+import DoctorManagement from '@/components/admin/DoctorManagement';
+import PatientManagement from '@/components/admin/PatientManagement';
+import AppointmentManagement from '@/components/admin/AppointmentManagement';
+import InventoryManagement from '@/components/admin/InventoryManagement';
+import SystemAlertsManagement from '@/components/admin/SystemAlertsManagement';
 import SystemConfiguration from '@/components/admin/SystemConfiguration';
 import { ReportsGenerator } from '@/components/admin/ReportsGenerator';
 import { DatabaseManagement } from '@/components/admin/DatabaseManagement';
@@ -16,7 +21,7 @@ import QualityAssuranceDashboard from '@/components/testing/QualityAssuranceDash
 import ComplianceDashboard from '@/components/compliance/ComplianceDashboard';
 import IoTDashboard from '@/components/iot/IoTDashboard';
 
-type AdminView = 'dashboard' | 'users' | 'config' | 'reports' | 'database' | 'analytics' | 'monitoring' | 'executive' | 'global' | 'automation' | 'qa' | 'compliance' | 'iot';
+type AdminView = 'dashboard' | 'users' | 'doctors' | 'patients' | 'appointments' | 'inventory' | 'alerts' | 'config' | 'reports' | 'database' | 'analytics' | 'monitoring' | 'executive' | 'global' | 'automation' | 'qa' | 'compliance' | 'iot';
 
 export default function AdminDashboard() {
   const [activeView, setActiveView] = useState<AdminView>('dashboard');
@@ -60,6 +65,16 @@ export default function AdminDashboard() {
     switch (activeView) {
       case 'users':
         return <UserManagement />;
+      case 'doctors':
+        return <DoctorManagement />;
+      case 'patients':
+        return <PatientManagement />;
+      case 'appointments':
+        return <AppointmentManagement />;
+      case 'inventory':
+        return <InventoryManagement />;
+      case 'alerts':
+        return <SystemAlertsManagement />;
       case 'config':
         return <SystemConfiguration />;
       case 'reports':
@@ -107,13 +122,13 @@ export default function AdminDashboard() {
               ))}
             </div>
 
-            {/* Core Administration */}
+            {/* Gestión Principal */}
             <Card>
               <CardHeader>
-                <CardTitle>Administración Principal</CardTitle>
+                <CardTitle>Gestión Principal</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <Button 
                     onClick={() => setActiveView('users')} 
                     variant="outline" 
@@ -123,11 +138,62 @@ export default function AdminDashboard() {
                     <span className="text-sm font-medium">Gestionar Usuarios</span>
                   </Button>
                   <Button 
-                    onClick={() => setActiveView('config')} 
+                    onClick={() => setActiveView('doctors')} 
+                    variant="outline" 
+                    className="h-auto flex-col py-6 hover:bg-green-50 border-green-200"
+                  >
+                    <Stethoscope className="h-8 w-8 mb-2 text-green-600" />
+                    <span className="text-sm font-medium">Gestionar Médicos</span>
+                  </Button>
+                  <Button 
+                    onClick={() => setActiveView('patients')} 
+                    variant="outline" 
+                    className="h-auto flex-col py-6 hover:bg-purple-50 border-purple-200"
+                  >
+                    <Users className="h-8 w-8 mb-2 text-purple-600" />
+                    <span className="text-sm font-medium">Gestionar Pacientes</span>
+                  </Button>
+                  <Button 
+                    onClick={() => setActiveView('appointments')} 
                     variant="outline" 
                     className="h-auto flex-col py-6 hover:bg-orange-50 border-orange-200"
                   >
-                    <Settings className="h-8 w-8 mb-2 text-orange-600" />
+                    <Calendar className="h-8 w-8 mb-2 text-orange-600" />
+                    <span className="text-sm font-medium">Gestionar Citas</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Operaciones y Recursos */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Operaciones y Recursos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Button 
+                    onClick={() => setActiveView('inventory')} 
+                    variant="outline" 
+                    className="h-auto flex-col py-6 hover:bg-indigo-50 border-indigo-200"
+                  >
+                    <Package className="h-8 w-8 mb-2 text-indigo-600" />
+                    <span className="text-sm font-medium">Inventario</span>
+                  </Button>
+                  <Button 
+                    onClick={() => setActiveView('alerts')} 
+                    variant="outline" 
+                    className="h-auto flex-col py-6 hover:bg-red-50 border-red-200"
+                  >
+                    <Bell className="h-8 w-8 mb-2 text-red-600" />
+                    <span className="text-sm font-medium">Alertas Sistema</span>
+                  </Button>
+                  <Button 
+                    onClick={() => setActiveView('config')} 
+                    variant="outline" 
+                    className="h-auto flex-col py-6 hover:bg-gray-50 border-gray-200"
+                  >
+                    <Settings className="h-8 w-8 mb-2 text-gray-600" />
                     <span className="text-sm font-medium">Configuración</span>
                   </Button>
                   <Button 
@@ -142,7 +208,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {/* Analytics & Intelligence */}
+            {/* Analytics e Inteligencia */}
             <Card>
               <CardHeader>
                 <CardTitle>Analytics e Inteligencia</CardTitle>
@@ -177,10 +243,10 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {/* Operations & Monitoring */}
+            {/* Monitoreo y Automatización */}
             <Card>
               <CardHeader>
-                <CardTitle>Operaciones y Monitoreo</CardTitle>
+                <CardTitle>Monitoreo y Automatización</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -212,7 +278,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {/* Global & Compliance */}
+            {/* Global y Cumplimiento */}
             <Card>
               <CardHeader>
                 <CardTitle>Global y Cumplimiento</CardTitle>
@@ -247,7 +313,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {/* Recent Activity */}
+            {/* Actividad Reciente */}
             <Card>
               <CardHeader>
                 <CardTitle>Actividad Reciente</CardTitle>
@@ -256,39 +322,39 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   {[
                     { 
+                      action: 'Nuevo médico registrado', 
+                      user: 'Dr. Luis Fernández', 
+                      time: 'Hace 1 minuto',
+                      type: 'doctor',
+                      status: 'success'
+                    },
+                    { 
+                      action: 'Inventario bajo', 
+                      user: 'Sistema', 
+                      time: 'Hace 2 minutos',
+                      type: 'inventory',
+                      status: 'warning'
+                    },
+                    { 
                       action: 'Nuevo usuario registrado', 
                       user: 'Dr. Ana García', 
-                      time: 'Hace 2 minutos',
+                      time: 'Hace 5 minutos',
                       type: 'user',
                       status: 'success'
                     },
                     { 
                       action: 'Cita programada', 
                       user: 'Juan Pérez', 
-                      time: 'Hace 5 minutos',
+                      time: 'Hace 8 minutos',
                       type: 'appointment',
-                      status: 'info'
-                    },
-                    { 
-                      action: 'Pago procesado', 
-                      user: 'María López', 
-                      time: 'Hace 10 minutos',
-                      type: 'payment',
-                      status: 'success'
-                    },
-                    { 
-                      action: 'Sistema optimizado', 
-                      user: 'Sistema', 
-                      time: 'Hace 1 hora',
-                      type: 'system',
                       status: 'info'
                     },
                     { 
                       action: 'Alerta de seguridad', 
                       user: 'Sistema', 
-                      time: 'Hace 2 horas',
+                      time: 'Hace 15 minutos',
                       type: 'security',
-                      status: 'warning'
+                      status: 'error'
                     }
                   ].map((activity, index) => (
                     <div key={index} className="flex items-center justify-between py-3 px-4 border rounded-lg hover:bg-gray-50">
