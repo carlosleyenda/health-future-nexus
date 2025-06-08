@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { User, Calendar, Phone } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import type { User as UserType } from '@/types';
 
 interface MobileMenuProps {
@@ -84,13 +84,14 @@ export default function MobileMenu({
           // Menú móvil para usuarios no autenticados
           <>
             {navigation.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
+                onClick={onMenuClose}
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
             <div className="pt-4 pb-2 space-y-2">
               <Button 

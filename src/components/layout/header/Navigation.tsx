@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface NavigationProps {
   isAuthenticated: boolean;
@@ -21,13 +22,13 @@ export default function Navigation({ isAuthenticated }: NavigationProps) {
   return (
     <nav className="hidden md:flex space-x-8">
       {navigation.map((item) => (
-        <a
+        <Link
           key={item.name}
-          href={item.href}
+          to={item.href}
           className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
         >
           {item.name}
-        </a>
+        </Link>
       ))}
     </nav>
   );

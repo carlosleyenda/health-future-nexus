@@ -5,6 +5,10 @@ import { useAuthStore } from '@/store/auth';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Index from '../pages/Index';
+import Especialidades from '../pages/public/Especialidades';
+import Servicios from '../pages/public/Servicios';
+import Nosotros from '../pages/public/Nosotros';
+import Contacto from '../pages/public/Contacto';
 import NotFound from '../pages/NotFound';
 import { AuthPage } from '../pages/auth/AuthPage';
 import MainLayout from '@/components/layout/MainLayout';
@@ -38,6 +42,54 @@ export default function AppRoutes() {
             <Header />
             <main className="flex-1">
               <Index />
+            </main>
+            <Footer />
+          </div>
+        </PublicRoute>
+      } />
+      
+      <Route path="/especialidades" element={
+        <PublicRoute>
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1">
+              <Especialidades />
+            </main>
+            <Footer />
+          </div>
+        </PublicRoute>
+      } />
+      
+      <Route path="/servicios" element={
+        <PublicRoute>
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1">
+              <Servicios />
+            </main>
+            <Footer />
+          </div>
+        </PublicRoute>
+      } />
+      
+      <Route path="/nosotros" element={
+        <PublicRoute>
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1">
+              <Nosotros />
+            </main>
+            <Footer />
+          </div>
+        </PublicRoute>
+      } />
+      
+      <Route path="/contacto" element={
+        <PublicRoute>
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1">
+              <Contacto />
             </main>
             <Footer />
           </div>
