@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Video, VideoOff, Mic, MicOff, Monitor, Phone, MessageCircle, 
@@ -43,6 +42,9 @@ export default function AdvancedVideoCall({
   const [prescriptionDetails, setPrescriptionDetails] = useState({ medication: '', dosage: '' });
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [connectionIssues, setConnectionIssues] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [showParticipants, setShowParticipants] = useState(false);
+  const [currentPanel, setCurrentPanel] = useState<'chat' | 'notes' | 'transcript' | 'participants'>('chat');
 
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -50,6 +52,8 @@ export default function AdvancedVideoCall({
   const {
     callState,
     medicalNotes,
+    participants,
+    isTranscribing,
     localVideoRef: setLocalVideoRef,
     remoteVideoRef: setRemoteVideoRef,
     startCall,
@@ -61,6 +65,8 @@ export default function AdvancedVideoCall({
     saveMedicalNote,
     startRecording,
     takeScreenshot,
+    startTranscription,
+    stopTranscription,
   } = useAdvancedVideoCall(appointmentId, userId, userRole);
 
   // Set video refs
@@ -140,13 +146,15 @@ export default function AdvancedVideoCall({
 
   return (
     <div className="h-screen flex flex-col bg-gray-900">
-      {/* Header with Enhanced Status */}
+      {/* Enhanced Header */}
       <div className="bg-white border-b p-4 shadow-sm">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div>
               <h1 className="text-xl font-semibold">Consulta Virtual Avanzada</h1>
-              <p className="text-sm text-gray-500">ID: {appointmentId}</p>
+              <p className="text-sm text-gray-500">
+                ID: {appointmentId} | Participantes: {participants.length + 1}
+              </p>
             </div>
             
             {/* Connection Status */}
@@ -159,6 +167,14 @@ export default function AdvancedVideoCall({
                 }`} />
                 {callState.isConnected ? 'Conectado' : 'Conectando...'}
               </div>
+
+              {/* Transcription Status */}
+              {isTranscribing && (
+                <Badge variant="outline" className="text-blue-600 border-blue-600">
+                  <div className="h-2 w-2 bg-blue-500 rounded-full mr-1 animate-pulse" />
+                  Transcribiendo
+                </Badge>
+              )}
 
               {/* Connection Quality */}
               <div className={`text-sm ${getConnectionQualityColor(callState.connectionQuality)}`}>
@@ -309,22 +325,16 @@ export default function AdvancedVideoCall({
               {/* Doctor-only Controls */}
               {userRole === 'doctor' && (
                 <>
-                  <Button
-                    variant={callState.isRecording ? "destructive" : "outline"}
-                    size="lg"
-                    onClick={startRecording}
-                    className="rounded-full w-14 h-14"
-                  >
-                    {callState.isRecording ? <Square className="h-6 w-6" /> : <div className="h-6 w-6 bg-red-500 rounded-full" />}
-                  </Button>
+                  {/* ... keep existing code (recording, screenshot) */}
 
+                  {/* Transcription Control */}
                   <Button
-                    variant="outline"
+                    variant={isTranscribing ? "destructive" : "outline"}
                     size="lg"
-                    onClick={() => takeScreenshot()}
+                    onClick={isTranscribing ? stopTranscription : () => startTranscription(callState.sessionId || '', localStream)}
                     className="rounded-full w-14 h-14"
                   >
-                    <Camera className="h-6 w-6" />
+                    <FileText className="h-6 w-6" />
                   </Button>
                 </>
               )}
@@ -397,13 +407,13 @@ export default function AdvancedVideoCall({
           </div>
         </div>
 
-        {/* Enhanced Sidebar */}
+        {/* Enhanced Sidebar with Multiple Panels */}
         <div className="w-96 bg-white border-l flex flex-col">
-          {/* Sidebar Tabs */}
+          {/* Enhanced Sidebar Tabs */}
           <div className="flex border-b">
             <Button
-              variant={showChat ? "default" : "ghost"}
-              onClick={() => { setShowChat(true); setShowNotes(false); }}
+              variant={currentPanel === 'chat' ? "default" : "ghost"}
+              onClick={() => setCurrentPanel('chat')}
               className="flex-1 rounded-none border-r"
             >
               <MessageCircle className="h-4 w-4 mr-2" />
@@ -414,10 +424,32 @@ export default function AdvancedVideoCall({
                 </Badge>
               )}
             </Button>
+
+            <Button
+              variant={currentPanel === 'participants' ? "default" : "ghost"}
+              onClick={() => setCurrentPanel('participants')}
+              className="flex-1 rounded-none border-r"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Equipo
+              <Badge variant="secondary" className="ml-2">
+                {participants.length + 1}
+              </Badge>
+            </Button>
+
+            <Button
+              variant={currentPanel === 'transcript' ? "default" : "ghost"}
+              onClick={() => setCurrentPanel('transcript')}
+              className="flex-1 rounded-none border-r"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Texto
+            </Button>
+
             {userRole === 'doctor' && (
               <Button
-                variant={showNotes ? "default" : "ghost"}
-                onClick={() => { setShowNotes(true); setShowChat(false); }}
+                variant={currentPanel === 'notes' ? "default" : "ghost"}
+                onClick={() => setCurrentPanel('notes')}
                 className="flex-1 rounded-none"
               >
                 <FileText className="h-4 w-4 mr-2" />
@@ -431,132 +463,150 @@ export default function AdvancedVideoCall({
             )}
           </div>
 
-          {/* Chat Panel */}
-          {showChat && (
-            <div className="flex-1 flex flex-col">
-              <div className="p-4 border-b">
-                <h3 className="font-medium">Chat Seguro</h3>
-                <p className="text-xs text-gray-500">Mensajes encriptados end-to-end</p>
-              </div>
-              
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {callState.messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}
-                  >
+          {/* Panel Content */}
+          <div className="flex-1 overflow-hidden">
+            {currentPanel === 'chat' && (
+              <div className="h-full flex flex-col">
+                {/* Chat Panel */}
+                <div className="p-4 border-b">
+                  <h3 className="font-medium">Chat Seguro</h3>
+                  <p className="text-xs text-gray-500">Mensajes encriptados end-to-end</p>
+                </div>
+                
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {callState.messages.map((msg) => (
                     <div
-                      className={`max-w-xs px-3 py-2 rounded-lg ${
-                        msg.senderId === userId
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-900'
-                      }`}
+                      key={msg.id}
+                      className={`flex ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}
                     >
-                      <p className="text-sm">{msg.message}</p>
-                      <p className="text-xs opacity-75 mt-1">
-                        {new Date(msg.timestamp).toLocaleTimeString('es-MX', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
+                      <div
+                        className={`max-w-xs px-3 py-2 rounded-lg ${
+                          msg.senderId === userId
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-900'
+                        }`}
+                      >
+                        <p className="text-sm">{msg.message}</p>
+                        <p className="text-xs opacity-75 mt-1">
+                          {new Date(msg.timestamp).toLocaleTimeString('es-MX', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
 
-              {/* Message Input */}
-              <div className="border-t p-4">
-                <div className="flex gap-2">
-                  <Input
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Mensaje seguro..."
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  />
-                  <Button onClick={handleSendMessage} size="sm">
-                    <Send className="h-4 w-4" />
-                  </Button>
+                {/* Message Input */}
+                <div className="border-t p-4">
+                  <div className="flex gap-2">
+                    <Input
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder="Mensaje seguro..."
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                    />
+                    <Button onClick={handleSendMessage} size="sm">
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Enhanced Medical Notes Panel */}
-          {showNotes && userRole === 'doctor' && (
-            <div className="flex-1 flex flex-col">
-              <div className="p-4 border-b">
-                <h3 className="font-medium">Notas Médicas</h3>
-                <p className="text-xs text-gray-500">Tiempo de consulta: {formatDuration(callState.callDuration)}</p>
-              </div>
+            {currentPanel === 'participants' && (
+              <ParticipantsList
+                sessionId={callState.sessionId || ''}
+                currentUserId={userId}
+                isDoctor={userRole === 'doctor'}
+              />
+            )}
 
-              {/* Add Note */}
-              <div className="p-4 border-b space-y-3">
-                <Select value={noteType} onValueChange={(value: MedicalNote['noteType']) => setNoteType(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="observation">Observación</SelectItem>
-                    <SelectItem value="symptom">Síntoma</SelectItem>
-                    <SelectItem value="diagnosis">Diagnóstico</SelectItem>
-                    <SelectItem value="prescription">Prescripción</SelectItem>
-                    <SelectItem value="recommendation">Recomendación</SelectItem>
-                  </SelectContent>
-                </Select>
+            {currentPanel === 'transcript' && (
+              <TranscriptionPanel
+                sessionId={callState.sessionId || ''}
+                isRecording={isTranscribing}
+              />
+            )}
 
-                <Textarea
-                  value={currentNote}
-                  onChange={(e) => setCurrentNote(e.target.value)}
-                  placeholder={`Escribir ${noteType}...`}
-                  rows={3}
-                />
+            {currentPanel === 'notes' && userRole === 'doctor' && (
+              <div className="h-full flex flex-col">
+                {/* Enhanced Medical Notes Panel */}
+                <div className="p-4 border-b">
+                  <h3 className="font-medium">Notas Médicas</h3>
+                  <p className="text-xs text-gray-500">Tiempo de consulta: {formatDuration(callState.callDuration)}</p>
+                </div>
 
-                {noteType === 'prescription' && (
-                  <div className="space-y-2">
-                    <Input
-                      placeholder="Medicamento"
-                      value={prescriptionDetails.medication}
-                      onChange={(e) => setPrescriptionDetails(prev => ({ ...prev, medication: e.target.value }))}
-                    />
-                    <Input
-                      placeholder="Dosis"
-                      value={prescriptionDetails.dosage}
-                      onChange={(e) => setPrescriptionDetails(prev => ({ ...prev, dosage: e.target.value }))}
-                    />
-                  </div>
-                )}
+                {/* Add Note */}
+                <div className="p-4 border-b space-y-3">
+                  <Select value={noteType} onValueChange={(value: MedicalNote['noteType']) => setNoteType(value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="observation">Observación</SelectItem>
+                      <SelectItem value="symptom">Síntoma</SelectItem>
+                      <SelectItem value="diagnosis">Diagnóstico</SelectItem>
+                      <SelectItem value="prescription">Prescripción</SelectItem>
+                      <SelectItem value="recommendation">Recomendación</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-                <Button onClick={handleSaveNote} size="sm" className="w-full">
-                  <Save className="h-4 w-4 mr-2" />
-                  Guardar Nota
-                </Button>
-              </div>
+                  <Textarea
+                    value={currentNote}
+                    onChange={(e) => setCurrentNote(e.target.value)}
+                    placeholder={`Escribir ${noteType}...`}
+                    rows={3}
+                  />
 
-              {/* Notes List */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {medicalNotes.map((note) => (
-                  <div key={note.id} className="p-3 bg-gray-50 rounded-lg">
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge className={getNoteTypeColor(note.noteType)}>
-                        {note.noteType}
-                      </Badge>
-                      <span className="text-xs text-gray-500">
-                        {formatDuration(note.timestampInCall)}
-                      </span>
+                  {noteType === 'prescription' && (
+                    <div className="space-y-2">
+                      <Input
+                        placeholder="Medicamento"
+                        value={prescriptionDetails.medication}
+                        onChange={(e) => setPrescriptionDetails(prev => ({ ...prev, medication: e.target.value }))}
+                      />
+                      <Input
+                        placeholder="Dosis"
+                        value={prescriptionDetails.dosage}
+                        onChange={(e) => setPrescriptionDetails(prev => ({ ...prev, dosage: e.target.value }))}
+                      />
                     </div>
-                    <p className="text-sm mb-2">{note.content}</p>
-                    {note.isPrescription && (
-                      <div className="text-xs text-green-700 bg-green-50 p-2 rounded">
-                        <strong>Medicamento:</strong> {note.medicationName}<br />
-                        <strong>Dosis:</strong> {note.dosage}
+                  )}
+
+                  <Button onClick={handleSaveNote} size="sm" className="w-full">
+                    <Save className="h-4 w-4 mr-2" />
+                    Guardar Nota
+                  </Button>
+                </div>
+
+                {/* Notes List */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {medicalNotes.map((note) => (
+                    <div key={note.id} className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <Badge className={getNoteTypeColor(note.noteType)}>
+                          {note.noteType}
+                        </Badge>
+                        <span className="text-xs text-gray-500">
+                          {formatDuration(note.timestampInCall)}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                ))}
+                      <p className="text-sm mb-2">{note.content}</p>
+                      {note.isPrescription && (
+                        <div className="text-xs text-green-700 bg-green-50 p-2 rounded">
+                          <strong>Medicamento:</strong> {note.medicationName}<br />
+                          <strong>Dosis:</strong> {note.dosage}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

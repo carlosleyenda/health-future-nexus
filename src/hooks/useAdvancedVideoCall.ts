@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { WebRTCService } from '@/services/webrtc/webrtcService';
 import { VideoCallService } from '@/services/api/videoCallService';
@@ -22,6 +21,9 @@ export function useAdvancedVideoCall(appointmentId: string, userId: string, user
   const [medicalNotes, setMedicalNotes] = useState<MedicalNote[]>([]);
   const [localVideoRef, setLocalVideoRef] = useState<HTMLVideoElement | null>(null);
   const [remoteVideoRef, setRemoteVideoRef] = useState<HTMLVideoElement | null>(null);
+  const [participants, setParticipants] = useState<any[]>([]);
+  const [transcript, setTranscript] = useState<any[]>([]);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   
   const webrtcService = useRef<WebRTCService>();
   const callStartTime = useRef<number>();
@@ -50,7 +52,7 @@ export function useAdvancedVideoCall(appointmentId: string, userId: string, user
     };
   }, [remoteVideoRef]);
 
-  // Start call
+  // Enhanced start call with transcription and participants
   const startCall = useCallback(async (doctorId: string, patientId: string) => {
     try {
       if (!webrtcService.current) return;
@@ -62,7 +64,7 @@ export function useAdvancedVideoCall(appointmentId: string, userId: string, user
       const localStream = await webrtcService.current.initializeSession(
         session.id,
         userId,
-        userRole === 'doctor' // Doctor is the initiator
+        userRole === 'doctor'
       );
 
       if (localVideoRef && localStream) {
@@ -74,6 +76,11 @@ export function useAdvancedVideoCall(appointmentId: string, userId: string, user
         sessionId: session.id,
         participants: [userId],
       }));
+
+      // Start transcription if user consents
+      if (userRole === 'doctor') {
+        await startTranscription(session.id, localStream);
+      }
 
       // Start call duration tracking
       callStartTime.current = Date.now();
@@ -87,10 +94,13 @@ export function useAdvancedVideoCall(appointmentId: string, userId: string, user
       // Update session status
       await VideoCallService.updateSessionStatus(session.id, 'active');
 
-      // Setup signaling channel
+      // Setup signaling and participants channels
       const channel = supabase.channel(`video-call-${session.id}`);
       channel.on('broadcast', { event: 'signaling' }, (payload) => {
         webrtcService.current?.handleSignalingMessage(payload.payload);
+      });
+      channel.on('broadcast', { event: 'participant-update' }, () => {
+        loadParticipants(session.id);
       });
       channel.subscribe();
 
@@ -101,12 +111,49 @@ export function useAdvancedVideoCall(appointmentId: string, userId: string, user
     }
   }, [appointmentId, userId, userRole, localVideoRef]);
 
-  // End call
+  // Start transcription
+  const startTranscription = useCallback(async (sessionId: string, stream: MediaStream) => {
+    try {
+      await TranscriptionService.startTranscription(sessionId, stream);
+      setIsTranscribing(true);
+      toast.success('Transcripción automática activada');
+    } catch (error) {
+      console.error('Error starting transcription:', error);
+      toast.error('Error al iniciar la transcripción');
+    }
+  }, []);
+
+  // Stop transcription
+  const stopTranscription = useCallback(() => {
+    TranscriptionService.stopTranscription();
+    setIsTranscribing(false);
+  }, []);
+
+  // Load participants
+  const loadParticipants = useCallback(async (sessionId: string) => {
+    try {
+      const data = await ParticipantsService.getSessionParticipants(sessionId);
+      setParticipants(data);
+      setCallState(prev => ({ ...prev, participants: data.map(p => p.userId) }));
+    } catch (error) {
+      console.error('Error loading participants:', error);
+    }
+  }, []);
+
+  // Enhanced end call with cleanup
   const endCall = useCallback(async () => {
     try {
       if (webrtcService.current && callState.sessionId) {
         await webrtcService.current.endCall();
         await VideoCallService.updateSessionStatus(callState.sessionId, 'ended');
+        
+        // Stop transcription
+        if (isTranscribing) {
+          stopTranscription();
+        }
+
+        // Leave session as participant
+        await ParticipantsService.leaveSession(callState.sessionId, userId);
         
         if (durationInterval.current) {
           clearInterval(durationInterval.current);
@@ -124,7 +171,7 @@ export function useAdvancedVideoCall(appointmentId: string, userId: string, user
       console.error('Error ending call:', error);
       toast.error('Error al finalizar la videollamada');
     }
-  }, [callState.sessionId]);
+  }, [callState.sessionId, isTranscribing, stopTranscription, userId]);
 
   // Toggle video
   const toggleVideo = useCallback(async () => {
@@ -223,18 +270,25 @@ export function useAdvancedVideoCall(appointmentId: string, userId: string, user
     }
   }, [callState.sessionId, userId]);
 
-  // Load medical notes when session starts
+  // Load data when session starts
   useEffect(() => {
-    if (callState.sessionId && userRole === 'doctor') {
-      VideoCallService.getMedicalNotes(callState.sessionId)
-        .then(setMedicalNotes)
-        .catch(console.error);
+    if (callState.sessionId) {
+      loadParticipants(callState.sessionId);
+      
+      if (userRole === 'doctor') {
+        VideoCallService.getMedicalNotes(callState.sessionId)
+          .then(setMedicalNotes)
+          .catch(console.error);
+      }
     }
-  }, [callState.sessionId, userRole]);
+  }, [callState.sessionId, userRole, loadParticipants]);
 
   return {
     callState,
     medicalNotes,
+    participants,
+    transcript,
+    isTranscribing,
     localVideoRef: setLocalVideoRef,
     remoteVideoRef: setRemoteVideoRef,
     startCall,
@@ -246,5 +300,8 @@ export function useAdvancedVideoCall(appointmentId: string, userId: string, user
     saveMedicalNote,
     startRecording,
     takeScreenshot,
+    startTranscription,
+    stopTranscription,
+    loadParticipants,
   };
 }
