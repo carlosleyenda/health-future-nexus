@@ -10,6 +10,13 @@ export const useNearbyPharmacies = () => {
   });
 };
 
+export const usePharmacyNetwork = () => {
+  return useQuery({
+    queryKey: ['pharmacy-network'],
+    queryFn: () => PharmacyService.getNearbyPharmacies(),
+  });
+};
+
 export const useSearchPharmacies = (searchTerm: string) => {
   return useQuery({
     queryKey: ['search-pharmacies', searchTerm],
