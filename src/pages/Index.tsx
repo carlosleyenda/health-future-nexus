@@ -3,8 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Video, Calendar, Shield, Users, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+
   const features = [
     {
       icon: Video,
@@ -43,6 +46,14 @@ const Index = () => {
     "Ginecología", "Neurología", "Pediatría", "Psiquiatría"
   ];
 
+  const handlePatientLogin = () => {
+    navigate('/auth');
+  };
+
+  const handleDoctorLogin = () => {
+    navigate('/auth');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       {/* Hero Section */}
@@ -62,10 +73,19 @@ const Index = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg">
+            <Button 
+              size="lg" 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg"
+              onClick={handlePatientLogin}
+            >
               Comenzar como Paciente
             </Button>
-            <Button size="lg" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-4 text-lg">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-4 text-lg"
+              onClick={handleDoctorLogin}
+            >
               Portal Médicos
             </Button>
           </div>
@@ -139,7 +159,10 @@ const Index = () => {
             ))}
           </div>
           
-          <Button className="mt-8 bg-green-600 hover:bg-green-700 text-white">
+          <Button 
+            className="mt-8 bg-green-600 hover:bg-green-700 text-white"
+            onClick={handlePatientLogin}
+          >
             Ver Todas las Especialidades
           </Button>
         </div>
@@ -155,10 +178,19 @@ const Index = () => {
             Únete a miles de pacientes que ya confían en nuestra plataforma
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4">
+            <Button 
+              size="lg" 
+              className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4"
+              onClick={handlePatientLogin}
+            >
               Crear Cuenta Gratis
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4"
+              onClick={handlePatientLogin}
+            >
               Conocer Más
             </Button>
           </div>

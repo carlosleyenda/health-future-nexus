@@ -1,62 +1,38 @@
 
-import { delay } from '@/lib/utils';
-
-export interface AdminStats {
-  totalPatients: number;
-  totalDoctors: number;
-  totalAppointments: number;
-  revenue: number;
-  appointmentsToday: number;
-  newPatientsThisMonth: number;
-}
-
-export interface UserManagement {
-  id: string;
-  name: string;
-  email: string;
-  role: 'patient' | 'doctor' | 'admin';
-  status: 'active' | 'suspended' | 'pending';
-  lastLogin: string;
-}
+import { delay } from '@/lib/delay';
 
 export class AdminService {
-  static async getDashboardStats(): Promise<AdminStats> {
-    await delay(400);
+  static async getAnalytics() {
+    await delay(300);
     return {
-      totalPatients: 1250,
-      totalDoctors: 45,
-      totalAppointments: 3420,
-      revenue: 285000,
-      appointmentsToday: 12,
-      newPatientsThisMonth: 89
+      totalUsers: 15420,
+      activeUsers: 8932,
+      totalAppointments: 45236,
+      revenue: 2340000,
+      patientsGrowth: 12.5,
+      doctorsGrowth: 8.3,
+      appointmentsGrowth: 15.7,
+      revenueGrowth: 22.1,
     };
   }
 
-  static async getRevenueAnalytics(period: string) {
-    await delay(500);
-    return [
-      { month: 'Enero', revenue: 45000, appointments: 320 },
-      { month: 'Febrero', revenue: 52000, appointments: 380 },
-      { month: 'Marzo', revenue: 48000, appointments: 360 }
-    ];
+  static async getSystemHealth() {
+    await delay(200);
+    return {
+      status: 'healthy' as const,
+      uptime: '99.9%',
+      responseTime: '120ms',
+      activeConnections: 1420,
+      serverLoad: 65,
+    };
   }
 
-  static async getUserManagement(): Promise<UserManagement[]> {
-    await delay(600);
+  static async getAllUsers() {
+    await delay(400);
     return [
-      {
-        id: '1',
-        name: 'Juan Pérez',
-        email: 'juan@test.com',
-        role: 'patient',
-        status: 'active',
-        lastLogin: '2024-06-08T10:00:00Z'
-      }
+      { id: '1', name: 'Juan Pérez', email: 'juan@test.com', role: 'patient', status: 'active' },
+      { id: '2', name: 'María García', email: 'maria@test.com', role: 'doctor', status: 'active' },
+      { id: '3', name: 'Carlos Admin', email: 'admin@test.com', role: 'admin', status: 'active' },
     ];
-  }
-
-  static async updateUserStatus(userId: string, status: 'active' | 'suspended'): Promise<boolean> {
-    await delay(300);
-    return true;
   }
 }

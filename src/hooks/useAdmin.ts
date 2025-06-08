@@ -1,41 +1,25 @@
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { AdminService } from '@/services/api/adminService';
-import { toast } from 'sonner';
 
-export const useAdminStats = () => {
+export const useAdminAnalytics = () => {
   return useQuery({
-    queryKey: ['admin-stats'],
-    queryFn: () => AdminService.getDashboardStats(),
+    queryKey: ['admin-analytics'],
+    queryFn: AdminService.getAnalytics,
   });
 };
 
-export const useRevenueAnalytics = (period: string) => {
+export const useSystemHealth = () => {
   return useQuery({
-    queryKey: ['revenue-analytics', period],
-    queryFn: () => AdminService.getRevenueAnalytics(period),
+    queryKey: ['system-health'],
+    queryFn: AdminService.getSystemHealth,
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 };
 
 export const useUserManagement = () => {
   return useQuery({
     queryKey: ['user-management'],
-    queryFn: () => AdminService.getUserManagement(),
-  });
-};
-
-export const useUpdateUserStatus = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: ({ userId, status }: { userId: string; status: 'active' | 'suspended' }) =>
-      AdminService.updateUserStatus(userId, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-management'] });
-      toast.success('Estado de usuario actualizado');
-    },
-    onError: () => {
-      toast.error('Error al actualizar el estado');
-    },
+    queryFn: AdminService.getAllUsers,
   });
 };
