@@ -171,23 +171,21 @@ export class GenomicsService {
         neanderthalAdmixture: 2.1,
         references: ['PMID:23456789']
       },
-      carrierScreening: [
-        {
-          id: 'carrier-001',
-          diseases: [
-            {
-              diseaseName: 'Cystic Fibrosis',
-              gene: 'CFTR',
-              carrierRisk: 0.04,
-              inheritancePattern: 'autosomal recessive',
-              recommendations: ['Partner screening recommended']
-            }
-          ],
-          reportSummary: 'Carrier for Cystic Fibrosis',
-          recommendations: ['Genetic counseling', 'Partner testing'],
-          references: ['PMID:34567890']
-        }
-      ],
+      carrierScreening: {
+        id: 'carrier-001',
+        diseases: [
+          {
+            diseaseName: 'Cystic Fibrosis',
+            gene: 'CFTR',
+            carrierRisk: 0.04,
+            inheritancePattern: 'autosomal recessive',
+            recommendations: ['Partner screening recommended']
+          }
+        ],
+        reportSummary: 'Carrier for Cystic Fibrosis',
+        recommendations: ['Genetic counseling', 'Partner testing'],
+        references: ['PMID:34567890']
+      },
       createdAt: '2024-01-15T10:00:00Z',
       updatedAt: '2024-01-20T15:30:00Z'
     };
