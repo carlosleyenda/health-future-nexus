@@ -203,7 +203,7 @@ export default function SystemMonitoring() {
                 <div className="flex items-center gap-2">
                   <span className="font-bold">{metric.value}</span>
                   {metric.unit && <span className="text-sm text-gray-500">{metric.unit}</span>}
-                  <Badge className={getStatusColor(metric.status)} size="sm">
+                  <Badge className={getStatusColor(metric.status)}>
                     {getStatusIcon(metric.status)}
                   </Badge>
                 </div>
@@ -230,7 +230,7 @@ export default function SystemMonitoring() {
                 <div className="flex items-center gap-2">
                   <span className="font-bold">{metric.value}</span>
                   <span className="text-sm text-gray-500">{metric.unit}</span>
-                  <Badge className={getStatusColor(metric.status)} size="sm">
+                  <Badge className={getStatusColor(metric.status)}>
                     {getStatusIcon(metric.status)}
                   </Badge>
                 </div>

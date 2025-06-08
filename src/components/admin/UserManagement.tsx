@@ -11,13 +11,14 @@ import CreateUserForm from './CreateUserForm';
 import { useAllUsersAdmin, useUpdateUser, useDeleteUser } from '@/hooks/useAdminManagement';
 import { toast } from 'sonner';
 
-interface User {
+interface AdminUser {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   role: 'admin' | 'doctor' | 'patient';
   status: 'active' | 'inactive' | 'pending';
+  isActive: boolean;
   createdAt: string;
   lastLogin?: string;
 }
@@ -28,13 +29,13 @@ export default function UserManagement() {
   const [selectedRole, setSelectedRole] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
 
   const { data: usersData, isLoading, error } = useAllUsersAdmin(currentPage, 10, searchTerm);
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
 
-  const handleUserCreated = (newUser: User) => {
+  const handleUserCreated = (newUser: AdminUser) => {
     setShowCreateForm(false);
     toast.success('Usuario creado exitosamente');
   };
@@ -62,7 +63,20 @@ export default function UserManagement() {
     }
   };
 
-  const filteredUsers = usersData?.users?.filter(user => {
+  // Convert API users to AdminUser format
+  const convertedUsers: AdminUser[] = usersData?.users?.map(user => ({
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    role: user.role as 'admin' | 'doctor' | 'patient',
+    status: user.isActive ? 'active' : 'inactive',
+    isActive: user.isActive,
+    createdAt: user.createdAt,
+    lastLogin: undefined // API doesn't provide lastLogin, so we set it as undefined
+  })) || [];
+
+  const filteredUsers = convertedUsers.filter(user => {
     const matchesSearch = 
       user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -74,7 +88,7 @@ export default function UserManagement() {
       (selectedStatus === 'inactive' && !user.isActive);
     
     return matchesSearch && matchesRole && matchesStatus;
-  }) || [];
+  });
 
   const getStatusBadge = (isActive: boolean) => {
     if (isActive) {
