@@ -9,10 +9,10 @@ interface VideoCallState {
   isScreenSharing: boolean;
   isRecording: boolean;
   participants: Array<{ id: string; name: string; isVideoEnabled: boolean; isAudioEnabled: boolean }>;
-  messages: Array<{ id: string; sender: string; message: string; timestamp: string }>;
+  messages: Array<{ id: string; senderId: string; sender: string; message: string; timestamp: string }>;
 }
 
-export const useVideoCall = (appointmentId: string) => {
+export const useVideoCall = (appointmentId: string, userId?: string) => {
   const [callState, setCallState] = useState<VideoCallState>({
     isConnected: false,
     isVideoEnabled: true,
@@ -43,7 +43,7 @@ export const useVideoCall = (appointmentId: string) => {
     toast.success(`Grabación ${callState.isRecording ? 'detenida' : 'iniciada'}`);
   };
 
-  const endCall = () => {
+  const endCall = (doctorId?: string, patientId?: string) => {
     setCallState(prev => ({ ...prev, isConnected: false }));
     toast.success('Llamada finalizada');
   };
@@ -53,13 +53,15 @@ export const useVideoCall = (appointmentId: string) => {
     toast.success('Conectado a la llamada');
   };
 
-  const startCall = () => {
-    joinCall();
+  const startCall = (doctorId: string, patientId: string) => {
+    setCallState(prev => ({ ...prev, isConnected: true }));
+    toast.success('Consulta iniciada');
   };
 
   const sendMessage = (message: string) => {
     const newMessage = {
       id: crypto.randomUUID(),
+      senderId: userId || 'unknown',
       sender: 'Usuario',
       message,
       timestamp: new Date().toISOString(),

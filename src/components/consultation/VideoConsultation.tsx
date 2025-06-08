@@ -41,6 +41,12 @@ export default function VideoConsultation({ appointmentId, userId, userRole }: V
     }
   };
 
+  const handleEndCall = () => {
+    if (appointment) {
+      endCall(appointment.doctorId, appointment.patientId);
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gray-900">
       {/* Header */}
@@ -198,7 +204,7 @@ export default function VideoConsultation({ appointmentId, userId, userRole }: V
           <Button
             variant="destructive"
             size="lg"
-            onClick={endCall}
+            onClick={handleEndCall}
             className="rounded-full w-12 h-12"
           >
             <Phone className="h-5 w-5 rotate-180" />

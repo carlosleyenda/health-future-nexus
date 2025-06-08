@@ -60,7 +60,9 @@ export default function ConsultationRoom({ appointmentId, userId, userRole }: Co
   };
 
   const handleEndCall = () => {
-    endCall();
+    if (appointment) {
+      endCall(appointment.doctorId, appointment.patientId);
+    }
     toast.success('Consulta finalizada');
   };
 
