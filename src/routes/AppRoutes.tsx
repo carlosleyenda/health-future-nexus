@@ -14,11 +14,12 @@ import MainLayout from '@/components/layout/MainLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
 import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
-import { AdminDashboard } from '@/components/dashboard/AdminDashboard';
+import AdminDashboard from '@/components/dashboard/AdminDashboard';
 import UserProfile from '@/components/profile/UserProfile';
 import HealthMonitoring from '@/components/health/HealthMonitoring';
 import ConsultationRoom from '@/components/consultation/ConsultationRoom';
 import PharmacyModule from '@/components/pharmacy/PharmacyModule';
+import PaymentPortal from '@/components/payment/PaymentPortal';
 
 // Public Route wrapper - redirects to appropriate dashboard if authenticated
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -155,6 +156,15 @@ export default function AppRoutes() {
         <Route index element={<PharmacyModule />} />
       </Route>
       
+      {/* Payments Portal */}
+      <Route path="/payments" element={
+        <ProtectedRoute>
+          <MainLayout />
+        </ProtectedRoute>
+      }>
+        <Route index element={<PaymentPortal />} />
+      </Route>
+      
       {/* Additional protected routes */}
       <Route path="/appointments" element={
         <ProtectedRoute allowedRoles={['patient', 'doctor']}>
@@ -188,14 +198,6 @@ export default function AppRoutes() {
         </ProtectedRoute>
       }>
         <Route index element={<div>Medical History</div>} />
-      </Route>
-      
-      <Route path="/payments" element={
-        <ProtectedRoute allowedRoles={['patient']}>
-          <MainLayout />
-        </ProtectedRoute>
-      }>
-        <Route index element={<div>Payments</div>} />
       </Route>
       
       <Route path="/patients" element={

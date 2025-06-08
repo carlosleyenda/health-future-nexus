@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,24 +9,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { X } from 'lucide-react';
 
 const createUserSchema = z.object({
   firstName: z.string().min(2, 'Nombre debe tener al menos 2 caracteres'),
   lastName: z.string().min(2, 'Apellido debe tener al menos 2 caracteres'),
   email: z.string().email('Email inválido'),
-  phone: z.string().min(10, 'Teléfono debe tener al menos 10 dígitos'),
   role: z.enum(['patient', 'doctor', 'admin']),
+  phone: z.string().optional(),
   password: z.string().min(6, 'Contraseña debe tener al menos 6 caracteres'),
-  confirmPassword: z.string(),
-  // Campos opcionales para doctores
-  medicalLicense: z.string().optional(),
-  specialties: z.array(z.string()).optional(),
-  yearsExperience: z.number().optional(),
-  consultationFee: z.number().optional(),
-  // Campos opcionales para pacientes
-  dateOfBirth: z.string().optional(),
-  gender: z.enum(['male', 'female', 'other']).optional(),
-  bloodType: z.string().optional(),
+  confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Las contraseñas no coinciden",
   path: ["confirmPassword"],
@@ -33,226 +26,135 @@ const createUserSchema = z.object({
 
 type CreateUserFormData = z.infer<typeof createUserSchema>;
 
-interface CreateUserFormProps {
-  onUserCreated: (userData: CreateUserFormType) => void;
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: 'admin' | 'doctor' | 'patient';
+  status: 'active' | 'inactive' | 'pending';
 }
 
-export default function CreateUserForm({ onUserCreated }: CreateUserFormProps) {
-  const createUser = useCreateUser();
-  
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    setValue,
-  } = useForm<CreateUserFormData>({
-    resolver: zodResolver(createUserSchema),
-    defaultValues: {
-      role: 'patient',
-    },
+interface CreateUserFormProps {
+  onUserCreated: (user: User) => void;
+  onClose: () => void;
+}
+
+export default function CreateUserForm({ onUserCreated, onClose }: CreateUserFormProps) {
+  const form = useForm<CreateUserFormData>({
+    resolver: zodResolver(createUserSchema)
   });
 
-  const selectedRole = watch('role');
-
-  const onSubmit = (data: CreateUserFormData) => {
-    // Convert form data to match API expectations
-    const userData: CreateUserFormType = {
+  const createUser = async (data: CreateUserFormData) => {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const newUser: User = {
+      id: crypto.randomUUID(),
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
-      phone: data.phone,
       role: data.role,
-      password: data.password,
-      confirmPassword: data.confirmPassword,
-      medicalLicense: data.medicalLicense,
-      specialties: data.specialties,
-      yearsExperience: data.yearsExperience,
-      consultationFee: data.consultationFee,
-      dateOfBirth: data.dateOfBirth,
-      gender: data.gender,
-      bloodType: data.bloodType,
+      status: 'active'
     };
 
-    createUser.mutate(userData, {
-      onSuccess: () => {
-        toast.success('Usuario creado exitosamente');
-        onUserCreated(userData);
-      },
-      onError: () => {
-        toast.error('Error al crear usuario');
-      },
-    });
+    onUserCreated(newUser);
+    toast.success('Usuario creado exitosamente');
+  };
+
+  const onSubmit = async (data: CreateUserFormData) => {
+    try {
+      await createUser(data);
+    } catch (error) {
+      toast.error('Error al crear usuario');
+    }
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Crear Nuevo Usuario</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Información básica */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="firstName">Nombre *</Label>
-              <Input
-                id="firstName"
-                {...register('firstName')}
-                className={errors.firstName ? 'border-red-500' : ''}
-              />
-              {errors.firstName && (
-                <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="lastName">Apellido *</Label>
-              <Input
-                id="lastName"
-                {...register('lastName')}
-                className={errors.lastName ? 'border-red-500' : ''}
-              />
-              {errors.lastName && (
-                <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="email">Email *</Label>
-            <Input
-              id="email"
-              type="email"
-              {...register('email')}
-              className={errors.email ? 'border-red-500' : ''}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="phone">Teléfono *</Label>
-            <Input
-              id="phone"
-              {...register('phone')}
-              className={errors.phone ? 'border-red-500' : ''}
-            />
-            {errors.phone && (
-              <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="role">Rol *</Label>
-            <Select value={selectedRole} onValueChange={(value) => setValue('role', value as any)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar rol" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="patient">Paciente</SelectItem>
-                <SelectItem value="doctor">Doctor</SelectItem>
-                <SelectItem value="admin">Administrador</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Campos específicos para doctores */}
-          {selectedRole === 'doctor' && (
-            <div className="space-y-4 border-t pt-4">
-              <h3 className="font-medium">Información del Doctor</h3>
-              <div>
-                <Label htmlFor="medicalLicense">Cédula Profesional</Label>
-                <Input id="medicalLicense" {...register('medicalLicense')} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="yearsExperience">Años de Experiencia</Label>
-                  <Input
-                    id="yearsExperience"
-                    type="number"
-                    {...register('yearsExperience', { valueAsNumber: true })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="consultationFee">Tarifa de Consulta (MXN)</Label>
-                  <Input
-                    id="consultationFee"
-                    type="number"
-                    {...register('consultationFee', { valueAsNumber: true })}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Campos específicos para pacientes */}
-          {selectedRole === 'patient' && (
-            <div className="space-y-4 border-t pt-4">
-              <h3 className="font-medium">Información del Paciente</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="dateOfBirth">Fecha de Nacimiento</Label>
-                  <Input id="dateOfBirth" type="date" {...register('dateOfBirth')} />
-                </div>
-                <div>
-                  <Label htmlFor="gender">Género</Label>
-                  <Select onValueChange={(value) => setValue('gender', value as any)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar género" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Masculino</SelectItem>
-                      <SelectItem value="female">Femenino</SelectItem>
-                      <SelectItem value="other">Otro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="bloodType">Tipo de Sangre</Label>
-                <Input id="bloodType" {...register('bloodType')} placeholder="Ej: O+, A-, B+, AB-" />
-              </div>
-            </div>
-          )}
-
-          {/* Contraseñas */}
-          <div className="grid grid-cols-2 gap-4 border-t pt-4">
-            <div>
-              <Label htmlFor="password">Contraseña *</Label>
-              <Input
-                id="password"
-                type="password"
-                {...register('password')}
-                className={errors.password ? 'border-red-500' : ''}
-              />
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="confirmPassword">Confirmar Contraseña *</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                {...register('confirmPassword')}
-                className={errors.confirmPassword ? 'border-red-500' : ''}
-              />
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
-              )}
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={createUser.isPending}
-          >
-            {createUser.isPending ? 'Creando...' : 'Crear Usuario'}
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Crear Nuevo Usuario</CardTitle>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <X className="h-4 w-4" />
           </Button>
-        </form>
-      </CardContent>
-    </Card>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="firstName">Nombre</Label>
+                <Input id="firstName" {...form.register('firstName')} />
+                {form.formState.errors.firstName && (
+                  <p className="text-sm text-red-500">{form.formState.errors.firstName.message}</p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="lastName">Apellido</Label>
+                <Input id="lastName" {...form.register('lastName')} />
+                {form.formState.errors.lastName && (
+                  <p className="text-sm text-red-500">{form.formState.errors.lastName.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" {...form.register('email')} />
+              {form.formState.errors.email && (
+                <p className="text-sm text-red-500">{form.formState.errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="role">Rol</Label>
+              <Select onValueChange={(value) => form.setValue('role', value as 'patient' | 'doctor' | 'admin')}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="patient">Paciente</SelectItem>
+                  <SelectItem value="doctor">Doctor</SelectItem>
+                  <SelectItem value="admin">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
+              {form.formState.errors.role && (
+                <p className="text-sm text-red-500">{form.formState.errors.role.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="phone">Teléfono (Opcional)</Label>
+              <Input id="phone" {...form.register('phone')} />
+            </div>
+
+            <div>
+              <Label htmlFor="password">Contraseña</Label>
+              <Input id="password" type="password" {...form.register('password')} />
+              {form.formState.errors.password && (
+                <p className="text-sm text-red-500">{form.formState.errors.password.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
+              <Input id="confirmPassword" type="password" {...form.register('confirmPassword')} />
+              {form.formState.errors.confirmPassword && (
+                <p className="text-sm text-red-500">{form.formState.errors.confirmPassword.message}</p>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Button type="submit" className="flex-1">
+                Crear Usuario
+              </Button>
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -1,206 +1,180 @@
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { useGenerateReport } from '@/hooks/useAdminManagement';
-import { useToast } from '@/hooks/use-toast';
-import { BarChart3, Download, Calendar, FileText, Loader2 } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Download, FileSpreadsheet, FileText, Calendar } from 'lucide-react';
+import { toast } from 'sonner';
 
-export const ReportsGenerator = () => {
-  const [reportData, setReportData] = useState<any>(null);
-  const { toast } = useToast();
-  const generateReportMutation = useGenerateReport();
+interface ReportGeneratorProps {}
 
-  const { register, handleSubmit, watch } = useForm({
-    defaultValues: {
-      type: '',
-      format: '',
-      startDate: '',
-      endDate: '',
-    },
-  });
+export function ReportsGenerator({}: ReportGeneratorProps) {
+  const [reportType, setReportType] = useState<string>('');
+  const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const [format, setFormat] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const reportType = watch('type');
+  const reportTypes = [
+    { value: 'appointments', label: 'Reporte de Citas' },
+    { value: 'financial', label: 'Reporte Financiero' },
+    { value: 'patients', label: 'Reporte de Pacientes' },
+    { value: 'doctors', label: 'Reporte de Doctores' },
+    { value: 'prescriptions', label: 'Reporte de Prescripciones' },
+    { value: 'system', label: 'Reporte del Sistema' }
+  ];
 
-  const onSubmit = async (data: any) => {
+  const formats = [
+    { value: 'pdf', label: 'PDF', icon: FileText },
+    { value: 'excel', label: 'Excel', icon: FileSpreadsheet },
+    { value: 'csv', label: 'CSV', icon: Download }
+  ];
+
+  const generateReport = async () => {
+    if (!reportType || !format || !dateRange.start || !dateRange.end) {
+      toast.error('Por favor completa todos los campos');
+      return;
+    }
+
+    setIsGenerating(true);
+    
     try {
-      const result = await generateReportMutation.mutateAsync({
-        type: data.type,
-        dateRange: {
-          start: data.startDate,
-          end: data.endDate,
-        },
-        format: data.format,
-      });
+      // Simulate report generation
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      setReportData(result);
-      toast({
-        title: 'Reporte generado exitosamente',
-        description: `Reporte de ${getReportTypeLabel(data.type)} generado en formato ${data.format.toUpperCase()}.`,
-      });
+      // Simulate file download
+      const fileName = `reporte_${reportType}_${dateRange.start}_${dateRange.end}.${format}`;
+      toast.success(`Reporte generado: ${fileName}`);
+      
+      // In a real implementation, this would trigger a file download
+      console.log('Generating report:', { reportType, format, dateRange });
+      
     } catch (error) {
-      toast({
-        title: 'Error al generar reporte',
-        description: 'Hubo un problema al generar el reporte.',
-        variant: 'destructive',
-      });
+      toast.error('Error al generar el reporte');
+    } finally {
+      setIsGenerating(false);
     }
-  };
-
-  const getReportTypeLabel = (type: string) => {
-    switch (type) {
-      case 'users': return 'Usuarios';
-      case 'appointments': return 'Citas';
-      case 'revenue': return 'Ingresos';
-      case 'medications': return 'Medicamentos';
-      default: return type;
-    }
-  };
-
-  const downloadReport = () => {
-    if (!reportData) return;
-    
-    const dataStr = JSON.stringify(reportData.data, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `reporte_${reportData.type}_${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: 'Reporte descargado',
-      description: 'El archivo ha sido descargado exitosamente.',
-    });
   };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Generador de Reportes</h2>
-        <p className="text-muted-foreground">Genera reportes detallados del sistema</p>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
-            Configuración del Reporte
+            <Download className="h-5 w-5" />
+            Generador de Reportes
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Tipo de Reporte</label>
-                <Select onValueChange={(value) => register('type').onChange({ target: { value } })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona el tipo de reporte" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="users">Usuarios</SelectItem>
-                    <SelectItem value="appointments">Citas</SelectItem>
-                    <SelectItem value="revenue">Ingresos</SelectItem>
-                    <SelectItem value="medications">Medicamentos</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Formato</label>
-                <Select onValueChange={(value) => register('format').onChange({ target: { value } })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona el formato" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pdf">PDF</SelectItem>
-                    <SelectItem value="csv">CSV</SelectItem>
-                    <SelectItem value="excel">Excel</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="reportType">Tipo de Reporte</Label>
+              <Select value={reportType} onValueChange={setReportType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {reportTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Fecha de Inicio</label>
-                <Input type="date" {...register('startDate')} />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Fecha de Fin</label>
-                <Input type="date" {...register('endDate')} />
-              </div>
+            <div>
+              <Label htmlFor="format">Formato</Label>
+              <Select value={format} onValueChange={setFormat}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar formato" />
+                </SelectTrigger>
+                <SelectContent>
+                  {formats.map((fmt) => (
+                    <SelectItem key={fmt.value} value={fmt.value}>
+                      <div className="flex items-center gap-2">
+                        <fmt.icon className="h-4 w-4" />
+                        {fmt.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="startDate">Fecha de Inicio</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={dateRange.start}
+                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+              />
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={generateReportMutation.isPending}
-            >
-              {generateReportMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generando reporte...
-                </>
-              ) : (
-                <>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Generar Reporte
-                </>
-              )}
-            </Button>
-          </form>
+            <div>
+              <Label htmlFor="endDate">Fecha de Fin</Label>
+              <Input
+                id="endDate"
+                type="date"
+                value={dateRange.end}
+                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <Button 
+            onClick={generateReport} 
+            disabled={isGenerating}
+            className="w-full"
+          >
+            {isGenerating ? (
+              <>
+                <Calendar className="h-4 w-4 mr-2 animate-spin" />
+                Generando Reporte...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4 mr-2" />
+                Generar Reporte
+              </>
+            )}
+          </Button>
         </CardContent>
       </Card>
 
-      {reportData && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Reporte Generado</span>
-              <Button onClick={downloadReport} variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Descargar
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <Badge variant="outline">
-                  Tipo: {getReportTypeLabel(reportData.type)}
-                </Badge>
-                <Badge variant="outline">
-                  Formato: {reportData.format.toUpperCase()}
-                </Badge>
-                <Badge variant="outline">
-                  Registros: {reportData.data.length}
-                </Badge>
-              </div>
-              
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium mb-2">Vista Previa de Datos:</h4>
-                <pre className="text-sm overflow-x-auto">
-                  {JSON.stringify(reportData.data.slice(0, 3), null, 2)}
-                </pre>
-                {reportData.data.length > 3 && (
-                  <p className="text-sm text-gray-500 mt-2">
-                    ... y {reportData.data.length - 3} registros más
+      {/* Recent Reports */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Reportes Recientes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {[
+              { name: 'Reporte Financiero Diciembre', date: '2024-01-15', format: 'PDF', size: '2.4 MB' },
+              { name: 'Reporte de Citas Semanal', date: '2024-01-14', format: 'Excel', size: '1.8 MB' },
+              { name: 'Reporte de Pacientes Mensual', date: '2024-01-10', format: 'CSV', size: '856 KB' }
+            ].map((report, index) => (
+              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <p className="font-medium">{report.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {report.date} • {report.format} • {report.size}
                   </p>
-                )}
+                </div>
+                <Button variant="ghost" size="sm">
+                  <Download className="h-4 w-4" />
+                </Button>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
-};
+}
+
+export default ReportsGenerator;
