@@ -1,93 +1,85 @@
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PatientService, AppointmentService } from '@/services/api';
-import { toast } from 'sonner';
-import type { Patient, MedicalRecord, Allergy, HealthMetric } from '@/lib/database';
+import { useQuery } from '@tanstack/react-query';
 
+// Mock patient data - replace with actual API calls
 export const usePatientProfile = (patientId: string) => {
   return useQuery({
-    queryKey: ['patient', patientId],
-    queryFn: () => PatientService.getProfile(patientId),
+    queryKey: ['patient-profile', patientId],
+    queryFn: async () => ({
+      id: patientId,
+      firstName: 'Juan',
+      lastName: 'Pérez',
+      bloodType: 'O+',
+      allergies: [
+        {
+          id: 'allergy-1',
+          allergen: 'Penicilina',
+          severity: 'severe' as const,
+          reaction: 'Erupción cutánea severa',
+          diagnosedDate: '2020-03-15'
+        }
+      ],
+      currentMedications: [
+        {
+          id: 'med-1',
+          name: 'Aspirina',
+          dosage: '100mg',
+          frequency: 'Diario'
+        }
+      ]
+    }),
     enabled: !!patientId,
-  });
-};
-
-export const useUpdatePatientProfile = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: ({ patientId, updates }: { patientId: string; updates: Partial<Patient> }) =>
-      PatientService.updateProfile(patientId, updates),
-    onSuccess: (updatedPatient) => {
-      if (updatedPatient) {
-        queryClient.setQueryData(['patient', updatedPatient.id], updatedPatient);
-        toast.success('Perfil actualizado correctamente');
-      }
-    },
-    onError: () => {
-      toast.error('Error al actualizar el perfil');
-    },
   });
 };
 
 export const usePatientMedicalHistory = (patientId: string) => {
   return useQuery({
-    queryKey: ['medical-history', patientId],
-    queryFn: () => PatientService.getMedicalHistory(patientId),
+    queryKey: ['patient-medical-history', patientId],
+    queryFn: async () => [
+      {
+        id: 'record-1',
+        date: '2024-01-15',
+        chiefComplaint: 'Dolor de cabeza persistente',
+        diagnosis: ['Migraña', 'Tensión muscular'],
+        treatmentPlan: 'Analgésicos y descanso',
+        vitalSigns: {
+          bloodPressure: '120/80',
+          heartRate: 72,
+          temperature: 36.5,
+          weight: 70,
+          height: 175
+        }
+      }
+    ],
+    enabled: !!patientId,
+  });
+};
+
+export const usePatientHealthMetrics = (patientId: string) => {
+  return useQuery({
+    queryKey: ['patient-health-metrics', patientId],
+    queryFn: async () => ({
+      bloodPressure: { systolic: 120, diastolic: 80 },
+      heartRate: 72,
+      weight: 70,
+      temperature: 36.5
+    }),
     enabled: !!patientId,
   });
 };
 
 export const usePatientAllergies = (patientId: string) => {
   return useQuery({
-    queryKey: ['allergies', patientId],
-    queryFn: () => PatientService.getAllergies(patientId),
-    enabled: !!patientId,
-  });
-};
-
-export const useAddAllergy = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: (allergy: Omit<Allergy, 'id'>) => PatientService.addAllergy(allergy),
-    onSuccess: (newAllergy) => {
-      queryClient.invalidateQueries({ queryKey: ['allergies', newAllergy.patientId] });
-      toast.success('Alergia agregada correctamente');
-    },
-    onError: () => {
-      toast.error('Error al agregar la alergia');
-    },
-  });
-};
-
-export const usePatientHealthMetrics = (patientId: string, type?: string) => {
-  return useQuery({
-    queryKey: ['health-metrics', patientId, type],
-    queryFn: () => PatientService.getHealthMetrics(patientId, type),
-    enabled: !!patientId,
-  });
-};
-
-export const useAddHealthMetric = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: (metric: Omit<HealthMetric, 'id'>) => PatientService.addHealthMetric(metric),
-    onSuccess: (newMetric) => {
-      queryClient.invalidateQueries({ queryKey: ['health-metrics', newMetric.patientId] });
-      toast.success('Métrica de salud registrada');
-    },
-    onError: () => {
-      toast.error('Error al registrar la métrica');
-    },
-  });
-};
-
-export const usePatientAppointments = (patientId: string) => {
-  return useQuery({
-    queryKey: ['patient-appointments', patientId],
-    queryFn: () => AppointmentService.getPatientAppointments(patientId),
+    queryKey: ['patient-allergies', patientId],
+    queryFn: async () => [
+      {
+        id: 'allergy-1',
+        allergen: 'Penicilina',
+        severity: 'severe' as const,
+        reaction: 'Erupción cutánea severa',
+        diagnosedDate: '2020-03-15'
+      }
+    ],
     enabled: !!patientId,
   });
 };
@@ -95,15 +87,19 @@ export const usePatientAppointments = (patientId: string) => {
 export const usePatientPrescriptions = (patientId: string) => {
   return useQuery({
     queryKey: ['patient-prescriptions', patientId],
-    queryFn: () => PatientService.getPrescriptions(patientId),
-    enabled: !!patientId,
-  });
-};
-
-export const usePatientTransactions = (patientId: string) => {
-  return useQuery({
-    queryKey: ['patient-transactions', patientId],
-    queryFn: () => PatientService.getTransactions(patientId),
+    queryFn: async () => [
+      {
+        id: 'prescription-1',
+        medicationName: 'Aspirina',
+        dosage: '100mg',
+        quantity: '30 tabletas',
+        frequency: 'Una vez al día',
+        duration: 30,
+        instructions: 'Tomar con alimentos',
+        status: 'delivered' as const,
+        createdAt: '2024-01-15'
+      }
+    ],
     enabled: !!patientId,
   });
 };
