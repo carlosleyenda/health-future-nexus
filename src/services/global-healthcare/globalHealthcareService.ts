@@ -409,7 +409,7 @@ export class GlobalHealthcareService {
         communicationRating: 4.7,
         timeliness: 4.6,
         facilities: 4.9,
-        likelihoodToRecommend: 4.8,
+        likelihoodTorecommend: 4.8,
         responseRate: 85.2,
         totalResponses: 12500,
         trends: []
@@ -699,6 +699,15 @@ export class GlobalHealthcareService {
             }
           ],
           thirdPartyValidation: ['Medical Tourism Association']
+        },
+        pricing: {
+          currency: 'USD',
+          medicalCosts: 25000,
+          accommodationCosts: 3500,
+          travelCosts: 2000,
+          supportServicesCosts: 1500,
+          totalPackageCost: 32000,
+          potentialSavings: 43000
         },
         testimonials: []
       }

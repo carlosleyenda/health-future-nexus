@@ -1,69 +1,69 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { GenomicsService, LabIntegrationService, PrivacyService } from '@/services/genomics/genomicsService';
+import { GenomicsService } from '@/services/genomics/genomicsService';
 import { toast } from 'sonner';
 import type { 
   GenomicProfile, 
-  PharmacogenomicProfile, 
+  PharmacogenomicProfile,
   DiseasePredisposition,
   FamilyHealthPlan,
   ResearchParticipation,
-  AncestryAnalysis
+  TargetedTherapy,
+  ClinicalTrial
 } from '@/types/genomics';
 
-export const useGenomicProfile = (patientId: string) => {
+export const useGenomicProfile = (patientId?: string) => {
   return useQuery({
     queryKey: ['genomic-profile', patientId],
-    queryFn: () => GenomicsService.getGenomicProfile(patientId),
+    queryFn: () => GenomicsService.getGenomicProfile(patientId!),
     enabled: !!patientId,
-    staleTime: 1000 * 60 * 60, // 1 hour
   });
 };
 
-export const usePharmacogenomics = (patientId: string) => {
+export const usePharmacogenomics = (patientId?: string) => {
   return useQuery({
     queryKey: ['pharmacogenomics', patientId],
-    queryFn: () => GenomicsService.getPharmacogenomicProfile(patientId),
+    queryFn: () => GenomicsService.getPharmacogenomicProfile(patientId!),
     enabled: !!patientId,
   });
 };
 
-export const useDiseasePredisposition = (patientId: string) => {
+export const useDiseasePredisposition = (patientId?: string) => {
   return useQuery({
     queryKey: ['disease-predisposition', patientId],
-    queryFn: () => GenomicsService.getDiseasePredisposition(patientId),
+    queryFn: () => GenomicsService.getDiseasePredisposition(patientId!),
     enabled: !!patientId,
   });
 };
 
-export const useAncestryAnalysis = (patientId: string) => {
+export const useAncestryAnalysis = (patientId?: string) => {
   return useQuery({
     queryKey: ['ancestry-analysis', patientId],
-    queryFn: () => GenomicsService.getAncestryAnalysis(patientId),
+    queryFn: () => GenomicsService.getAncestryAnalysis(patientId!),
     enabled: !!patientId,
   });
 };
 
-export const useCarrierScreening = (patientId: string) => {
+export const useCarrierScreening = (patientId?: string) => {
   return useQuery({
     queryKey: ['carrier-screening', patientId],
-    queryFn: () => GenomicsService.getCarrierScreening(patientId),
+    queryFn: () => GenomicsService.getCarrierScreening(patientId!),
     enabled: !!patientId,
   });
 };
 
-export const useFamilyHealthPlan = (familyId: string) => {
+export const useFamilyHealthPlan = (patientId?: string) => {
   return useQuery({
-    queryKey: ['family-health-plan', familyId],
-    queryFn: () => GenomicsService.getFamilyHealthPlan(familyId),
-    enabled: !!familyId,
+    queryKey: ['family-health-plan', patientId],
+    queryFn: () => GenomicsService.getFamilyHealthPlan(patientId!),
+    enabled: !!patientId,
   });
 };
 
-export const useResearchParticipation = (patientId: string) => {
+export const useResearchParticipation = (patientId?: string) => {
   return useQuery({
     queryKey: ['research-participation', patientId],
-    queryFn: () => GenomicsService.getResearchParticipation(patientId),
+    queryFn: () => GenomicsService.getResearchParticipation(patientId!),
     enabled: !!patientId,
   });
 };
@@ -72,141 +72,110 @@ export const useProcessGenomicData = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (rawData: any) => GenomicsService.processGenomicData(rawData),
-    onSuccess: (profile) => {
-      queryClient.setQueryData(['genomic-profile', profile.patientId], profile);
-      toast.success('Datos genómicos procesados correctamente');
+    mutationFn: (genomicData: { patientId: string; rawData: any; dataType: string }) =>
+      GenomicsService.processGenomicData(genomicData.rawData, genomicData.dataType),
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['genomic-profile', variables.patientId] });
+      toast.success('Datos genómicos procesados exitosamente');
     },
-    onError: (error) => {
-      console.error('Error processing genomic data:', error);
-      toast.error('Error al procesar los datos genómicos');
+    onError: () => {
+      toast.error('Error al procesar datos genómicos');
     },
   });
 };
 
-export const useTargetedTherapies = (patientId: string) => {
+export const useGeneratePersonalizedReport = () => {
+  return useMutation({
+    mutationFn: (patientId: string) => GenomicsService.generatePersonalizedReport(patientId),
+    onSuccess: () => {
+      toast.success('Reporte personalizado generado');
+    },
+    onError: () => {
+      toast.error('Error al generar reporte');
+    },
+  });
+};
+
+export const useTargetedTherapies = (patientId?: string) => {
   return useQuery({
     queryKey: ['targeted-therapies', patientId],
-    queryFn: async () => {
-      const profile = await GenomicsService.getGenomicProfile(patientId);
-      if (profile?.somaticMutations) {
-        const variants = profile.somaticMutations.map(m => m.mutation);
-        return GenomicsService.getTargetedTherapies(variants);
-      }
-      return [];
-    },
+    queryFn: () => GenomicsService.getTargetedTherapies(patientId!),
     enabled: !!patientId,
   });
 };
 
-export const useClinicalTrials = (patientId: string) => {
+export const usePrecisionMedicine = () => {
+  return useMutation({
+    mutationFn: (data: { patientId: string; condition: string }) =>
+      GenomicsService.getPrecisionMedicineRecommendations(data.patientId, data.condition),
+    onSuccess: () => {
+      toast.success('Recomendaciones de medicina de precisión generadas');
+    },
+    onError: () => {
+      toast.error('Error al generar recomendaciones');
+    },
+  });
+};
+
+export const useClinicalTrials = (patientId?: string) => {
   return useQuery({
     queryKey: ['clinical-trials', patientId],
-    queryFn: async () => {
-      const profile = await GenomicsService.getGenomicProfile(patientId);
-      if (profile) {
-        return GenomicsService.searchClinicalTrials(profile);
-      }
-      return [];
-    },
+    queryFn: () => GenomicsService.getClinicalTrials(patientId!),
     enabled: !!patientId,
   });
 };
 
-// Lab Integration Hooks
-export const useIntegrate23andMe = () => {
+export const useIntegrateLabData = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (credentials: any) => LabIntegrationService.integrate23andMe(credentials),
-    onSuccess: (profile) => {
-      queryClient.setQueryData(['genomic-profile', profile.patientId], profile);
-      toast.success('Datos de 23andMe integrados correctamente');
+    mutationFn: (data: { patientId: string; labProvider: string; credentials: any }) =>
+      GenomicsService.integrateWithLab(data.labProvider, data.credentials),
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['genomic-profile', variables.patientId] });
+      toast.success('Integración con laboratorio completada');
     },
     onError: () => {
-      toast.error('Error al integrar con 23andMe');
+      toast.error('Error en integración con laboratorio');
     },
   });
 };
 
-export const useIntegrateAncestryDNA = () => {
-  const queryClient = useQueryClient();
-  
+export const usePrivacySettings = () => {
   return useMutation({
-    mutationFn: (credentials: any) => LabIntegrationService.integrateAncestryDNA(credentials),
-    onSuccess: (ancestry) => {
-      toast.success('Datos de AncestryDNA integrados correctamente');
-    },
-    onError: () => {
-      toast.error('Error al integrar con AncestryDNA');
-    },
-  });
-};
-
-export const useIntegrateLabCorp = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: (credentials: any) => LabIntegrationService.integrateLabCorp(credentials),
-    onSuccess: (profile) => {
-      queryClient.setQueryData(['genomic-profile', profile.patientId], profile);
-      toast.success('Datos de LabCorp integrados correctamente');
-    },
-    onError: () => {
-      toast.error('Error al integrar con LabCorp');
-    },
-  });
-};
-
-export const useIntegrateQuest = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: (credentials: any) => LabIntegrationService.integrateQuest(credentials),
-    onSuccess: (profile) => {
-      queryClient.setQueryData(['genomic-profile', profile.patientId], profile);
-      toast.success('Datos de Quest Diagnostics integrados correctamente');
-    },
-    onError: () => {
-      toast.error('Error al integrar con Quest Diagnostics');
-    },
-  });
-};
-
-// Privacy Hooks
-export const useEncryptGenomicData = () => {
-  return useMutation({
-    mutationFn: (data: GenomicProfile) => PrivacyService.encryptGenomicData(data),
+    mutationFn: (settings: { patientId: string; privacyPreferences: any }) =>
+      GenomicsService.updatePrivacySettings(settings.privacyPreferences),
     onSuccess: () => {
-      toast.success('Datos genómicos encriptados correctamente');
+      toast.success('Configuración de privacidad actualizada');
     },
     onError: () => {
-      toast.error('Error al encriptar los datos genómicos');
+      toast.error('Error al actualizar configuración de privacidad');
     },
   });
 };
 
-export const useExportGenomicData = () => {
+export const useConsentManagement = () => {
   return useMutation({
-    mutationFn: ({ patientId, format }: { patientId: string; format: string }) => 
-      PrivacyService.exportData(patientId, format),
+    mutationFn: (consent: { patientId: string; consentType: string; granted: boolean }) =>
+      GenomicsService.manageConsent(consent.consentType, consent.granted),
     onSuccess: () => {
-      toast.success('Datos genómicos exportados correctamente');
+      toast.success('Consentimiento actualizado');
     },
     onError: () => {
-      toast.error('Error al exportar los datos genómicos');
+      toast.error('Error al actualizar consentimiento');
     },
   });
 };
 
-export const useAnonymizeData = () => {
+export const useDataPortability = () => {
   return useMutation({
-    mutationFn: (data: GenomicProfile) => PrivacyService.anonymizeData(data),
+    mutationFn: (request: { patientId: string; format: string; destination: string }) =>
+      GenomicsService.exportGenomicData(request.format, request.destination),
     onSuccess: () => {
-      toast.success('Datos anonimizados correctamente');
+      toast.success('Exportación de datos iniciada');
     },
     onError: () => {
-      toast.error('Error al anonimizar los datos');
+      toast.error('Error al exportar datos');
     },
   });
 };
