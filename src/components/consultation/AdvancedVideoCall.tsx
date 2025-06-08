@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Video, VideoOff, Mic, MicOff, Monitor, Phone, MessageCircle, 
-  Send, FileText, Save, Camera, Record, Square, Users, 
+  Send, FileText, Save, Camera, Square, Users, 
   AlertTriangle, Settings, Maximize, VolumeX, Volume2 
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -178,7 +178,7 @@ export default function AdvancedVideoCall({
             {/* Recording Indicator */}
             {callState.isRecording && (
               <Badge variant="destructive" className="animate-pulse">
-                <Record className="h-3 w-3 mr-1" />
+                <div className="h-3 w-3 mr-1 bg-white rounded-full" />
                 Grabando
               </Badge>
             )}
@@ -315,7 +315,7 @@ export default function AdvancedVideoCall({
                     onClick={startRecording}
                     className="rounded-full w-14 h-14"
                   >
-                    {callState.isRecording ? <Square className="h-6 w-6" /> : <Record className="h-6 w-6" />}
+                    {callState.isRecording ? <Square className="h-6 w-6" /> : <div className="h-6 w-6 bg-red-500 rounded-full" />}
                   </Button>
 
                   <Button

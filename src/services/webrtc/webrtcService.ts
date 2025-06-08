@@ -224,15 +224,15 @@ export class WebRTCService {
   private async sendSignalingMessage(message: any) {
     // This would typically go through a signaling server
     // For now, we'll use Supabase realtime channels
-    const { error } = await supabase
-      .channel(`video-call-${this.sessionId}`)
-      .send({
-        type: 'broadcast',
-        event: 'signaling',
-        payload: message,
-      });
-
-    if (error) {
+    try {
+      await supabase
+        .channel(`video-call-${this.sessionId}`)
+        .send({
+          type: 'broadcast',
+          event: 'signaling',
+          payload: message,
+        });
+    } catch (error) {
       console.error('Error sending signaling message:', error);
     }
   }
@@ -271,32 +271,32 @@ export class WebRTCService {
   }
 
   private async saveQualityMetrics(metrics: Partial<QualityMetrics>) {
-    const { error } = await supabase
-      .from('video_call_quality_metrics')
-      .insert({
-        session_id: this.sessionId,
-        user_id: this.userId,
-        timestamp_in_call: Math.floor(Date.now() / 1000),
-        ...metrics,
-      });
-
-    if (error) {
+    try {
+      await supabase
+        .from('video_call_quality_metrics')
+        .insert({
+          session_id: this.sessionId,
+          user_id: this.userId,
+          timestamp_in_call: Math.floor(Date.now() / 1000),
+          ...metrics,
+        });
+    } catch (error) {
       console.error('Error saving quality metrics:', error);
     }
   }
 
   private async logActivity(action: string, details?: any) {
-    const { error } = await supabase
-      .from('video_call_audit_log')
-      .insert({
-        session_id: this.sessionId,
-        user_id: this.userId,
-        action,
-        details,
-        timestamp_in_call: Math.floor(Date.now() / 1000),
-      });
-
-    if (error) {
+    try {
+      await supabase
+        .from('video_call_audit_log')
+        .insert({
+          session_id: this.sessionId,
+          user_id: this.userId,
+          action,
+          details,
+          timestamp_in_call: Math.floor(Date.now() / 1000),
+        });
+    } catch (error) {
       console.error('Error logging activity:', error);
     }
   }
