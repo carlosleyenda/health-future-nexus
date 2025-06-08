@@ -22,14 +22,14 @@ export default function MedicalTimeline({ events, onDocumentSelect }: MedicalTim
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" role="timeline" aria-label="Timeline de eventos médicos">
       {events.map((event, index) => (
         <div key={event.id} className="relative">
           {index !== events.length - 1 && (
-            <div className="absolute left-6 top-12 w-0.5 h-16 bg-gray-200" />
+            <div className="absolute left-6 top-12 w-0.5 h-16 bg-gray-200" aria-hidden="true" />
           )}
           
-          <Card>
+          <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-4">
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -39,9 +39,13 @@ export default function MedicalTimeline({ events, onDocumentSelect }: MedicalTim
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium text-sm">{event.title}</h3>
-                    <span className="text-xs text-gray-500">
-                      {new Date(event.date).toLocaleDateString()}
-                    </span>
+                    <time className="text-xs text-gray-500" dateTime={event.date}>
+                      {new Date(event.date).toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </time>
                   </div>
                   
                   <p className="text-sm text-gray-600 mb-2">{event.description}</p>
@@ -59,10 +63,10 @@ export default function MedicalTimeline({ events, onDocumentSelect }: MedicalTim
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          // Use the first document from the documents array
                           const firstDocument = event.documents[0];
                           onDocumentSelect(firstDocument);
                         }}
+                        aria-label={`Ver documento: ${event.documents[0].title}`}
                       >
                         Ver Documento
                       </Button>
