@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import PatientDashboard from '@/components/dashboard/PatientDashboard';
-import DoctorDashboard from '@/components/dashboard/DoctorDashboard';
-import AdminDashboard from '@/components/dashboard/AdminDashboard';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
+import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
+import { AdminDashboard } from '@/components/dashboard/AdminDashboard';
 import UserProfile from '@/components/profile/UserProfile';
 import AppointmentBooking from '@/components/appointments/AppointmentBooking';
 import PharmacyModule from '@/components/pharmacy/PharmacyModule';
@@ -15,6 +15,34 @@ import CompletePatientPortal from '@/components/patient/CompletePatientPortal';
 import PaymentPortal from '@/components/payments/PaymentPortal';
 import VideoConsultation from '@/components/consultation/VideoConsultation';
 import ConsultationRoom from '@/components/consultation/ConsultationRoom';
+import MedicalChat from '@/components/chat/MedicalChat';
+
+// Wrapper components para pasar props de URL
+function VideoConsultationWrapper() {
+  const { appointmentId } = useParams();
+  const { user } = useAuthStore();
+  
+  return (
+    <VideoConsultation 
+      appointmentId={appointmentId || ''} 
+      userId={user?.id || ''} 
+      userRole={user?.role || 'patient'} 
+    />
+  );
+}
+
+function ConsultationRoomWrapper() {
+  const { roomId } = useParams();
+  const { user } = useAuthStore();
+  
+  return (
+    <ConsultationRoom 
+      appointmentId={roomId || ''} 
+      userId={user?.id || ''} 
+      userRole={user?.role || 'patient'} 
+    />
+  );
+}
 
 export default function AppRoutes() {
   const { user } = useAuthStore();
@@ -73,13 +101,25 @@ export default function AppRoutes() {
       
       <Route path="/consultation/:appointmentId" element={
         <ProtectedRoute>
-          <VideoConsultation />
+          <VideoConsultationWrapper />
         </ProtectedRoute>
       } />
       
       <Route path="/consultation-room/:roomId" element={
         <ProtectedRoute>
-          <ConsultationRoom />
+          <ConsultationRoomWrapper />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/chat" element={
+        <ProtectedRoute>
+          <MedicalChat />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/chat/:conversationId" element={
+        <ProtectedRoute>
+          <MedicalChat />
         </ProtectedRoute>
       } />
     </Routes>
