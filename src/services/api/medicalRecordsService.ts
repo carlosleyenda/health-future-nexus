@@ -29,7 +29,11 @@ const mockDocuments: MedicalDocument[] = [
         accessedAt: '2024-01-15T10:30:00Z',
         action: 'view'
       }
-    ]
+    ],
+    date: '2024-01-15',
+    doctor: 'Dr. García',
+    fileType: 'JPEG',
+    url: '/placeholder.svg'
   },
   {
     id: 'doc-2',
@@ -54,7 +58,11 @@ const mockDocuments: MedicalDocument[] = [
       signature: 'digital_signature_hash',
       verified: true
     },
-    accessHistory: []
+    accessHistory: [],
+    date: '2024-01-10',
+    doctor: 'Dr. García',
+    fileType: 'PDF',
+    url: '/placeholder.svg'
   }
 ];
 
@@ -120,7 +128,11 @@ export class MedicalRecordsService {
       tags: metadata.tags || [],
       isShared: false,
       sharedWith: [],
-      accessHistory: []
+      accessHistory: [],
+      date: new Date().toISOString().split('T')[0],
+      doctor: metadata.uploadedBy!,
+      fileType: file.type.toUpperCase(),
+      url: URL.createObjectURL(file)
     };
 
     mockDocuments.push(newDocument);

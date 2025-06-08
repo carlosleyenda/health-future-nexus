@@ -11,7 +11,7 @@ import type {
   EnvironmentalExposures
 } from '@/types/genomics';
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+import { delay } from '@/lib/delay';
 
 export class GenomicsService {
   // Genomic Profile Management
@@ -255,53 +255,42 @@ export class GenomicsService {
   }
 
   static async getCarrierScreening(patientId: string): Promise<CarrierScreening[]> {
-    await delay(500);
-
+    await delay(600);
+    
     return [
       {
-        id: 'screening-001',
+        id: 'carrier-1',
         diseases: [
           {
-            diseaseName: 'Cystic Fibrosis',
+            diseaseName: 'Fibrosis Quística',
             gene: 'CFTR',
             carrierRisk: 0.04,
-            inheritancePattern: 'autosomal recessive',
-            recommendations: ['Partner screening not required']
-          }
-        ],
-        reportSummary: 'Negative for common CFTR mutations',
-        recommendations: ['No immediate action required'],
-        references: ['PMID:56789012']
-      },
-      {
-        id: 'screening-002',
-        diseases: [
+            inheritancePattern: 'Autosómica recesiva',
+            recommendations: [
+              'Consulta genética para planificación familiar',
+              'Pruebas prenatales disponibles'
+            ]
+          },
           {
-            diseaseName: 'Sickle Cell Disease',
+            diseaseName: 'Anemia Falciforme',
             gene: 'HBB',
-            carrierRisk: 0.001,
-            inheritancePattern: 'autosomal recessive',
-            recommendations: ['No action required']
+            carrierRisk: 0.08,
+            inheritancePattern: 'Autosómica recesiva',
+            recommendations: [
+              'Evaluación del estado de portador de la pareja',
+              'Consejería genética especializada'
+            ]
           }
         ],
-        reportSummary: 'Negative for sickle cell variants',
-        recommendations: ['No action required'],
-        references: ['PMID:67890123']
-      },
-      {
-        id: 'screening-003',
-        diseases: [
-          {
-            diseaseName: 'Tay-Sachs Disease',
-            gene: 'HEXA',
-            carrierRisk: 0.25,
-            inheritancePattern: 'autosomal recessive',
-            recommendations: ['Partner screening recommended']
-          }
+        reportSummary: 'Análisis de portador para 200+ condiciones genéticas comunes',
+        recommendations: [
+          'Discutir resultados con asesor genético',
+          'Considerar pruebas adicionales según historial familiar'
         ],
-        reportSummary: 'Carrier for Tay-Sachs disease',
-        recommendations: ['Genetic counseling', 'Partner testing'],
-        references: ['PMID:78901234']
+        references: [
+          'ACMG Guidelines for Carrier Screening',
+          'ACOG Committee Opinion on Carrier Screening'
+        ]
       }
     ];
   }

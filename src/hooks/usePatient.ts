@@ -1,5 +1,5 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Mock patient data - replace with actual API calls
 export const usePatientProfile = (patientId: string) => {
@@ -55,15 +55,35 @@ export const usePatientMedicalHistory = (patientId: string) => {
   });
 };
 
-export const usePatientHealthMetrics = (patientId: string) => {
+export const usePatientHealthMetrics = (patientId: string, metricType?: string) => {
   return useQuery({
-    queryKey: ['patient-health-metrics', patientId],
-    queryFn: async () => ({
-      bloodPressure: { systolic: 120, diastolic: 80 },
-      heartRate: 72,
-      weight: 70,
-      temperature: 36.5
-    }),
+    queryKey: ['patient-health-metrics', patientId, metricType],
+    queryFn: async () => {
+      // Return array of health metrics for charts
+      if (metricType) {
+        return [
+          {
+            id: '1',
+            value: metricType === 'heart_rate' ? 72 : metricType === 'blood_pressure' ? 120 : metricType === 'weight' ? 70 : 36.5,
+            unit: metricType === 'heart_rate' ? 'bpm' : metricType === 'blood_pressure' ? 'mmHg' : metricType === 'weight' ? 'kg' : '°C',
+            recordedAt: new Date().toISOString()
+          },
+          {
+            id: '2',
+            value: metricType === 'heart_rate' ? 75 : metricType === 'blood_pressure' ? 118 : metricType === 'weight' ? 69.5 : 36.3,
+            unit: metricType === 'heart_rate' ? 'bpm' : metricType === 'blood_pressure' ? 'mmHg' : metricType === 'weight' ? 'kg' : '°C',
+            recordedAt: new Date(Date.now() - 86400000).toISOString()
+          }
+        ];
+      }
+      
+      return {
+        bloodPressure: { systolic: 120, diastolic: 80 },
+        heartRate: 72,
+        weight: 70,
+        temperature: 36.5
+      };
+    },
     enabled: !!patientId,
   });
 };
@@ -101,5 +121,28 @@ export const usePatientPrescriptions = (patientId: string) => {
       }
     ],
     enabled: !!patientId,
+  });
+};
+
+export const useAddHealthMetric = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: {
+      patientId: string;
+      type: string;
+      value: number;
+      unit: string;
+      recordedAt: string;
+    }) => {
+      // Mock API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return { id: crypto.randomUUID(), ...data };
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['patient-health-metrics', variables.patientId]
+      });
+    }
   });
 };
