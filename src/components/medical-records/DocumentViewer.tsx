@@ -28,8 +28,8 @@ export default function DocumentViewer(props: CombinedProps) {
   
   const mockDocument: MedicalDocument = document || {
     id: documentId || '',
-    patientId: '',
-    doctorId: '',
+    patientId: 'patient-1',
+    doctorId: 'doctor-1',
     category: 'consultation',
     type: 'pdf',
     title: 'Documento Médico',
@@ -43,7 +43,11 @@ export default function DocumentViewer(props: CombinedProps) {
     tags: [],
     isShared: false,
     sharedWith: [],
-    accessHistory: []
+    accessHistory: [],
+    date: new Date().toISOString().split('T')[0],
+    doctor: 'Dr. Sistema',
+    fileType: 'PDF',
+    url: '/placeholder.svg'
   };
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 200));

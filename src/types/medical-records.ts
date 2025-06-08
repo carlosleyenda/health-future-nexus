@@ -73,4 +73,5 @@ export interface AccessRecord {
   userRole: string;
   accessedAt: string;
   action: string;
+  ipAddress?: string;
 }

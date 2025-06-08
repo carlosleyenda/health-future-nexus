@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { MedicalDocument } from '@/types/medical-records';
+import type { MedicalDocument, MedicalTimelineEvent } from '@/types/medical-records';
 
 export const usePatientDocuments = (patientId: string) => {
   return useQuery({
@@ -37,13 +37,18 @@ export const usePatientDocuments = (patientId: string) => {
 export const usePatientTimeline = (patientId: string) => {
   return useQuery({
     queryKey: ['patient-timeline', patientId],
-    queryFn: async () => [
+    queryFn: async (): Promise<MedicalTimelineEvent[]> => [
       {
         id: 'event-1',
+        patientId,
         date: '2024-01-15',
         type: 'consultation',
         title: 'Consulta General',
-        description: 'Revisión médica general'
+        description: 'Revisión médica general',
+        doctorId: 'doctor-1',
+        doctorName: 'Dr. García',
+        documents: [],
+        severity: 'low'
       }
     ],
     enabled: !!patientId,

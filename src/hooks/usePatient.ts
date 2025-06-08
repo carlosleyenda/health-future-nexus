@@ -59,7 +59,7 @@ export const usePatientHealthMetrics = (patientId: string, metricType?: string) 
   return useQuery({
     queryKey: ['patient-health-metrics', patientId, metricType],
     queryFn: async () => {
-      // Return array of health metrics for charts
+      // Always return array format for consistent typing
       if (metricType) {
         return [
           {
@@ -77,12 +77,8 @@ export const usePatientHealthMetrics = (patientId: string, metricType?: string) 
         ];
       }
       
-      return {
-        bloodPressure: { systolic: 120, diastolic: 80 },
-        heartRate: 72,
-        weight: 70,
-        temperature: 36.5
-      };
+      // Return empty array for consistent typing when no metric type specified
+      return [];
     },
     enabled: !!patientId,
   });
