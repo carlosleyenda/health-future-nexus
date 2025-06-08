@@ -8,8 +8,8 @@ import { Stethoscope, Users, FileText, Calendar, MessageSquare } from 'lucide-re
 import TodaysSchedule from './sections/TodaysSchedule';
 import PatientAlerts from './sections/PatientAlerts';
 import RevenueSummary from './sections/RevenueSummary';
-import DoctorQuickActions from './sections/DoctorQuickActions';
 import RecentReviews from './sections/RecentReviews';
+import DoctorActions from '@/components/doctor/DoctorActions';
 
 export const DoctorDashboard = () => {
   const { user } = useAuthStore();
@@ -76,8 +76,8 @@ export const DoctorDashboard = () => {
         ))}
       </div>
       
-      {/* Quick Actions */}
-      <DoctorQuickActions />
+      {/* Doctor Actions - Componente completo de acciones */}
+      <DoctorActions doctorId={user?.id || ''} />
       
       {/* Main Grid responsive */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">

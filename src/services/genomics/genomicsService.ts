@@ -254,8 +254,8 @@ export class GenomicsService {
     };
   }
 
-  static async getCarrierScreening(patientId: string): Promise<CarrierScreening[]> {
-    await delay(600);
+  static async getCarrierScreening(userId: string): Promise<CarrierScreening[]> {
+    await delay(400);
     
     return [
       {
@@ -267,29 +267,19 @@ export class GenomicsService {
             carrierRisk: 0.04,
             inheritancePattern: 'Autosómica recesiva',
             recommendations: [
-              'Consulta genética para planificación familiar',
-              'Pruebas prenatales disponibles'
-            ]
-          },
-          {
-            diseaseName: 'Anemia Falciforme',
-            gene: 'HBB',
-            carrierRisk: 0.08,
-            inheritancePattern: 'Autosómica recesiva',
-            recommendations: [
-              'Evaluación del estado de portador de la pareja',
-              'Consejería genética especializada'
+              'Considerar asesoramiento genético antes del embarazo',
+              'Pruebas genéticas para la pareja'
             ]
           }
         ],
-        reportSummary: 'Análisis de portador para 200+ condiciones genéticas comunes',
+        reportSummary: 'Análisis completo de portador para condiciones genéticas comunes',
         recommendations: [
-          'Discutir resultados con asesor genético',
-          'Considerar pruebas adicionales según historial familiar'
+          'Consultar con especialista en genética médica',
+          'Compartir resultados con familiares directos'
         ],
         references: [
-          'ACMG Guidelines for Carrier Screening',
-          'ACOG Committee Opinion on Carrier Screening'
+          'American College of Medical Genetics Guidelines',
+          'Clinical Genomics Standards'
         ]
       }
     ];
