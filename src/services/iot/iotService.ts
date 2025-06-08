@@ -326,6 +326,7 @@ export class IoTService {
     return [
       {
         id: crypto.randomUUID(),
+        deviceId: 'device-123',
         type: 'battery_low',
         severity: 'medium',
         title: 'Low Battery Warning',
@@ -351,6 +352,7 @@ export class IoTService {
     
     return {
       id: crypto.randomUUID(),
+      deviceId: 'predictive-ai',
       type: 'anomaly_detected',
       severity: 'high',
       title: 'Predictive Health Alert',
