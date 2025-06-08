@@ -1,56 +1,33 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Users, 
-  Activity, 
-  DollarSign, 
-  Server, 
-  TrendingUp, 
-  AlertTriangle,
-  UserPlus,
-  Settings,
-  BarChart3,
-  Shield,
-  Database,
-  Cpu
-} from "lucide-react";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
-import { useAdminAnalytics, useSystemHealth, useAllUsers } from '@/hooks/useAdmin';
-import { UserManagement } from '@/components/admin/UserManagement';
-import { SystemConfiguration } from '@/components/admin/SystemConfiguration';
-import { ReportsGenerator } from '@/components/admin/ReportsGenerator';
-import { DatabaseManagement } from '@/components/admin/DatabaseManagement';
-import { CreateUserForm } from '@/components/admin/CreateUserForm';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Users, Calendar, DollarSign, Activity, Plus, Settings, FileText, Database, UserPlus } from 'lucide-react';
+import SystemConfiguration from '@/components/admin/SystemConfiguration';
+import ReportsGenerator from '@/components/admin/ReportsGenerator';
+import DatabaseManagement from '@/components/admin/DatabaseManagement';
+import CreateUserForm from '@/components/admin/CreateUserForm';
+import UserManagement from '@/components/admin/UserManagement';
 
-type AdminView = 'dashboard' | 'users' | 'config' | 'reports' | 'database' | 'create-user';
+interface AdminTab {
+  id: string;
+  label: string;
+  icon: React.ElementType;
+}
 
-export const AdminDashboard = () => {
-  const [currentView, setCurrentView] = useState<AdminView>('dashboard');
-  const [showCreateUserDialog, setShowCreateUserDialog] = useState(false);
-  
-  const { data: analytics, isLoading: analyticsLoading } = useAdminAnalytics();
-  const { data: systemHealth, isLoading: healthLoading } = useSystemHealth();
-  const { data: users, isLoading: usersLoading } = useAllUsers();
+export default function AdminDashboard() {
+  const [activeTab, setActiveTab] = useState<string>('overview');
 
-  const renderCurrentView = () => {
-    switch (currentView) {
+  const tabs: AdminTab[] = [
+    { id: 'overview', label: 'Vista General', icon: Activity },
+    { id: 'users', label: 'Usuarios', icon: Users },
+    { id: 'config', label: 'Configuración', icon: Settings },
+    { id: 'reports', label: 'Reportes', icon: FileText },
+    { id: 'database', label: 'Base de Datos', icon: Database },
+  ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
       case 'users':
         return <UserManagement />;
       case 'config':
@@ -60,385 +37,152 @@ export const AdminDashboard = () => {
       case 'database':
         return <DatabaseManagement />;
       default:
-        return renderDashboardView();
-    }
-  };
-
-  const renderDashboardView = () => {
-    if (analyticsLoading || healthLoading || usersLoading) {
-      return (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-6">
-                  <div className="h-8 bg-gray-200 rounded mb-2" />
-                  <div className="h-12 bg-gray-200 rounded" />
-                </CardContent>
-              </Card>
-            ))}
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Usuarios Totales
+                </CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">1,248</div>
+                <p className="text-xs text-muted-foreground">
+                  +180 desde el mes pasado
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <Badge variant="outline">845 Pacientes</Badge>
+                  <Badge variant="outline">312 Doctores</Badge>
+                  <Badge variant="outline">91 Admin</Badge>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Citas Programadas
+                </CardTitle>
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">349</div>
+                <p className="text-xs text-muted-foreground">
+                  +24% desde la semana pasada
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <Badge variant="outline" className="bg-green-50">245 Confirmadas</Badge>
+                  <Badge variant="outline" className="bg-yellow-50">78 Pendientes</Badge>
+                  <Badge variant="outline" className="bg-red-50">26 Canceladas</Badge>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Ingresos Mensuales
+                </CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">$248,560</div>
+                <p className="text-xs text-muted-foreground">
+                  +12.5% desde el mes pasado
+                </p>
+                <div className="mt-4">
+                  <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div className="bg-green-500 h-full rounded-full" style={{ width: '78%' }}></div>
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>Meta: $300,000</span>
+                    <span>78%</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Consultas Virtuales
+                </CardTitle>
+                <Activity className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">1,423</div>
+                <p className="text-xs text-muted-foreground">
+                  +32% desde el mes pasado
+                </p>
+                <div className="mt-4 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span>Completadas</span>
+                    <span>1,245</span>
+                  </div>
+                  <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div className="bg-blue-500 h-full rounded-full" style={{ width: '87%' }}></div>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span>Canceladas</span>
+                    <span>178</span>
+                  </div>
+                  <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div className="bg-red-500 h-full rounded-full" style={{ width: '13%' }}></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="md:col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Acciones Rápidas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Button className="w-full flex items-center gap-2 justify-center" onClick={() => setActiveTab('users')}>
+                    <UserPlus className="h-4 w-4" />
+                    <span>Crear Usuario</span>
+                  </Button>
+                  <Button variant="outline" className="w-full flex items-center gap-2 justify-center" onClick={() => setActiveTab('reports')}>
+                    <FileText className="h-4 w-4" />
+                    <span>Generar Reporte</span>
+                  </Button>
+                  <Button variant="outline" className="w-full flex items-center gap-2 justify-center" onClick={() => setActiveTab('config')}>
+                    <Settings className="h-4 w-4" />
+                    <span>Configuración</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      );
+        );
     }
-
-    const revenueData = analytics?.revenueChart || [];
-    const appointmentsData = analytics?.appointmentsChart || [];
-    const specialtyData = analytics?.specialtyDistribution || [];
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
-
-    return (
-      <div className="space-y-6">
-        {/* System Overview - Métricas clave */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Usuarios</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analytics?.totalUsers?.toLocaleString() || '0'}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">+{analytics?.patientsGrowth || 0}%</span> vs mes anterior
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Usuarios Activos</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analytics?.activeUsers?.toLocaleString() || '0'}</div>
-              <p className="text-xs text-muted-foreground">
-                En los últimos 30 días
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Consultas Totales</CardTitle>
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analytics?.totalAppointments?.toLocaleString() || '0'}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">+{analytics?.appointmentsGrowth || 0}%</span> vs mes anterior
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Ingresos Totales</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                ${(analytics?.revenue || 0).toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">+{analytics?.revenueGrowth || 0}%</span> vs mes anterior
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Revenue Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Ingresos por Mes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value?.toLocaleString()}`, 'Ingresos']} />
-                  <Bar dataKey="revenue" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Appointments Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Citas por Mes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={appointmentsData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="appointments" stroke="#82ca9d" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* System Health & User Management */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* System Health */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Server className="h-5 w-5" />
-                Estado del Sistema
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Estado General</span>
-                  <Badge variant={systemHealth?.status === 'healthy' ? 'default' : 'destructive'}>
-                    {systemHealth?.status === 'healthy' ? 'Operativo' : 'Problema'}
-                  </Badge>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>CPU</span>
-                    <span>{systemHealth?.cpu || 0}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full" 
-                      style={{ width: `${systemHealth?.cpu || 0}%` }}
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Memoria</span>
-                    <span>{systemHealth?.memory || 0}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full" 
-                      style={{ width: `${systemHealth?.memory || 0}%` }}
-                    />
-                  </div>
-                </div>
-                
-                <div className="pt-2 border-t">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Tiempo Activo</span>
-                    <span className="text-green-600">{systemHealth?.uptime || '99.9%'}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Conexiones Activas</span>
-                    <span>{systemHealth?.activeConnections || 0}</span>
-                  </div>
-                </div>
-                
-                {systemHealth?.alerts && systemHealth.alerts.length > 0 && (
-                  <div className="pt-2 border-t">
-                    <h4 className="text-sm font-medium mb-2 flex items-center gap-1">
-                      <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                      Alertas
-                    </h4>
-                    {systemHealth.alerts.map((alert) => (
-                      <div key={alert.id} className="flex items-center gap-2 text-sm text-yellow-700 bg-yellow-50 p-2 rounded">
-                        <AlertTriangle className="h-3 w-3" />
-                        {alert.message}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* User Management */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Gestión de Usuarios
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {users?.filter(u => u.role === 'patient').length || 0}
-                    </div>
-                    <div className="text-sm text-gray-600">Pacientes</div>
-                  </div>
-                  <div className="text-center p-3 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">
-                      {users?.filter(u => u.role === 'doctor').length || 0}
-                    </div>
-                    <div className="text-sm text-gray-600">Doctores</div>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium">Usuarios Recientes</h4>
-                  {users?.slice(0, 3).map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-2 border rounded">
-                      <div>
-                        <div className="text-sm font-medium">{user.name}</div>
-                        <div className="text-xs text-gray-500">{user.email}</div>
-                      </div>
-                      <Badge variant="outline" className="capitalize">
-                        {user.role}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Specialty Distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Distribución por Especialidad</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={specialtyData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {specialtyData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Quick Admin Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Acciones Rápidas de Administración
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Button 
-                variant="outline" 
-                className="h-20 flex flex-col gap-2"
-                onClick={() => setShowCreateUserDialog(true)}
-              >
-                <UserPlus className="h-6 w-6" />
-                <span className="text-sm">Nuevo Usuario</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                className="h-20 flex flex-col gap-2"
-                onClick={() => setCurrentView('config')}
-              >
-                <Settings className="h-6 w-6" />
-                <span className="text-sm">Configuración</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                className="h-20 flex flex-col gap-2"
-                onClick={() => setCurrentView('reports')}
-              >
-                <BarChart3 className="h-6 w-6" />
-                <span className="text-sm">Reportes</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                className="h-20 flex flex-col gap-2"
-                onClick={() => setCurrentView('database')}
-              >
-                <Database className="h-6 w-6" />
-                <span className="text-sm">Base de Datos</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
   };
 
   return (
     <div className="space-y-6">
-      {currentView === 'dashboard' ? (
-        <>
-          <div>
-            <h1 className="text-3xl font-bold">Panel de Administración</h1>
-            <p className="text-muted-foreground">Gestiona usuarios y configuración del sistema</p>
-          </div>
-          
-          {renderDashboardView()}
-        </>
-      ) : (
-        <>
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              onClick={() => setCurrentView('dashboard')}
-            >
-              ← Volver al Dashboard
-            </Button>
-            <Button 
-              variant={currentView === 'users' ? 'default' : 'outline'}
-              onClick={() => setCurrentView('users')}
-            >
-              Usuarios
-            </Button>
-            <Button 
-              variant={currentView === 'config' ? 'default' : 'outline'}
-              onClick={() => setCurrentView('config')}
-            >
-              Configuración
-            </Button>
-            <Button 
-              variant={currentView === 'reports' ? 'default' : 'outline'}
-              onClick={() => setCurrentView('reports')}
-            >
-              Reportes
-            </Button>
-            <Button 
-              variant={currentView === 'database' ? 'default' : 'outline'}
-              onClick={() => setCurrentView('database')}
-            >
-              Base de Datos
-            </Button>
-          </div>
-          
-          {renderCurrentView()}
-        </>
-      )}
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold tracking-tight">Panel de Administración</h1>
+        <Button onClick={() => setActiveTab('users')}>
+          <Plus className="h-4 w-4 mr-2" />
+          Nuevo Usuario
+        </Button>
+      </div>
 
-      {/* Dialog para crear usuario */}
-      <Dialog open={showCreateUserDialog} onOpenChange={setShowCreateUserDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Crear Nuevo Usuario</DialogTitle>
-          </DialogHeader>
-          <CreateUserForm onSuccess={() => setShowCreateUserDialog(false)} />
-        </DialogContent>
-      </Dialog>
+      <div className="flex overflow-x-auto space-x-4 pb-2">
+        {tabs.map((tab) => (
+          <Button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            variant={activeTab === tab.id ? "default" : "outline"}
+            className="flex items-center gap-2"
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </Button>
+        ))}
+      </div>
+
+      {renderTabContent()}
     </div>
   );
-};
+}

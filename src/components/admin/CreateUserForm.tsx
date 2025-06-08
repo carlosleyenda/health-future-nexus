@@ -1,16 +1,13 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useCreateUser } from '@/hooks/useAdminManagement';
 import { toast } from 'sonner';
-import type { CreateUserForm as CreateUserFormType } from '@/types/admin';
 
 const createUserSchema = z.object({
   firstName: z.string().min(2, 'Nombre debe tener al menos 2 caracteres'),
@@ -36,7 +33,11 @@ const createUserSchema = z.object({
 
 type CreateUserFormData = z.infer<typeof createUserSchema>;
 
-export default function CreateUserForm() {
+interface CreateUserFormProps {
+  onUserCreated: (userData: CreateUserFormType) => void;
+}
+
+export default function CreateUserForm({ onUserCreated }: CreateUserFormProps) {
   const createUser = useCreateUser();
   
   const {
@@ -76,6 +77,7 @@ export default function CreateUserForm() {
     createUser.mutate(userData, {
       onSuccess: () => {
         toast.success('Usuario creado exitosamente');
+        onUserCreated(userData);
       },
       onError: () => {
         toast.error('Error al crear usuario');
@@ -84,7 +86,7 @@ export default function CreateUserForm() {
   };
 
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card>
       <CardHeader>
         <CardTitle>Crear Nuevo Usuario</CardTitle>
       </CardHeader>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth';
@@ -222,6 +221,11 @@ export default function AppRoutes() {
         </ProtectedRoute>
       }>
         <Route index element={<div>Admin Panel</div>} />
+        <Route path="users" element={<div>User Management</div>} />
+        <Route path="users/new" element={<div>Create User</div>} />
+        <Route path="system" element={<div>System Status</div>} />
+        <Route path="logs" element={<div>System Logs</div>} />
+        <Route path="analytics" element={<div>Analytics Dashboard</div>} />
       </Route>
 
       <Route path="/settings" element={
