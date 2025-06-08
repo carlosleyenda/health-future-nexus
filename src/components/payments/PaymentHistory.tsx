@@ -1,156 +1,111 @@
 
-import React from 'react';
-import { CreditCard, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { usePatientTransactions } from '@/hooks/usePatient';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Download, Search, Filter } from 'lucide-react';
 
 interface PaymentHistoryProps {
-  patientId: string;
+  userId: string;
+  patientId?: string;
 }
 
-export default function PaymentHistory({ patientId }: PaymentHistoryProps) {
-  const { data: transactions, isLoading } = usePatientTransactions(patientId);
+export default function PaymentHistory({ userId, patientId }: PaymentHistoryProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('all');
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'failed': return <XCircle className="h-4 w-4 text-red-500" />;
-      case 'pending': return <Clock className="h-4 w-4 text-yellow-500" />;
-      default: return <Clock className="h-4 w-4 text-gray-500" />;
+  // Mock payment data
+  const payments = [
+    {
+      id: 'pay1',
+      date: '2024-06-07',
+      amount: 800,
+      type: 'consultation',
+      status: 'completed',
+      description: 'Consulta virtual - Dr. García'
+    },
+    {
+      id: 'pay2',
+      date: '2024-06-05',
+      amount: 150,
+      type: 'medication',
+      status: 'completed',
+      description: 'Medicamentos - Omeprazol'
+    },
+    {
+      id: 'pay3',
+      date: '2024-06-01',
+      amount: 1200,
+      type: 'consultation',
+      status: 'pending',
+      description: 'Consulta presencial - Dr. López'
     }
-  };
+  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'failed': return 'bg-red-100 text-red-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'completed': return 'default';
+      case 'pending': return 'secondary';
+      case 'failed': return 'destructive';
+      default: return 'outline';
     }
   };
-
-  const getPaymentMethodLabel = (method: string) => {
-    switch (method) {
-      case 'credit_card': return 'Tarjeta de Crédito';
-      case 'debit_card': return 'Tarjeta de Débito';
-      case 'bank_transfer': return 'Transferencia';
-      case 'cash': return 'Efectivo';
-      case 'insurance': return 'Seguro Médico';
-      default: return method;
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-24 bg-gray-200 rounded-lg animate-pulse" />
-        ))}
-      </div>
-    );
-  }
-
-  if (!transactions?.length) {
-    return (
-      <Card>
-        <CardContent className="text-center py-8">
-          <CreditCard className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Sin historial de pagos</h3>
-          <p className="text-gray-500">Tus transacciones aparecerán aquí después de realizar pagos</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const totalPaid = transactions
-    .filter(t => t.status === 'completed')
-    .reduce((sum, t) => sum + t.amount, 0);
 
   return (
-    <div className="space-y-6">
-      {/* Resumen */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Resumen de Pagos
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Total Pagado</p>
-              <p className="text-2xl font-bold text-green-600">${totalPaid.toLocaleString()} MXN</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Transacciones</p>
-              <p className="text-2xl font-bold">{transactions.length}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Último Pago</p>
-              <p className="text-lg font-medium">
-                {transactions[0] ? 
-                  new Date(transactions[0].createdAt).toLocaleDateString('es-MX') : 
-                  'N/A'
-                }
-              </p>
-            </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Historial de Pagos</CardTitle>
+        <div className="flex gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar pagos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Lista de transacciones */}
-      <div className="space-y-4">
-        {transactions
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-          .map((transaction) => (
-          <Card key={transaction.id}>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start">
-                <div className="flex items-start gap-3">
-                  {getStatusIcon(transaction.status)}
+          <Select value={filterType} onValueChange={setFilterType}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="consultation">Consultas</SelectItem>
+              <SelectItem value="medication">Medicamentos</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Exportar
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {payments.map((payment) => (
+            <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex-1">
+                <div className="flex items-center gap-3">
                   <div>
-                    <h3 className="font-medium">
-                      {transaction.appointmentId ? 'Consulta Médica' : 'Pago de Servicios'}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {getPaymentMethodLabel(transaction.paymentMethod)}
-                    </p>
-                    <div className="flex items-center gap-1 mt-1 text-xs text-gray-400">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(transaction.createdAt).toLocaleDateString('es-MX')} - {' '}
-                      {new Date(transaction.createdAt).toLocaleTimeString('es-MX', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </div>
+                    <p className="font-medium">{payment.description}</p>
+                    <p className="text-sm text-gray-500">{payment.date}</p>
                   </div>
                 </div>
-                
-                <div className="text-right">
-                  <p className="text-lg font-semibold">
-                    ${transaction.amount.toLocaleString()} {transaction.currency}
-                  </p>
-                  <Badge className={getStatusColor(transaction.status)}>
-                    {transaction.status.toUpperCase()}
-                  </Badge>
-                </div>
               </div>
-
-              {transaction.completedAt && (
-                <div className="mt-3 pt-3 border-t text-xs text-gray-500">
-                  Completado el: {new Date(transaction.completedAt).toLocaleDateString('es-MX')} a las {' '}
-                  {new Date(transaction.completedAt).toLocaleTimeString('es-MX', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
+              <div className="text-right">
+                <p className="text-lg font-bold">${payment.amount}</p>
+                <Badge variant={getStatusColor(payment.status)}>
+                  {payment.status === 'completed' ? 'Completado' : 
+                   payment.status === 'pending' ? 'Pendiente' : 'Fallido'}
+                </Badge>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
