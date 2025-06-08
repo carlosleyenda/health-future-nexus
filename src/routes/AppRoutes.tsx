@@ -5,6 +5,8 @@ import { useAuthStore } from '@/store/auth';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import MainLayout from '@/components/layout/MainLayout';
 import Index from '@/pages/Index';
+import NotFound from '@/pages/NotFound';
+import Settings from '@/pages/Settings';
 import { AuthPage } from '@/pages/auth/AuthPage';
 import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
 import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
@@ -72,14 +74,20 @@ export default function AppRoutes() {
             
             {/* Rutas específicas para pacientes */}
             <Route path="appointments" element={<AppointmentBooking />} />
-            <Route path="consultations" element={<ConsultationRoom />} />
-            <Route path="health" element={<HealthDashboard />} />
+            <Route path="consultations" element={
+              <ConsultationRoom 
+                appointmentId={user?.id || ''} 
+                userId={user?.id || ''} 
+                userRole={getUserRole(user?.role || 'patient')} 
+              />
+            } />
+            <Route path="health" element={<HealthDashboard patientId={user?.id || ''} />} />
             <Route path="pharmacy" element={<PharmacyModule />} />
             <Route path="payments" element={<PaymentPortal />} />
             
             {/* Rutas específicas para doctores */}
-            <Route path="patients" element={<CompletePatientPortal />} />
-            <Route path="schedule" element={<DoctorSchedule />} />
+            <Route path="patients" element={<CompletePatientPortal patientId={user?.id || ''} />} />
+            <Route path="schedule" element={<DoctorSchedule doctorId={user?.id || ''} />} />
             
             {/* Rutas específicas para admin */}
             <Route path="admin" element={<AdminDashboard />} />
@@ -95,6 +103,7 @@ export default function AppRoutes() {
             <Route path="ai-personality" element={<AIPersonalityDashboard />} />
             <Route path="delivery" element={<MedicalDelivery />} />
             <Route path="profile" element={<UserProfile />} />
+            <Route path="settings" element={<Settings />} />
           </>
         )}
       </Route>
@@ -102,8 +111,8 @@ export default function AppRoutes() {
       {/* Auth routes */}
       <Route path="/auth" element={<AuthPage />} />
       
-      {/* Catch all route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* 404 route - debe ir al final */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
