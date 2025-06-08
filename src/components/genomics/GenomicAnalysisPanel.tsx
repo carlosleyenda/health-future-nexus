@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -298,8 +297,8 @@ export default function GenomicAnalysisPanel() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
-                        <p className="text-gray-600">Enzima</p>
-                        <p className="font-medium">{response.enzyme}</p>
+                        <p className="text-gray-600">Gen</p>
+                        <p className="font-medium">{response.gene}</p>
                       </div>
                       <div>
                         <p className="text-gray-600">Eficacia Esperada</p>

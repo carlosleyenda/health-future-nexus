@@ -1,12 +1,17 @@
+
 export interface GenomicProfile {
   id: string;
   patientId: string;
   processedAt: string;
+  sequenceType?: string;
+  sequenceData?: any;
   qualityMetrics: {
     overallQuality: number;
     coverage: number;
     mappingRate: number;
     errorRate: number;
+    q30Percentage?: number;
+    totalReads?: number;
   };
   variants?: Variant[];
   riskFactors?: RiskFactor[];
@@ -33,6 +38,46 @@ export interface GenomicProfile {
   environmentalExposures?: EnvironmentalExposures;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface DiseasePredisposition {
+  id: string;
+  disease: string;
+  riskScore: number;
+  confidence: number;
+  genes: string[];
+  description: string;
+}
+
+export interface CarrierScreeningResult {
+  id: string;
+  diseaseName: string;
+  carrierStatus: 'carrier' | 'non-carrier' | 'inconclusive';
+  gene: string;
+  variant: string;
+  description: string;
+}
+
+export interface ExternalLabIntegration {
+  id: string;
+  provider: string;
+  status: string;
+  lastSync: string;
+}
+
+export interface GeneticVariant {
+  id: string;
+  gene: string;
+  variant: string;
+  significance: string;
+}
+
+export interface TargetedTherapy {
+  id: string;
+  therapy: string;
+  indication: string;
+  genes: string[];
+  efficacy: number;
 }
 
 export interface Variant {
@@ -224,6 +269,7 @@ export interface MicrobiomeAnalysis {
 
 export interface ClinicalTrial {
   id: string;
+  nctId?: string;
   trialName: string;
   description: string;
   status: string;
@@ -308,12 +354,17 @@ export interface PopulationRisk {
 
 export interface DrugResponse {
   medication: string;
+  drugName?: string;
   gene: string;
   variant: string;
+  enzyme?: string;
   metabolizerStatus: string;
   efficacyPrediction: string;
+  expectedResponse?: string;
   adverseReactionRisk: string;
   dosageRecommendation?: string;
+  mechanism?: string;
+  clinicalRecommendation?: string;
   references: string[];
 }
 
@@ -384,9 +435,37 @@ export interface GeneExpression {
   clinicalSignificance: string;
 }
 
+export interface Protein {
+  name: string;
+  level: number;
+  unit: string;
+  function: string;
+  clinicalSignificance: string;
+}
+
+export interface Bacteria {
+  name: string;
+  abundance: number;
+  role: string;
+  healthImpact: string;
+}
+
+export interface Fungi {
+  name: string;
+  abundance: number;
+  pathogenic: boolean;
+}
+
+export interface Virus {
+  name: string;
+  detected: boolean;
+  strain?: string;
+}
+
 export interface FamilyHealthPlan {
   id: string;
   familyId: string;
+  generations?: number;
   members: FamilyMember[];
   sharedConditions: string[];
   geneticCounselingRecommended: boolean;
@@ -407,6 +486,7 @@ export interface FamilyMember {
 export interface ResearchParticipation {
   id: string;
   studyId: string;
+  studies?: any[];
   patientId: string;
   consentDate: string;
   withdrawalDate?: string;
