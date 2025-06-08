@@ -22,121 +22,171 @@ export class GenomicsService {
     return {
       id: patientId,
       patientId,
-      sequencingData: {
-        wholeGenomeSequenced: true,
-        exomeSequenced: true,
-        panelTesting: ['Cardio', 'Cancer', 'Pharmacogenomics'],
-        sequencingDate: '2024-01-15',
-        sequencingProvider: 'Illumina',
+      processedAt: '2024-01-15T10:00:00Z',
+      qualityMetrics: {
+        overallQuality: 98.5,
         coverage: 30,
-        qualityScore: 98.5,
-        rawDataLocation: 'encrypted_storage_bucket',
-        processingPipeline: 'GATK v4.2',
-        referenceGenome: 'GRCh38'
+        mappingRate: 95.2,
+        errorRate: 0.001,
+        q30Percentage: 98.5,
+        totalReads: 500000000
       },
       variants: [
         {
           id: 'var-001',
+          gene: 'CYP2C9',
           chromosome: '1',
           position: 169519049,
+          ref: 'C',
+          alt: 'T',
           rsId: 'rs1799853',
-          gene: 'CYP2C9',
-          variant: 'c.430C>T',
-          zygosity: 'heterozygous',
-          clinicalSignificance: 'pathogenic',
           alleleFrequency: 0.12,
-          pathogenicity: 0.95,
-          inheritance: 'autosomal_recessive',
-          phenotype: 'Poor metabolizer',
-          drugResponse: 'Warfarin sensitivity'
+          zygosity: 'heterozygous',
+          impact: 'high',
+          consequence: 'missense_variant',
+          pathogenicity: 'pathogenic',
+          populations: [
+            { population: 'European', frequency: 0.12 },
+            { population: 'African', frequency: 0.05 }
+          ],
+          conservationScores: [
+            { algorithm: 'GERP', score: 4.2 },
+            { algorithm: 'PhyloP', score: 3.8 }
+          ],
+          predictions: {
+            sift: 0.02,
+            polyphen: 0.95,
+            cadd: 25.3
+          },
+          annotations: ['ClinVar', 'dbSNP'],
+          references: ['PMID:12345678']
         }
       ],
       pharmacogenomicProfile: {
+        id: 'pgx-001',
         drugResponses: [
           {
             medication: 'Warfarin',
+            drugName: 'Warfarin',
             gene: 'CYP2C9',
+            variant: 'c.430C>T',
+            enzyme: 'CYP2C9',
             metabolizerStatus: 'poor',
             efficacyPrediction: 'Reduced effectiveness',
+            expectedResponse: 'Reduced response',
             adverseReactionRisk: 'High bleeding risk',
-            dosageRecommendation: 'Start with 50% standard dose'
+            dosageRecommendation: 'Start with 50% standard dose',
+            mechanism: 'Reduced enzyme activity',
+            clinicalRecommendation: 'Monitor INR closely',
+            references: ['PMID:12345678']
           }
         ],
-        drugInteractions: [
+        geneVariants: [
           {
-            drug1: 'Warfarin',
-            drug2: 'Aspirin',
-            interaction: 'Increased bleeding risk',
-            severity: 'high',
-            recommendation: 'Monitor INR closely'
+            gene: 'CYP2C9',
+            variant: '*2/*3',
+            allele: '*2',
+            function: 'Poor metabolizer'
           }
         ],
-        metabolizerStatus: {
-          'CYP2D6': 'normal',
-          'CYP2C9': 'poor',
-          'CYP2C19': 'rapid',
-          'CYP3A4': 'normal'
-        }
+        enzymeActivity: [
+          {
+            enzyme: 'CYP2C9',
+            activityLevel: 0.25,
+            unit: 'relative activity'
+          }
+        ],
+        metabolizerStatus: 'Poor metabolizer',
+        recommendations: [
+          'Start with reduced warfarin dose',
+          'Monitor INR closely'
+        ],
+        references: ['PMID:12345678']
       },
       riskFactors: [
         {
+          id: 'risk-001',
           condition: 'Type 2 Diabetes',
+          gene: 'TCF7L2',
           riskScore: 75,
-          confidence: 0.85,
-          contributingVariants: ['rs7903146', 'rs12255372'],
+          oddsRatio: 1.5,
+          confidenceInterval: {
+            lower: 1.2,
+            upper: 1.8
+          },
+          associatedGenes: ['TCF7L2', 'PPARG'],
+          description: 'Increased risk for Type 2 Diabetes',
           recommendations: [
             'Regular glucose monitoring',
             'Dietary modifications',
             'Annual HbA1c testing'
           ],
-          preventiveActions: [
-            'Weight management',
-            'Regular exercise',
-            'Mediterranean diet'
-          ]
+          evidenceLevel: 'Strong',
+          populations: [
+            { population: 'European', riskScore: 75 },
+            { population: 'Asian', riskScore: 80 }
+          ],
+          references: ['PMID:12345678']
         }
       ],
       clinicalTrials: [
         {
-          trialId: 'NCT12345678',
+          id: 'trial-001',
+          nctId: 'NCT12345678',
           trialName: 'Precision Medicine for Diabetes',
+          description: 'A trial testing personalized diabetes treatment',
+          status: 'recruiting',
           phase: 'Phase III',
+          conditions: ['Type 2 Diabetes'],
           sponsor: 'NIH',
-          eligibilityCriteria: ['T2D genetic variant carriers'],
-          matchScore: 0.92,
           location: 'Multiple centers',
-          estimatedDuration: '2 years',
-          contactInfo: 'trials@nih.gov'
+          contact: 'trials@nih.gov',
+          eligibilityCriteria: ['T2D genetic variant carriers'],
+          url: 'https://clinicaltrials.gov/ct2/show/NCT12345678',
+          references: ['NCT12345678']
         }
       ],
       ancestryAnalysis: {
-        primaryAncestry: 'European',
-        ancestryComposition: [
+        id: 'ancestry-001',
+        populationGroups: [
           { population: 'Northern European', percentage: 65 },
           { population: 'Southern European', percentage: 25 },
           { population: 'East Asian', percentage: 10 }
         ],
+        geographicOrigins: [
+          { region: 'Scandinavia', percentage: 40 },
+          { region: 'Mediterranean', percentage: 35 },
+          { region: 'East Asia', percentage: 25 }
+        ],
+        haplogroups: {
+          maternal: 'H1a1',
+          paternal: 'R1b1a2'
+        },
         migrationPatterns: [
           {
-            timeframe: '500-1000 years ago',
             region: 'Scandinavia to Central Europe',
-            confidence: 0.78
+            timeframe: '500-1000 years ago',
+            description: 'Viking expansion period'
           }
         ],
-        medicalRelevance: [
-          'Higher risk for lactose tolerance',
-          'Lower risk for sickle cell disease',
-          'Increased alcohol metabolism efficiency'
-        ]
+        neanderthalAdmixture: 2.1,
+        references: ['PMID:23456789']
       },
-      carrierStatus: [
+      carrierScreening: [
         {
-          condition: 'Cystic Fibrosis',
-          gene: 'CFTR',
-          carrierStatus: 'negative',
-          allelesTested: ['F508del', 'G542X', 'W1282X'],
-          reproductiveRisk: 'Low',
-          partnerScreeningRecommended: false
+          id: 'carrier-001',
+          diseases: [
+            {
+              diseaseName: 'Cystic Fibrosis',
+              gene: 'CFTR',
+              carrierRisk: 0.04,
+              inheritancePattern: 'autosomal recessive',
+              recommendations: ['Partner screening recommended']
+            }
+          ],
+          reportSummary: 'Carrier for Cystic Fibrosis',
+          recommendations: ['Genetic counseling', 'Partner testing'],
+          references: ['PMID:34567890']
         }
       ],
       createdAt: '2024-01-15T10:00:00Z',
@@ -148,41 +198,60 @@ export class GenomicsService {
     await delay(800);
 
     return {
-      patientId,
+      id: 'pgx-profile-001',
       drugResponses: [
         {
           medication: 'Clopidogrel',
+          drugName: 'Clopidogrel',
           gene: 'CYP2C19',
+          variant: '*2/*2',
+          enzyme: 'CYP2C19',
           metabolizerStatus: 'poor',
           efficacyPrediction: 'Reduced effectiveness',
+          expectedResponse: 'Poor response',
           adverseReactionRisk: 'Low',
-          dosageRecommendation: 'Consider alternative antiplatelet therapy'
+          dosageRecommendation: 'Consider alternative antiplatelet therapy',
+          mechanism: 'Reduced prodrug activation',
+          clinicalRecommendation: 'Consider prasugrel or ticagrelor',
+          references: ['PMID:98765432']
         },
         {
           medication: 'Simvastatin',
+          drugName: 'Simvastatin',
           gene: 'SLCO1B1',
+          variant: 'c.521T>C',
+          enzyme: 'SLCO1B1',
           metabolizerStatus: 'normal',
           efficacyPrediction: 'Standard effectiveness',
+          expectedResponse: 'Normal response',
           adverseReactionRisk: 'Moderate myopathy risk',
-          dosageRecommendation: 'Standard dose, monitor CK levels'
+          dosageRecommendation: 'Standard dose, monitor CK levels',
+          mechanism: 'Normal transporter function',
+          clinicalRecommendation: 'Monitor creatine kinase levels',
+          references: ['PMID:87654321']
         }
       ],
-      drugInteractions: [
+      geneVariants: [
         {
-          drug1: 'Clopidogrel',
-          drug2: 'Omeprazole',
-          interaction: 'Reduced clopidogrel effectiveness',
-          severity: 'moderate',
-          recommendation: 'Use alternative PPI or increase clopidogrel dose'
+          gene: 'CYP2C19',
+          variant: '*2/*2',
+          allele: '*2',
+          function: 'Poor metabolizer'
         }
       ],
-      metabolizerStatus: {
-        'CYP2D6': 'extensive',
-        'CYP2C9': 'poor',
-        'CYP2C19': 'poor',
-        'CYP3A4': 'normal',
-        'UGT1A1': 'normal'
-      }
+      enzymeActivity: [
+        {
+          enzyme: 'CYP2C19',
+          activityLevel: 0.1,
+          unit: 'relative activity'
+        }
+      ],
+      metabolizerStatus: 'Poor metabolizer for CYP2C19',
+      recommendations: [
+        'Avoid clopidogrel',
+        'Consider alternative antiplatelet therapy'
+      ],
+      references: ['PMID:98765432']
     };
   }
 
@@ -191,38 +260,18 @@ export class GenomicsService {
 
     return [
       {
-        condition: 'Coronary Artery Disease',
+        id: 'disease-001',
+        disease: 'Coronary Artery Disease',
         riskScore: 68,
-        confidence: 0.82,
-        contributingVariants: ['rs6725887', 'rs17465637'],
-        recommendations: [
-          'Lipid profile every 6 months',
-          'Blood pressure monitoring',
-          'Cardiovascular exercise program'
-        ],
-        preventiveActions: [
-          'Mediterranean diet',
-          'Omega-3 supplementation',
-          'Stress management',
-          'Smoking cessation if applicable'
-        ]
+        genes: ['rs6725887', 'rs17465637'],
+        description: 'Increased risk for coronary artery disease based on genetic variants'
       },
       {
-        condition: 'Alzheimer\'s Disease',
+        id: 'disease-002',
+        disease: "Alzheimer's Disease",
         riskScore: 45,
-        confidence: 0.75,
-        contributingVariants: ['rs429358 (APOE4)'],
-        recommendations: [
-          'Cognitive assessment every 2 years',
-          'Brain health optimization',
-          'Memory training exercises'
-        ],
-        preventiveActions: [
-          'Regular physical exercise',
-          'Mediterranean diet',
-          'Social engagement',
-          'Lifelong learning'
-        ]
+        genes: ['rs429358 (APOE4)'],
+        description: 'Moderate risk for Alzheimer\'s disease due to APOE4 variant'
       }
     ];
   }
@@ -231,33 +280,37 @@ export class GenomicsService {
     await delay(700);
 
     return {
-      primaryAncestry: 'European',
-      ancestryComposition: [
+      id: 'ancestry-002',
+      populationGroups: [
         { population: 'British & Irish', percentage: 40 },
         { population: 'French & German', percentage: 25 },
         { population: 'Scandinavian', percentage: 20 },
         { population: 'Italian', percentage: 10 },
         { population: 'Ashkenazi Jewish', percentage: 5 }
       ],
+      geographicOrigins: [
+        { region: 'British Isles', percentage: 40 },
+        { region: 'Western Europe', percentage: 35 },
+        { region: 'Northern Europe', percentage: 25 }
+      ],
+      haplogroups: {
+        maternal: 'H1a1a',
+        paternal: 'R1b1a2a'
+      },
       migrationPatterns: [
         {
-          timeframe: '1000-1500 years ago',
           region: 'Celtic migrations from British Isles',
-          confidence: 0.85
+          timeframe: '1000-1500 years ago',
+          description: 'Celtic expansion period'
         },
         {
-          timeframe: '500-1000 years ago',
           region: 'Germanic tribal movements',
-          confidence: 0.72
+          timeframe: '500-1000 years ago',
+          description: 'Migration period'
         }
       ],
-      medicalRelevance: [
-        'Higher lactose tolerance (99% probability)',
-        'Increased risk for Factor V Leiden',
-        'Enhanced response to certain cardiovascular medications',
-        'Lower risk for sickle cell disease',
-        'Moderate risk for BRCA mutations (Ashkenazi heritage)'
-      ]
+      neanderthalAdmixture: 2.3,
+      references: ['PMID:45678901']
     };
   }
 
@@ -266,28 +319,49 @@ export class GenomicsService {
 
     return [
       {
-        condition: 'Cystic Fibrosis',
-        gene: 'CFTR',
-        carrierStatus: 'negative',
-        allelesTested: ['F508del', 'G542X', 'W1282X', 'N1303K'],
-        reproductiveRisk: 'Low (1 in 25,000)',
-        partnerScreeningRecommended: false
+        id: 'screening-001',
+        diseases: [
+          {
+            diseaseName: 'Cystic Fibrosis',
+            gene: 'CFTR',
+            carrierRisk: 0.04,
+            inheritancePattern: 'autosomal recessive',
+            recommendations: ['Partner screening not required']
+          }
+        ],
+        reportSummary: 'Negative for common CFTR mutations',
+        recommendations: ['No immediate action required'],
+        references: ['PMID:56789012']
       },
       {
-        condition: 'Sickle Cell Disease',
-        gene: 'HBB',
-        carrierStatus: 'negative',
-        allelesTested: ['HbS', 'HbC'],
-        reproductiveRisk: 'Very Low',
-        partnerScreeningRecommended: false
+        id: 'screening-002',
+        diseases: [
+          {
+            diseaseName: 'Sickle Cell Disease',
+            gene: 'HBB',
+            carrierRisk: 0.001,
+            inheritancePattern: 'autosomal recessive',
+            recommendations: ['No action required']
+          }
+        ],
+        reportSummary: 'Negative for sickle cell variants',
+        recommendations: ['No action required'],
+        references: ['PMID:67890123']
       },
       {
-        condition: 'Tay-Sachs Disease',
-        gene: 'HEXA',
-        carrierStatus: 'carrier',
-        allelesTested: ['c.1421+1G>C', 'c.1274_1277dupTATC'],
-        reproductiveRisk: 'Moderate (1 in 4 if partner is carrier)',
-        partnerScreeningRecommended: true
+        id: 'screening-003',
+        diseases: [
+          {
+            diseaseName: 'Tay-Sachs Disease',
+            gene: 'HEXA',
+            carrierRisk: 0.25,
+            inheritancePattern: 'autosomal recessive',
+            recommendations: ['Partner screening recommended']
+          }
+        ],
+        reportSummary: 'Carrier for Tay-Sachs disease',
+        recommendations: ['Genetic counseling', 'Partner testing'],
+        references: ['PMID:78901234']
       }
     ];
   }
@@ -296,55 +370,28 @@ export class GenomicsService {
     await delay(900);
 
     return {
-      patientId,
-      inheritancePatterns: [
+      id: 'family-plan-001',
+      familyId: 'family-001',
+      generations: 3,
+      members: [
         {
-          condition: 'BRCA1/2 mutations',
-          inheritanceType: 'autosomal_dominant',
-          affectedRelatives: ['maternal grandmother', 'maternal aunt'],
-          recommendedTesting: ['mother', 'sister', 'daughter (when age appropriate)']
+          id: 'member-001',
+          patientId: patientId,
+          relationship: 'self',
+          conditions: ['Type 2 Diabetes risk'],
+          geneticDataAvailable: true,
+          notes: 'Primary patient'
         }
       ],
-      familyRiskAssessment: [
-        {
-          relative: 'Children',
-          conditions: ['Type 2 Diabetes', 'Hypertension'],
-          riskLevel: 'moderate',
-          recommendations: [
-            'Early lifestyle counseling',
-            'Regular BMI monitoring',
-            'Glucose screening starting at age 35'
-          ]
-        }
+      sharedConditions: ['BRCA1/2 mutations', 'Type 2 Diabetes'],
+      geneticCounselingRecommended: true,
+      lifestyleRecommendations: [
+        'Early lifestyle counseling',
+        'Regular BMI monitoring',
+        'Glucose screening starting at age 35'
       ],
-      reproductiveGuidance: {
-        preconceptionTesting: [
-          'Expanded carrier screening',
-          'Tay-Sachs carrier testing for partner'
-        ],
-        pregnancyConsiderations: [
-          'Genetic counseling recommended',
-          'Prenatal diagnostic options available',
-          'Consider preimplantation genetic testing'
-        ],
-        contraceptionConsiderations: [
-          'Avoid estrogen-containing contraceptives (thrombosis risk)',
-          'IUD or progestin-only options preferred'
-        ]
-      },
-      pediatricScreening: [
-        {
-          condition: 'Familial Hypercholesterolemia',
-          startAge: 2,
-          frequency: 'Every 5 years',
-          testType: 'Lipid panel'
-        }
-      ],
-      generationalPlanning: {
-        currentGeneration: 'Implement lifestyle modifications, regular screening',
-        nextGeneration: 'Genetic counseling, selective testing based on symptoms',
-        futureGenerations: 'Continued monitoring, evolving therapeutic options'
-      }
+      createdAt: '2024-01-15T10:00:00Z',
+      updatedAt: '2024-01-20T15:30:00Z'
     };
   }
 
@@ -352,7 +399,9 @@ export class GenomicsService {
     await delay(600);
 
     return {
-      currentParticipation: [
+      id: 'research-001',
+      studyId: 'ALL_OF_US_001',
+      studies: [
         {
           studyId: 'ALL_OF_US_001',
           studyName: 'All of Us Research Program',
@@ -363,37 +412,15 @@ export class GenomicsService {
           compensationType: 'none'
         }
       ],
-      eligibleStudies: [
-        {
-          studyId: 'PRECISION_CARDIO_002',
-          studyName: 'Precision Cardiology Initiative',
-          institution: 'Stanford Medicine',
-          phase: 'Recruitment',
-          eligibilityCriteria: ['CAD genetic variants', 'Age 40-70'],
-          estimatedDuration: '3 years',
-          compensation: '$200 per visit'
-        }
-      ],
-      dataContributions: {
+      patientId,
+      consentDate: '2023-06-15',
+      dataSharingAgreement: 'broad_consent',
+      studyData: {
         genomicDataShared: true,
         phenotypicDataShared: true,
-        lifestyleDataShared: true,
-        longitudinalFollowUp: true,
-        familyDataIncluded: false
+        lifestyleDataShared: true
       },
-      consentPreferences: {
-        futureResearch: true,
-        commercialUse: false,
-        recontactPermission: true,
-        dataDepositionDatabases: ['dbGaP', 'ClinVar'],
-        geographicRestrictions: ['USA', 'EU']
-      },
-      impactMetrics: {
-        studiesEnabled: 12,
-        publicationsReferencing: 8,
-        therapeuticTargetsIdentified: 3,
-        populationBenefitScore: 'High'
-      }
+      notes: 'Active participation in research'
     };
   }
 
@@ -419,30 +446,11 @@ export class GenomicsService {
 
     return [
       {
-        condition: 'Breast Cancer',
-        targetedTherapies: [
-          {
-            therapy: 'Trastuzumab (Herceptin)',
-            target: 'HER2',
-            efficacyPrediction: 'High response expected',
-            biomarkers: ['HER2 amplification'],
-            evidenceLevel: 'FDA approved',
-            recommendations: 'First-line therapy for HER2+ breast cancer'
-          }
-        ],
-        biomarkers: [
-          {
-            name: 'HER2',
-            status: 'positive',
-            method: 'IHC/FISH',
-            significance: 'Therapeutic target'
-          }
-        ],
-        resistanceMutations: [],
-        alternativeTherapies: [
-          'Pertuzumab + Trastuzumab',
-          'T-DM1 (second-line)'
-        ]
+        id: 'therapy-001',
+        therapy: 'Trastuzumab (Herceptin)',
+        indication: 'HER2+ Breast Cancer',
+        genes: ['ERBB2'],
+        efficacy: 85
       }
     ];
   }
@@ -466,19 +474,23 @@ export class GenomicsService {
 
     return [
       {
-        trialId: 'NCT04567890',
+        id: 'trial-002',
+        nctId: 'NCT04567890',
         trialName: 'Precision Oncology Trial for Solid Tumors',
+        description: 'Testing precision medicine approaches in solid tumors',
+        status: 'recruiting',
         phase: 'Phase II',
+        conditions: ['Solid tumors'],
         sponsor: 'National Cancer Institute',
+        location: 'Multiple US centers',
+        contact: 'clinicaltrials@nci.nih.gov',
         eligibilityCriteria: [
           'Solid tumor with actionable mutation',
           'ECOG performance status 0-1',
           'Adequate organ function'
         ],
-        matchScore: 0.89,
-        location: 'Multiple US centers',
-        estimatedDuration: '18 months',
-        contactInfo: 'clinicaltrials@nci.nih.gov'
+        url: 'https://clinicaltrials.gov/ct2/show/NCT04567890',
+        references: ['NCT04567890']
       }
     ];
   }
@@ -551,18 +563,17 @@ export class GenomicsService {
 
     return {
       id: 'env-001',
-      patientId,
       exposureType: 'Air Pollution',
       level: 45.2,
       unit: 'μg/m³ PM2.5',
-      source: 'EPA monitoring',
-      healthImpact: 'Moderate respiratory risk',
-      recommendations: [
+      duration: '12 months',
+      frequency: 'daily',
+      location: 'Urban area',
+      mitigationStrategies: [
         'Use air purifier indoors',
         'Limit outdoor exercise on high pollution days',
         'Consider antioxidant supplementation'
-      ],
-      recordedAt: '2024-01-20T12:00:00Z'
+      ]
     };
   }
 }

@@ -18,7 +18,11 @@ import {
   Clock,
   Battery
 } from 'lucide-react';
-import { useDeliveryAutomation } from '@/hooks/useDeliveryAutomation';
+import { 
+  useDroneFleets, 
+  useWeatherConditions, 
+  useSmartLockers 
+} from '@/hooks/useDeliveryAutomation';
 import { useAuthStore } from '@/store/auth';
 
 export default function AutomatedDeliveryDashboard() {
@@ -28,22 +32,23 @@ export default function AutomatedDeliveryDashboard() {
   const { 
     data: droneFleets,
     isLoading: dronesLoading 
-  } = useDeliveryAutomation.useDroneFleets();
+  } = useDroneFleets();
   
   const { 
     data: weatherData,
     isLoading: weatherLoading 
-  } = useDeliveryAutomation.useWeatherData();
-  
-  const { 
-    data: flightConditions,
-    isLoading: conditionsLoading 
-  } = useDeliveryAutomation.useFlightConditions();
+  } = useWeatherConditions(40.7128, -74.0060); // NYC coordinates as default
   
   const { 
     data: smartLockers,
     isLoading: lockersLoading 
-  } = useDeliveryAutomation.useSmartLockers();
+  } = useSmartLockers();
+
+  // Mock flight conditions data
+  const flightConditions = {
+    suitable: true,
+    riskLevel: 'low'
+  };
 
   if (dronesLoading || weatherLoading) {
     return (
