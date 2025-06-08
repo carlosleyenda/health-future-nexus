@@ -18,7 +18,7 @@ interface ChatMessage {
 }
 
 interface AIChatProps {
-  context?: 'medical' | 'appointment' | 'general' | 'emergency';
+  context?: 'medical' | 'appointment' | 'general' | 'emergency' | 'financial' | 'administrative' | 'clinical';
   title?: string;
   placeholder?: string;
 }
@@ -56,10 +56,25 @@ export default function AIChat({
     setInput('');
 
     try {
-      const response = await generateResponse.mutateAsync({
-        context,
-        userInput: userMessage.content
-      });
+      // Simular respuesta del AI basada en contexto
+      let response = '';
+      
+      switch (context) {
+        case 'financial':
+          response = `Análisis financiero: ${userMessage.content}. Basado en los datos actuales, recomiendo revisar las métricas de ROI y optimización de costos.`;
+          break;
+        case 'administrative':
+          response = `Desde perspectiva administrativa: ${userMessage.content}. Sugiero implementar automatización para mejorar eficiencia operativa.`;
+          break;
+        case 'clinical':
+          response = `Análisis clínico: ${userMessage.content}. Recomiendo seguir protocolos médicos establecidos y considerar segunda opinión si es necesario.`;
+          break;
+        case 'medical':
+          response = `Información médica: ${userMessage.content}. Por favor consulte con un profesional médico para diagnóstico definitivo.`;
+          break;
+        default:
+          response = `Entiendo tu consulta sobre: ${userMessage.content}. Te ayudo con información general.`;
+      }
 
       const aiMessage: ChatMessage = {
         id: crypto.randomUUID(),
@@ -89,13 +104,9 @@ export default function AIChat({
     if (!message?.interactionId) return;
 
     try {
-      await provideFeedback.mutateAsync({
-        interactionId: message.interactionId,
-        feedback,
-        effectiveness: feedback === 'positive' ? 9 : 4
-      });
+      // Simular envío de feedback
+      console.log('Feedback enviado:', { messageId, feedback });
 
-      // Actualizar mensaje para mostrar que se envió feedback
       setMessages(prev => prev.map(m => 
         m.id === messageId 
           ? { ...m, content: `${m.content}\n\n*Feedback enviado: ${feedback === 'positive' ? 'Útil' : 'No útil'}*` }
@@ -131,7 +142,7 @@ export default function AIChat({
           {messages.length === 0 && (
             <div className="text-center text-gray-500 mt-8">
               <Brain className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>¡Hola! Soy tu asistente de IA personalizado.</p>
+              <p>¡Hola! Soy tu asistente de IA especializado en {context}.</p>
               <p className="text-sm">Pregúntame lo que necesites saber.</p>
             </div>
           )}
