@@ -34,6 +34,7 @@ export default function MainLayout() {
     { label: 'Citas', path: '/appointments', roles: ['patient', 'doctor'] },
     { label: 'Consultas', path: '/consultations', roles: ['patient', 'doctor'] },
     { label: 'Salud', path: '/health', roles: ['patient'] },
+    { label: 'Farmacia', path: '/pharmacy', roles: ['patient'] },
     { label: 'Historial', path: '/medical-history', roles: ['patient'] },
     { label: 'Pagos', path: '/payments', roles: ['patient'] },
     { label: 'Pacientes', path: '/patients', roles: ['doctor'] },

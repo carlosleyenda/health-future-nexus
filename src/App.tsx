@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,7 @@ import UserProfile from "@/components/profile/UserProfile";
 import HealthMonitoring from "@/components/health/HealthMonitoring";
 import ConsultationRoom from "@/components/consultation/ConsultationRoom";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import PharmacyModule from "@/components/pharmacy/PharmacyModule";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -126,6 +126,15 @@ const App = () => (
                 />
               </ProtectedRoute>
             } />
+            
+            {/* Pharmacy module */}
+            <Route path="/pharmacy" element={
+              <ProtectedRoute allowedRoles={['patient']}>
+                <MainLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<PharmacyModule />} />
+            </Route>
             
             {/* Additional protected routes */}
             <Route path="/appointments" element={
