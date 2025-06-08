@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/auth';
 import { useNotifications, useRealtimeNotifications } from '@/hooks/useNotifications';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +35,7 @@ export default function MainHeader({
   const { user, logout } = useAuthStore();
   const { data: notifications = [] } = useNotifications(user?.id || '');
   const navigate = useNavigate();
+  const location = useLocation();
   
   // Activar notificaciones en tiempo real
   useRealtimeNotifications(user?.id || '');
@@ -73,19 +74,25 @@ export default function MainHeader({
               >
                 <Menu className="h-5 w-5" />
               </Button>
-              <h1 className="text-xl font-bold text-blue-600">Clínica Virtual</h1>
+              <Link to="/" className="text-xl font-bold text-blue-600">
+                Clínica Virtual
+              </Link>
             </div>
 
             {/* Navegación desktop */}
             <nav className="hidden lg:flex space-x-6">
               {filteredNavItems.map((item) => (
-                <button
+                <Link
                   key={item.path}
-                  onClick={() => navigate(item.path)}
-                  className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                  to={item.path}
+                  className={`font-medium transition-colors ${
+                    location.pathname === item.path
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
                 >
                   {item.label}
-                </button>
+                </Link>
               ))}
             </nav>
           </div>

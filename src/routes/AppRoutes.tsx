@@ -14,6 +14,13 @@ import MedicalAIAssistant from '@/components/ai/MedicalAIAssistant';
 import AIPersonalityDashboard from '@/components/ai/AIPersonalityDashboard';
 import MedicalDelivery from '@/components/delivery/MedicalDelivery';
 import UserProfile from '@/components/profile/UserProfile';
+import AppointmentBooking from '@/components/appointments/AppointmentBooking';
+import ConsultationRoom from '@/components/consultation/ConsultationRoom';
+import HealthDashboard from '@/components/health/HealthDashboard';
+import PharmacyModule from '@/components/pharmacy/PharmacyModule';
+import PaymentPortal from '@/components/payments/PaymentPortal';
+import CompletePatientPortal from '@/components/patient/CompletePatientPortal';
+import DoctorSchedule from '@/components/doctor/DoctorSchedule';
 import type { UserRole } from '@/types/user';
 
 export default function AppRoutes() {
@@ -60,24 +67,33 @@ export default function AppRoutes() {
         {/* Rutas protegidas anidadas */}
         {isAuthenticated && (
           <>
+            {/* Dashboard principal */}
             <Route index element={getDashboardComponent()} />
             
-            {/* Medical Records */}
+            {/* Rutas específicas para pacientes */}
+            <Route path="appointments" element={<AppointmentBooking />} />
+            <Route path="consultations" element={<ConsultationRoom />} />
+            <Route path="health" element={<HealthDashboard />} />
+            <Route path="pharmacy" element={<PharmacyModule />} />
+            <Route path="payments" element={<PaymentPortal />} />
+            
+            {/* Rutas específicas para doctores */}
+            <Route path="patients" element={<CompletePatientPortal />} />
+            <Route path="schedule" element={<DoctorSchedule />} />
+            
+            {/* Rutas específicas para admin */}
+            <Route path="admin" element={<AdminDashboard />} />
+            
+            {/* Rutas compartidas */}
             <Route path="medical-records" element={
               <MedicalRecordsSystem 
                 patientId={user?.id || ''} 
                 userRole={getUserRole(user?.role || 'patient')}
               />
             } />
-            
-            {/* AI Assistant */}
             <Route path="ai-assistant" element={<MedicalAIAssistant />} />
             <Route path="ai-personality" element={<AIPersonalityDashboard />} />
-            
-            {/* Medical Delivery */}
             <Route path="delivery" element={<MedicalDelivery />} />
-            
-            {/* Profile */}
             <Route path="profile" element={<UserProfile />} />
           </>
         )}

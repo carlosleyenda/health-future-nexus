@@ -19,25 +19,58 @@ export default function MainLayout() {
   // Conectar al servicio de tiempo real
   useRealtime(user?.id || '');
 
-  const navigationItems = [
-    { label: 'Dashboard', path: `/`, roles: ['patient', 'doctor', 'admin'] },
-    { label: 'Citas', path: '/appointments', roles: ['patient', 'doctor'] },
-    { label: 'Consultas', path: '/consultations', roles: ['patient', 'doctor'] },
-    { label: 'Salud', path: '/health', roles: ['patient'] },
-    { label: 'Farmacia', path: '/pharmacy', roles: ['patient'] },
-    { label: 'Historial Médico', path: '/medical-records', roles: ['patient', 'doctor'] },
-    { label: 'Asistente IA', path: '/ai-assistant', roles: ['patient', 'doctor'] },
-    { label: 'Delivery Médico', path: '/delivery', roles: ['patient', 'doctor'] },
-    { label: 'Pagos', path: '/payments', roles: ['patient'] },
-    { label: 'Pacientes', path: '/patients', roles: ['doctor'] },
-    { label: 'Agenda', path: '/schedule', roles: ['doctor'] },
-    { label: 'Administración', path: '/admin', roles: ['admin'] },
-  ];
+  const getNavigationItems = () => {
+    if (!user) return [];
+    
+    const baseItems = [
+      { label: 'Dashboard', path: '/', roles: ['patient', 'doctor', 'admin'] },
+    ];
+    
+    if (user.role === 'patient') {
+      return [
+        ...baseItems,
+        { label: 'Citas', path: '/appointments', roles: ['patient'] },
+        { label: 'Consultas', path: '/consultations', roles: ['patient'] },
+        { label: 'Salud', path: '/health', roles: ['patient'] },
+        { label: 'Farmacia', path: '/pharmacy', roles: ['patient'] },
+        { label: 'Historial Médico', path: '/medical-records', roles: ['patient'] },
+        { label: 'Asistente IA', path: '/ai-assistant', roles: ['patient'] },
+        { label: 'Delivery Médico', path: '/delivery', roles: ['patient'] },
+        { label: 'Pagos', path: '/payments', roles: ['patient'] },
+      ];
+    }
+    
+    if (user.role === 'doctor' || user.role === 'specialist') {
+      return [
+        ...baseItems,
+        { label: 'Pacientes', path: '/patients', roles: ['doctor'] },
+        { label: 'Agenda', path: '/schedule', roles: ['doctor'] },
+        { label: 'Consultas', path: '/consultations', roles: ['doctor'] },
+        { label: 'Historial Médico', path: '/medical-records', roles: ['doctor'] },
+        { label: 'Asistente IA', path: '/ai-assistant', roles: ['doctor'] },
+        { label: 'Delivery Médico', path: '/delivery', roles: ['doctor'] },
+      ];
+    }
+    
+    if (user.role === 'admin' || user.role === 'coordinator' || user.role === 'delivery_staff' || user.role === 'pharmacist') {
+      return [
+        ...baseItems,
+        { label: 'Administración', path: '/admin', roles: ['admin'] },
+        { label: 'Historial Médico', path: '/medical-records', roles: ['admin'] },
+        { label: 'Asistente IA', path: '/ai-assistant', roles: ['admin'] },
+        { label: 'Delivery Médico', path: '/delivery', roles: ['admin'] },
+      ];
+    }
+    
+    return baseItems;
+  };
+
+  const navigationItems = getNavigationItems();
 
   const quickActions = [
-    { label: 'Nueva Cita', icon: Plus, action: () => navigate('/appointments/new'), roles: ['patient'] },
-    { label: 'Consulta Virtual', icon: Plus, action: () => navigate('/consultations/new'), roles: ['doctor'] },
-    { label: 'Nuevo Paciente', icon: Plus, action: () => navigate('/patients/new'), roles: ['admin'] },
+    { label: 'Nueva Cita', icon: Plus, action: () => navigate('/appointments'), roles: ['patient'] },
+    { label: 'Consulta Virtual', icon: Plus, action: () => navigate('/consultations'), roles: ['doctor'] },
+    { label: 'Nuevo Paciente', icon: Plus, action: () => navigate('/patients'), roles: ['admin'] },
   ];
 
   if (!user) {
