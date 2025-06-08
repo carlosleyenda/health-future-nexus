@@ -4,101 +4,64 @@ import { delay } from '@/lib/delay';
 export interface DeliveryRequest {
   patientId: string;
   serviceType: string;
-  address: string;
   scheduledDate: string;
-  notes?: string;
+  notes: string;
+  address: string;
 }
 
 export class DeliveryService {
-  static async scheduleHomeConsultation(data: any) {
+  static async getActiveDeliveries() {
     await delay(300);
-    console.log('Scheduling home consultation:', data);
-    return { success: true, appointmentId: 'home-' + Date.now() };
-  }
-
-  static async scheduleLabCollection(data: any) {
-    await delay(300);
-    console.log('Scheduling lab collection:', data);
-    return { success: true, collectionId: 'lab-' + Date.now() };
-  }
-
-  static async getDeliveryHistory(userId: string) {
-    await delay(200);
     return [
       {
         id: '1',
-        type: 'home_consultation',
-        date: '2024-06-07',
-        status: 'completed',
-        doctor: 'Dr. María García',
+        patientName: 'Juan Pérez',
+        medication: 'Ibuprofeno 400mg',
+        status: 'en_camino',
+        estimatedTime: '15 min',
+        driver: 'Carlos García',
+        trackingNumber: 'DEL001'
       },
       {
         id: '2',
-        type: 'lab_collection',
-        date: '2024-06-05',
-        status: 'pending',
-        service: 'Análisis de sangre',
-      },
-    ];
-  }
-
-  static async getDeliveryServices(patientId: string) {
-    await delay(300);
-    console.log('Getting delivery services for patient:', patientId);
-    return [
-      {
-        id: '1',
-        patientId,
-        serviceType: 'home_consultation',
-        status: 'scheduled',
-        scheduledDate: '2024-06-10',
-        doctor: 'Dr. María García',
-        deliveryAddress: 'Calle Principal 123, Ciudad',
-        estimatedArrival: '10:00 AM'
-      },
-      {
-        id: '2',
-        patientId,
-        serviceType: 'lab_collection',
-        status: 'pending',
-        scheduledDate: '2024-06-08',
-        service: 'Análisis de sangre',
-        deliveryAddress: 'Calle Principal 123, Ciudad',
-        estimatedArrival: '2:00 PM'
+        patientName: 'María González',
+        medication: 'Antibiótico',
+        status: 'preparando',
+        estimatedTime: '45 min',
+        driver: 'Ana López',
+        trackingNumber: 'DEL002'
       }
     ];
   }
 
   static async requestDelivery(request: DeliveryRequest) {
-    await delay(400);
-    console.log('Requesting delivery service:', request);
+    await delay(500);
     return {
-      id: 'delivery-' + Date.now(),
-      patientId: request.patientId,
-      serviceType: request.serviceType,
-      status: 'requested',
-      scheduledDate: request.scheduledDate,
-      address: request.address,
-      notes: request.notes,
-      deliveryAddress: request.address,
-      estimatedArrival: '30 minutos'
+      id: Date.now().toString(),
+      ...request,
+      status: 'pending',
+      trackingNumber: `DEL${Date.now()}`,
+      estimatedTime: '30-45 min'
     };
   }
 
-  static async getDeliveryTracking(deliveryId: string) {
+  static async trackDelivery(trackingNumber: string) {
     await delay(200);
-    console.log('Getting delivery tracking for:', deliveryId);
     return {
-      id: deliveryId,
-      status: 'in_transit',
-      location: 'En camino a tu ubicación',
-      estimatedArrival: '15 minutos',
+      trackingNumber,
+      status: 'en_camino',
+      location: 'Cerca de tu ubicación',
+      estimatedTime: '10 min',
       driver: {
-        name: 'Carlos Rodríguez',
-        phone: '+52 555 123 4567'
+        name: 'Carlos García',
+        phone: '+1234567890',
+        rating: 4.8
       },
-      driverName: 'Carlos Rodríguez',
-      driverPhone: '+52 555 123 4567'
+      history: [
+        { time: '14:30', status: 'Pedido confirmado' },
+        { time: '14:45', status: 'En preparación' },
+        { time: '15:00', status: 'En camino' }
+      ]
     };
   }
 }
