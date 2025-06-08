@@ -1,627 +1,513 @@
-
 export interface GenomicProfile {
   id: string;
   patientId: string;
-  sequenceType: SequenceType;
-  sequenceData: GenomeSequence;
-  pharmacogenomics: PharmacogenomicProfile;
-  diseasePredisposition: DiseasePredisposition[];
-  ancestry: AncestryAnalysis;
-  carrierScreening: CarrierScreeningResult[];
-  somaticMutations: SomaticMutation[];
-  epigeneticMarkers: EpigeneticMarker[];
-  qualityMetrics: SequenceQualityMetrics;
-  processingDate: string;
-  labProvider: string;
-  consentStatus: ConsentStatus;
-  privacy: PrivacySettings;
+  processedAt: string;
+  qualityMetrics: {
+    overallQuality: number;
+    coverage: number;
+    mappingRate: number;
+    errorRate: number;
+  };
+  variants?: Variant[];
+  riskFactors?: RiskFactor[];
+  pharmacogenomicProfile?: PharmacogenomicProfile;
+  ancestryAnalysis?: AncestryAnalysis;
+  carrierScreening?: CarrierScreening;
+  somaticMutations?: SomaticMutation[];
+  tumorMarkers?: TumorMarker[];
+  methylationPatterns?: MethylationPattern[];
+  copyNumberVariations?: CopyNumberVariation[];
+  immuneResponseMarkers?: ImmuneResponseMarker[];
+  metabolomicProfile?: MetabolomicProfile;
+  proteomicProfile?: ProteomicProfile;
+  transcriptomicProfile?: TranscriptomicProfile;
+  epigeneticMarkers?: EpigeneticMarker[];
+  microbiomeAnalysis?: MicrobiomeAnalysis;
+  clinicalTrials?: ClinicalTrial[];
+  researchStudies?: ResearchStudy[];
+  privacySettings?: GenomicPrivacySettings;
+  labIntegration?: LabIntegration;
+  dataExport?: GenomicDataExport;
+  familyHistory?: FamilyHistory;
+  lifestyleFactors?: LifestyleFactors;
+  environmentalExposures?: EnvironmentalExposures;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type SequenceType = 'whole_genome' | 'whole_exome' | 'targeted_panel' | 'pharmacogenomic' | 'ancestry';
-
-export interface GenomeSequence {
-  chromosomes: ChromosomeData[];
-  variants: GeneticVariant[];
-  coverage: CoverageData;
-  qualityScores: QualityScore[];
-  rawDataUrl?: string;
-  vcfFileUrl?: string;
-}
-
-export interface ChromosomeData {
-  chromosome: string;
-  length: number;
-  variants: GeneticVariant[];
-  coverage: number;
-}
-
-export interface GeneticVariant {
+export interface Variant {
   id: string;
+  gene: string;
   chromosome: string;
   position: number;
-  refAllele: string;
-  altAllele: string;
-  genotype: string;
-  quality: number;
-  depth: number;
-  frequency: number;
-  dbsnpId?: string;
-  clinvarId?: string;
-  consequence: VariantConsequence;
-  geneSymbol?: string;
-  transcript?: string;
-  proteinChange?: string;
-  pathogenicity: PathogenicityPrediction;
+  ref: string;
+  alt: string;
+  rsId: string;
+  alleleFrequency: number;
+  zygosity: 'homozygous' | 'heterozygous';
+  impact: 'high' | 'moderate' | 'low' | 'modifier';
+  consequence: string;
+  pathogenicity: 'pathogenic' | 'likely_pathogenic' | 'benign' | 'likely_benign' | 'uncertain_significance';
+  clinicalSignificance?: string;
+  populations: PopulationFrequency[];
+  conservationScores: ConservationScore[];
+  predictions: PredictionScores;
+  annotations: string[];
+  references: string[];
 }
 
-export interface VariantConsequence {
-  type: ConsequenceType;
-  severity: SeverityLevel;
+export interface RiskFactor {
+  id: string;
+  condition: string;
+  gene: string;
+  riskScore: number;
+  oddsRatio: number;
+  confidenceInterval: {
+    lower: number;
+    upper: number;
+  };
+  associatedGenes: string[];
   description: string;
-  impact: ImpactLevel;
-}
-
-export type ConsequenceType = 
-  | 'missense'
-  | 'nonsense'
-  | 'frameshift'
-  | 'splice_site'
-  | 'synonymous'
-  | 'intronic'
-  | 'regulatory'
-  | 'intergenic';
-
-export type SeverityLevel = 'benign' | 'likely_benign' | 'uncertain' | 'likely_pathogenic' | 'pathogenic';
-export type ImpactLevel = 'low' | 'moderate' | 'high' | 'critical';
-
-export interface PathogenicityPrediction {
-  sift: number;
-  polyphen: number;
-  cadd: number;
-  clinvarSignificance?: string;
-  acmgClassification?: string;
-  confidence: number;
+  recommendations: string[];
+  evidenceLevel: string;
+  populations: PopulationRisk[];
+  references: string[];
 }
 
 export interface PharmacogenomicProfile {
-  metabolizerStatus: MetabolizerStatus;
+  id: string;
   drugResponses: DrugResponse[];
-  adverseReactions: AdverseReactionRisk[];
-  dosageRecommendations: DosageRecommendation[];
-  cyp450Variants: CYP450Variant[];
-  hlaAlleles: HLAAllele[];
-}
-
-export interface MetabolizerStatus {
-  cyp2d6: MetabolizerType;
-  cyp2c19: MetabolizerType;
-  cyp2c9: MetabolizerType;
-  cyp3a4: MetabolizerType;
-  cyp1a2: MetabolizerType;
-}
-
-export type MetabolizerType = 'poor' | 'intermediate' | 'normal' | 'rapid' | 'ultrarapid';
-
-export interface DrugResponse {
-  drugName: string;
-  expectedResponse: ResponseType;
-  confidence: number;
-  mechanism: string;
-  evidence: string[];
-  clinicalRecommendation: string;
-  alternativeDrugs: string[];
-  monitoring: string[];
-}
-
-export type ResponseType = 'poor' | 'reduced' | 'normal' | 'increased' | 'toxic';
-
-export interface AdverseReactionRisk {
-  drugName: string;
-  reactionType: string;
-  riskLevel: RiskLevel;
-  probability: number;
-  severity: SeverityLevel;
-  mechanism: string;
-  preventionStrategies: string[];
-}
-
-export type RiskLevel = 'very_low' | 'low' | 'moderate' | 'high' | 'very_high';
-
-export interface DosageRecommendation {
-  drugName: string;
-  recommendedDose: string;
-  adjustmentReason: string;
-  monitoringRequired: boolean;
-  titrationGuidance: string;
-  maxDose?: string;
-  contraindications: string[];
-}
-
-export interface CYP450Variant {
-  gene: string;
-  allele: string;
-  phenotype: string;
-  functionality: string;
-  frequency: number;
-}
-
-export interface HLAAllele {
-  allele: string;
-  drugAssociations: string[];
-  riskLevel: RiskLevel;
-}
-
-export interface DiseasePredisposition {
-  condition: string;
-  riskScore: number;
-  relativeRisk: number;
-  populationFrequency: number;
-  confidence: number;
-  associatedVariants: GeneticVariant[];
-  evidenceLevel: EvidenceLevel;
-  riskFactors: RiskFactor[];
+  geneVariants: GeneVariant[];
+  enzymeActivity: EnzymeActivity[];
+  metabolizerStatus: string;
   recommendations: string[];
-  screeningGuidelines: ScreeningGuideline[];
-}
-
-export type EvidenceLevel = 'limited' | 'moderate' | 'strong' | 'definitive';
-
-export interface RiskFactor {
-  factor: string;
-  contribution: number;
-  modifiable: boolean;
-  interventions: string[];
-}
-
-export interface ScreeningGuideline {
-  test: string;
-  frequency: string;
-  startAge: number;
-  endAge?: number;
-  indication: string;
+  references: string[];
 }
 
 export interface AncestryAnalysis {
-  populations: PopulationComponent[];
-  migrationPaths: MigrationPath[];
-  haplogroups: Haplogroup[];
-  medicalRelevance: MedicalAncestryInsight[];
+  id: string;
+  populationGroups: PopulationGroup[];
+  geographicOrigins: GeographicOrigin[];
+  haplogroups: {
+    maternal: string;
+    paternal: string;
+  };
+  migrationPatterns: MigrationPattern[];
+  neanderthalAdmixture: number;
+  references: string[];
 }
 
-export interface PopulationComponent {
-  population: string;
-  percentage: number;
-  confidence: number;
-  region: string;
-  medicalImplications: string[];
-}
-
-export interface MigrationPath {
-  timeframe: string;
-  regions: string[];
-  confidence: number;
-}
-
-export interface Haplogroup {
-  type: 'maternal' | 'paternal';
-  haplogroup: string;
-  description: string;
-  frequency: number;
-  medicalAssociations: string[];
-}
-
-export interface MedicalAncestryInsight {
-  condition: string;
-  populationRisk: number;
-  ancestryContribution: number;
+export interface CarrierScreening {
+  id: string;
+  diseases: CarrierDisease[];
+  reportSummary: string;
   recommendations: string[];
-}
-
-export interface CarrierScreeningResult {
-  condition: string;
-  carrierStatus: CarrierStatus;
-  variants: GeneticVariant[];
-  reproductiveRisk: ReproductiveRisk;
-  counselingRecommended: boolean;
-  partnerScreeningAdvised: boolean;
-}
-
-export type CarrierStatus = 'carrier' | 'non_carrier' | 'affected' | 'unknown';
-
-export interface ReproductiveRisk {
-  affectedChildRisk: number;
-  carrierChildRisk: number;
-  recommendedTesting: string[];
-  reproductiveOptions: string[];
+  references: string[];
 }
 
 export interface SomaticMutation {
-  tumorType?: string;
-  mutation: GeneticVariant;
-  therapeuticImplications: TherapeuticImplication[];
-  prognosticValue: PrognosticValue;
-  targetedTherapies: TargetedTherapy[];
-}
-
-export interface TherapeuticImplication {
-  therapy: string;
-  response: ResponseType;
-  evidence: string;
-  approvalStatus: string;
-}
-
-export interface PrognosticValue {
-  outcome: string;
-  impact: ImpactLevel;
-  survival: SurvivalData;
-}
-
-export interface SurvivalData {
-  medianSurvival: number;
-  fiveYearSurvival: number;
-  confidence: number;
-}
-
-export interface TargetedTherapy {
-  drugName: string;
-  targetGene: string;
-  mechanism: string;
-  approvalStatus: string;
-  clinicalTrials: ClinicalTrial[];
-}
-
-export interface ClinicalTrial {
-  nctId: string;
-  title: string;
-  phase: string;
-  status: string;
-  eligibilityCriteria: string[];
-  locations: string[];
-}
-
-export interface EpigeneticMarker {
-  type: EpigeneticType;
+  id: string;
   gene: string;
+  mutation: string;
+  chromosome: string;
+  position: number;
+  ref: string;
+  alt: string;
+  effect: string;
+  aminoAcidChange: string;
+  alleleFrequency: number;
+  tumorType: string;
+  clinicalSignificance: string;
+  drugResponse: string;
+  references: string[];
+}
+
+export interface TumorMarker {
+  id: string;
+  markerName: string;
+  value: number;
+  unit: string;
+  normalRange: {
+    min: number;
+    max: number;
+  };
+  interpretation: string;
+  tumorType: string;
+  clinicalSignificance: string;
+  references: string[];
+}
+
+export interface MethylationPattern {
+  id: string;
+  gene: string;
+  chromosome: string;
   position: number;
   methylationLevel: number;
-  expression: ExpressionLevel;
+  regionType: string;
   clinicalSignificance: string;
+  references: string[];
 }
 
-export type EpigeneticType = 'dna_methylation' | 'histone_modification' | 'chromatin_accessibility';
-export type ExpressionLevel = 'silenced' | 'reduced' | 'normal' | 'increased' | 'overexpressed';
-
-export interface SequenceQualityMetrics {
-  totalReads: number;
-  mappedReads: number;
-  averageCoverage: number;
-  coverageUniformity: number;
-  q30Percentage: number;
-  duplicateRate: number;
-  errorRate: number;
-  qualityPassed: boolean;
-}
-
-export interface CoverageData {
-  averageCoverage: number;
-  medianCoverage: number;
-  percentageCovered: number;
-  lowCoverageRegions: CoverageRegion[];
-}
-
-export interface CoverageRegion {
+export interface CopyNumberVariation {
+  id: string;
+  gene: string;
   chromosome: string;
   start: number;
   end: number;
-  coverage: number;
-  geneSymbol?: string;
+  copyNumber: number;
+  type: 'duplication' | 'deletion';
+  clinicalSignificance: string;
+  references: string[];
 }
 
-export interface QualityScore {
-  position: number;
-  quality: number;
-  confidence: number;
-}
-
-export interface ConsentStatus {
-  clinicalUse: boolean;
-  research: boolean;
-  dataSharing: boolean;
-  commercialUse: boolean;
-  familySharing: boolean;
-  consentDate: string;
-  withdrawalDate?: string;
-  granularPermissions: GranularPermission[];
-}
-
-export interface GranularPermission {
-  category: string;
-  permitted: boolean;
-  restrictions: string[];
-}
-
-export interface PrivacySettings {
-  encryption: EncryptionSettings;
-  accessControls: AccessControl[];
-  auditLog: AuditEntry[];
-  dataRetention: DataRetentionPolicy;
-  anonymization: AnonymizationSettings;
-  portability: DataPortabilitySettings;
-}
-
-export interface EncryptionSettings {
-  algorithm: string;
-  keyId: string;
-  encryptedAt: string;
-  integrityHash: string;
-}
-
-export interface AccessControl {
-  userId: string;
-  role: string;
-  permissions: Permission[];
-  accessLevel: AccessLevel;
-  expiresAt?: string;
-}
-
-export type Permission = 'read' | 'write' | 'delete' | 'share' | 'export';
-export type AccessLevel = 'none' | 'limited' | 'standard' | 'full' | 'admin';
-
-export interface AuditEntry {
+export interface ImmuneResponseMarker {
   id: string;
-  userId: string;
-  action: AuditAction;
-  timestamp: string;
-  ipAddress: string;
-  userAgent: string;
-  details: Record<string, any>;
+  markerName: string;
+  value: number;
+  unit: string;
+  normalRange: {
+    min: number;
+    max: number;
+  };
+  cellType: string;
+  clinicalSignificance: string;
+  references: string[];
 }
 
-export type AuditAction = 'access' | 'view' | 'download' | 'share' | 'modify' | 'delete' | 'consent_change';
-
-export interface DataRetentionPolicy {
-  retentionPeriod: number; // years
-  autoDeleteEnabled: boolean;
-  backupRetention: number; // years
-  archivalDate?: string;
+export interface MetabolomicProfile {
+  id: string;
+  metabolites: Metabolite[];
+  pathways: Pathway[];
+  diseaseAssociations: DiseaseAssociation[];
+  recommendations: string[];
+  references: string[];
 }
 
-export interface AnonymizationSettings {
-  method: AnonymizationMethod;
-  kValue: number;
-  lDiversity: number;
-  tCloseness: number;
-  appliedAt?: string;
+export interface ProteomicProfile {
+  id: string;
+  proteins: Protein[];
+  pathways: Pathway[];
+  diseaseAssociations: DiseaseAssociation[];
+  recommendations: string[];
+  references: string[];
 }
 
-export type AnonymizationMethod = 'k_anonymity' | 'l_diversity' | 't_closeness' | 'differential_privacy';
-
-export interface DataPortabilitySettings {
-  formats: ExportFormat[];
-  includeRawData: boolean;
-  includeAnalysis: boolean;
-  encryptExport: boolean;
+export interface TranscriptomicProfile {
+  id: string;
+  genes: GeneExpression[];
+  pathways: Pathway[];
+  diseaseAssociations: DiseaseAssociation[];
+  recommendations: string[];
+  references: string[];
 }
 
-export type ExportFormat = 'vcf' | 'json' | 'xml' | 'csv' | 'fhir' | 'hl7';
+export interface EpigeneticMarker {
+  id: string;
+  markerName: string;
+  chromosome: string;
+  position: number;
+  value: number;
+  cellType: string;
+  clinicalSignificance: string;
+  references: string[];
+}
 
-// Family Health Planning Types
+export interface MicrobiomeAnalysis {
+  id: string;
+  bacteria: Bacteria[];
+  fungi: Fungi[];
+  viruses: Virus[];
+  gutHealthScore: number;
+  recommendations: string[];
+  references: string[];
+}
+
+export interface ClinicalTrial {
+  id: string;
+  trialName: string;
+  description: string;
+  status: string;
+  phase: string;
+  conditions: string[];
+  sponsor: string;
+  location: string;
+  contact: string;
+  eligibilityCriteria: string[];
+  url: string;
+  references: string[];
+}
+
+export interface ResearchStudy {
+  id: string;
+  studyName: string;
+  description: string;
+  status: string;
+  sponsor: string;
+  location: string;
+  contact: string;
+  eligibilityCriteria: string[];
+  url: string;
+  references: string[];
+}
+
+export interface FamilyHistory {
+  id: string;
+  familyId: string;
+  relationship: string;
+  conditions: string[];
+  ageOfOnset: number;
+  geneticDataAvailable: boolean;
+  notes: string;
+}
+
+export interface LifestyleFactors {
+  id: string;
+  diet: string;
+  exercise: string;
+  smoking: boolean;
+  alcoholConsumption: string;
+  sleepPatterns: string;
+  stressLevels: string;
+  environmentalExposures: string[];
+  medications: string[];
+  supplements: string[];
+}
+
+export interface EnvironmentalExposures {
+  id: string;
+  exposureType: string;
+  level: number;
+  unit: string;
+  duration: string;
+  frequency: string;
+  location: string;
+  mitigationStrategies: string[];
+}
+
+// Sub-interfaces
+export interface PopulationFrequency {
+  population: string;
+  frequency: number;
+}
+
+export interface ConservationScore {
+  algorithm: string;
+  score: number;
+}
+
+export interface PredictionScores {
+  sift: number;
+  polyphen: number;
+  cadd: number;
+}
+
+export interface PopulationRisk {
+  population: string;
+  riskScore: number;
+}
+
+export interface DrugResponse {
+  medication: string;
+  gene: string;
+  variant: string;
+  metabolizerStatus: string;
+  efficacyPrediction: string;
+  adverseReactionRisk: string;
+  dosageRecommendation?: string;
+  references: string[];
+}
+
+export interface GeneVariant {
+  gene: string;
+  variant: string;
+  allele: string;
+  function: string;
+}
+
+export interface EnzymeActivity {
+  enzyme: string;
+  activityLevel: number;
+  unit: string;
+}
+
+export interface PopulationGroup {
+  population: string;
+  percentage: number;
+}
+
+export interface GeographicOrigin {
+  region: string;
+  percentage: number;
+}
+
+export interface MigrationPattern {
+  region: string;
+  timeframe: string;
+  description: string;
+}
+
+export interface CarrierDisease {
+  diseaseName: string;
+  gene: string;
+  carrierRisk: number;
+  inheritancePattern: string;
+  recommendations: string[];
+}
+
+export interface Metabolite {
+  name: string;
+  level: number;
+  unit: string;
+  normalRange: {
+    min: number;
+    max: number;
+  };
+  clinicalSignificance: string;
+}
+
+export interface Pathway {
+  name: string;
+  genes: string[];
+  description: string;
+}
+
+export interface DiseaseAssociation {
+  disease: string;
+  genes: string[];
+  riskScore: number;
+}
+
+export interface GeneExpression {
+  gene: string;
+  expressionLevel: number;
+  unit: string;
+  clinicalSignificance: string;
+}
+
 export interface FamilyHealthPlan {
   id: string;
   familyId: string;
-  generations: FamilyGeneration[];
-  riskAssessment: FamilyRiskAssessment;
-  reproductiveGuidance: ReproductiveGuidance;
-  pediatricScreening: PediatricScreeningPlan;
-  geneticCounseling: GeneticCounselingPlan;
-  coordination: TestingCoordination;
-}
-
-export interface FamilyGeneration {
-  generation: number;
   members: FamilyMember[];
-  sharedRisks: string[];
-  recommendedActions: string[];
+  sharedConditions: string[];
+  geneticCounselingRecommended: boolean;
+  lifestyleRecommendations: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface FamilyMember {
   id: string;
+  patientId: string;
   relationship: string;
-  age: number;
-  genomicProfile?: GenomicProfile;
-  healthStatus: HealthStatus;
-  riskFactors: RiskFactor[];
-}
-
-export interface HealthStatus {
   conditions: string[];
-  medications: string[];
-  lifestyle: LifestyleFactors;
+  geneticDataAvailable: boolean;
+  notes: string;
 }
 
-export interface LifestyleFactors {
-  smoking: boolean;
-  alcohol: string;
-  exercise: string;
-  diet: string;
-  stress: string;
-}
-
-export interface FamilyRiskAssessment {
-  heritableConditions: HeritableCondition[];
-  familyHistory: FamilyHistoryAnalysis;
-  penetrance: PenetranceAnalysis;
-  recommendations: FamilyRecommendation[];
-}
-
-export interface HeritableCondition {
-  condition: string;
-  inheritancePattern: InheritancePattern;
-  familyRisk: number;
-  population
-
-export interface GeneticCounselingPlan {
-  sessions: CounselingSession[];
-  materials: EducationalMaterial[];
-  followUpSchedule: FollowUpSchedule[];
-}
-
-export interface CounselingSession {
-  type: SessionType;
-  duration: number;
-  topics: string[];
-  scheduledDate?: string;
-  provider: string;
-}
-
-export type SessionType = 'pre_test' | 'post_test' | 'family_planning' | 'results_disclosure' | 'follow_up';
-
-// Research Integration Types
 export interface ResearchParticipation {
   id: string;
+  studyId: string;
   patientId: string;
-  studies: ResearchStudy[];
-  dataContributions: DataContribution[];
-  biobank: BiobankParticipation;
-  outcomes: ResearchOutcome[];
-  consent: ResearchConsent;
+  consentDate: string;
+  withdrawalDate?: string;
+  dataSharingAgreement: string;
+  studyData: any;
+  notes: string;
 }
 
-export interface ResearchStudy {
-  studyId: string;
-  title: string;
-  type: StudyType;
-  phase?: string;
-  eligibilityCriteria: string[];
-  participationLevel: ParticipationLevel;
-  dataShared: string[];
-  compensation?: string;
-}
-
-export type StudyType = 'genomic' | 'clinical_trial' | 'observational' | 'population' | 'rare_disease';
-export type ParticipationLevel = 'data_only' | 'biosamples' | 'follow_up' | 'intervention';
-
-export interface DataContribution {
-  studyId: string;
+// Lab Integration Types
+export interface LabIntegration {
+  id: string;
+  provider: '23andme' | 'ancestrydna' | 'labcorp' | 'quest' | 'helix' | 'dante_labs';
+  status: 'connected' | 'pending' | 'failed' | 'expired';
+  lastSync: string;
   dataTypes: string[];
-  contributionDate: string;
-  anonymized: boolean;
-  value: ResearchValue;
+  apiVersion: string;
+  credentials?: {
+    accessToken?: string;
+    refreshToken?: string;
+    apiKey?: string;
+    clientId?: string;
+  };
+  syncSettings: {
+    autoSync: boolean;
+    frequency: 'daily' | 'weekly' | 'monthly';
+    lastSyncDate?: string;
+    nextSyncDate?: string;
+  };
+  dataMapping: {
+    sourceField: string;
+    targetField: string;
+    transformFunction?: string;
+  }[];
+  qualityChecks: {
+    passed: boolean;
+    issues: string[];
+    confidence: number;
+  };
+  privacy: {
+    dataRetention: number; // days
+    shareWithResearch: boolean;
+    anonymizeData: boolean;
+    consentLevel: 'basic' | 'research' | 'commercial';
+  };
 }
 
-export interface ResearchValue {
-  scientificImpact: number;
-  populationBenefit: string[];
-  personalBenefit: string[];
+// Privacy and Security Types
+export interface GenomicPrivacySettings {
+  id: string;
+  patientId: string;
+  encryptionLevel: 'standard' | 'high' | 'quantum';
+  dataLocalization: 'local' | 'cloud' | 'hybrid';
+  accessControls: {
+    doctorAccess: boolean;
+    researchAccess: boolean;
+    familyAccess: boolean;
+    emergencyAccess: boolean;
+  };
+  consentSettings: {
+    diagnosticUse: boolean;
+    researchParticipation: boolean;
+    commercialUse: boolean;
+    dataSharing: boolean;
+    internationTransfer: boolean;
+  };
+  retentionPolicy: {
+    retentionPeriod: number; // years
+    automaticDeletion: boolean;
+    backupRetention: number; // years
+  };
+  auditLog: {
+    accessDate: string;
+    accessType: 'view' | 'download' | 'share' | 'delete';
+    userId: string;
+    purpose: string;
+    approved: boolean;
+  }[];
+  rightToPortability: {
+    exportFormats: string[];
+    lastExport?: string;
+    exportHistory: string[];
+  };
+  gdprCompliance: {
+    lawfulBasis: string;
+    dataSubjectRights: string[];
+    processingPurposes: string[];
+    thirdPartySharing: boolean;
+  };
 }
 
-export interface BiobankParticipation {
-  biobankId: string;
-  samplesStored: BiobankSample[];
-  accessPolicy: string;
-  storageConsent: boolean;
-  futureUseConsent: boolean;
-}
-
-export interface BiobankSample {
-  sampleId: string;
-  type: SampleType;
-  collectionDate: string;
-  storageLocation: string;
-  quality: SampleQuality;
-}
-
-export type SampleType = 'blood' | 'saliva' | 'tissue' | 'urine' | 'dna' | 'rna' | 'protein';
-
-export interface SampleQuality {
-  integrity: number;
-  purity: number;
-  concentration: number;
-  suitableFor: string[];
-}
-
-export interface ResearchOutcome {
-  studyId: string;
-  findings: ResearchFinding[];
-  publications: Publication[];
-  clinicalRelevance: string[];
-}
-
-export interface ResearchFinding {
-  discovery: string;
-  relevance: RelevanceLevel;
-  impact: ImpactLevel;
-  actionable: boolean;
-}
-
-export type RelevanceLevel = 'personal' | 'family' | 'population' | 'global';
-
-export interface Publication {
-  title: string;
-  journal: string;
-  doi: string;
-  publicationDate: string;
-  contribution: string;
-}
-
-export interface ResearchConsent {
-  dataSharing: boolean;
-  commercialUse: boolean;
-  internationalTransfer: boolean;
-  futureStudies: boolean;
-  recontact: boolean;
-  resultsReturn: boolean;
-}
-
-// API Integration Types
-export interface ExternalLabIntegration {
-  provider: LabProvider;
-  apiEndpoint: string;
-  authentication: LabAuthentication;
-  dataMapping: LabDataMapping;
-  qualityControls: QualityControl[];
-}
-
-export type LabProvider = 'labcorp' | 'quest' | '23andme' | 'ancestry' | 'color' | 'invitae' | 'myriad';
-
-export interface LabAuthentication {
-  method: AuthMethod;
-  credentials: AuthCredentials;
-  tokenExpiry?: string;
-}
-
-export type AuthMethod = 'oauth2' | 'api_key' | 'jwt' | 'mtls';
-
-export interface AuthCredentials {
-  clientId?: string;
-  clientSecret?: string;
-  apiKey?: string;
-  token?: string;
-}
-
-export interface LabDataMapping {
-  variantFormat: string;
-  referenceGenome: string;
-  qualityThresholds: QualityThreshold[];
-  fieldMappings: FieldMapping[];
-}
-
-export interface QualityThreshold {
-  metric: string;
-  minimumValue: number;
-  action: string;
-}
-
-export interface FieldMapping {
-  sourceField: string;
-  targetField: string;
-  transformation?: string;
-}
-
-export interface QualityControl {
-  test: string;
-  passed: boolean;
-  value: number;
-  threshold: number;
-  notes?: string;
+export interface GenomicDataExport {
+  id: string;
+  format: 'vcf' | 'json' | 'csv' | 'pdf' | 'fhir';
+  includeRawData: boolean;
+  includeInterpretations: boolean;
+  includeReports: boolean;
+  anonymizeData: boolean;
+  passwordProtected: boolean;
+  expirationDate: string;
+  downloadUrl?: string;
+  createdAt: string;
+  downloadedAt?: string;
+  downloadCount: number;
 }
