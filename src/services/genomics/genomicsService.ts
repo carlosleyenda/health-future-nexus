@@ -254,35 +254,33 @@ export class GenomicsService {
     };
   }
 
-  static async getCarrierScreening(userId: string): Promise<CarrierScreening[]> {
+  static async getCarrierScreening(userId: string): Promise<CarrierScreening> {
     await delay(400);
     
-    return [
-      {
-        id: 'carrier-1',
-        diseases: [
-          {
-            diseaseName: 'Fibrosis Quística',
-            gene: 'CFTR',
-            carrierRisk: 0.04,
-            inheritancePattern: 'Autosómica recesiva',
-            recommendations: [
-              'Considerar asesoramiento genético antes del embarazo',
-              'Pruebas genéticas para la pareja'
-            ]
-          }
-        ],
-        reportSummary: 'Análisis completo de portador para condiciones genéticas comunes',
-        recommendations: [
-          'Consultar con especialista en genética médica',
-          'Compartir resultados con familiares directos'
-        ],
-        references: [
-          'American College of Medical Genetics Guidelines',
-          'Clinical Genomics Standards'
-        ]
-      }
-    ];
+    return {
+      id: 'carrier-1',
+      diseases: [
+        {
+          diseaseName: 'Fibrosis Quística',
+          gene: 'CFTR',
+          carrierRisk: 0.04,
+          inheritancePattern: 'Autosómica recesiva',
+          recommendations: [
+            'Considerar asesoramiento genético antes del embarazo',
+            'Pruebas genéticas para la pareja'
+          ]
+        }
+      ],
+      reportSummary: 'Análisis completo de portador para condiciones genéticas comunes',
+      recommendations: [
+        'Consultar con especialista en genética médica',
+        'Compartir resultados con familiares directos'
+      ],
+      references: [
+        'American College of Medical Genetics Guidelines',
+        'Clinical Genomics Standards'
+      ]
+    };
   }
 
   static async getDiseasePredisposition(patientId: string): Promise<DiseasePredisposition[]> {

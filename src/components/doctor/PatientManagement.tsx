@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, User, Phone, Video, FileText, Calendar, Filter } from 'lucide-react';
+import { Search, User, Phone, Video, FileText, Calendar, Filter, Clock } from 'lucide-react';
 import { useDoctorPatients } from '@/hooks/useDoctor';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
