@@ -15,6 +15,7 @@ import { useAuthStore } from "@/store/auth";
 import { PatientDashboard } from "@/components/dashboard/PatientDashboard";
 import { DoctorDashboard } from "@/components/dashboard/DoctorDashboard";
 import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
+import UserProfile from "@/components/profile/UserProfile";
 
 const queryClient = new QueryClient();
 
@@ -78,6 +79,15 @@ const App = () => (
             </ProtectedRoute>
           }>
             <Route index element={<AdminDashboard />} />
+          </Route>
+          
+          {/* Profile route - accessible by all authenticated users */}
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<UserProfile />} />
           </Route>
           
           {/* Additional protected routes */}

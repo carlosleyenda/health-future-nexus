@@ -1,67 +1,40 @@
 
-import { delay } from '@/lib/delay';
+import { db } from '@/lib/database';
+import type { DeliveryService as DeliveryServiceType, DeliveryRequest } from '@/lib/database';
 
-export interface DeliveryRequest {
-  patientId: string;
-  serviceType: string;
-  scheduledDate: string;
-  notes: string;
-  address: string;
-}
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class DeliveryService {
-  static async getActiveDeliveries() {
+  static async getDeliveryServices(patientId: string): Promise<DeliveryServiceType[]> {
     await delay(300);
-    return [
-      {
-        id: '1',
-        patientName: 'Juan Pérez',
-        medication: 'Ibuprofeno 400mg',
-        status: 'en_camino',
-        estimatedTime: '15 min',
-        driver: 'Carlos García',
-        trackingNumber: 'DEL001'
-      },
-      {
-        id: '2',
-        patientName: 'María González',
-        medication: 'Antibiótico',
-        status: 'preparando',
-        estimatedTime: '45 min',
-        driver: 'Ana López',
-        trackingNumber: 'DEL002'
-      }
-    ];
+    // Mock data for now
+    return [];
   }
 
-  static async requestDelivery(request: DeliveryRequest) {
+  static async scheduleDelivery(request: DeliveryRequest): Promise<DeliveryServiceType> {
     await delay(500);
-    return {
-      id: Date.now().toString(),
-      ...request,
-      status: 'pending',
-      trackingNumber: `DEL${Date.now()}`,
-      estimatedTime: '30-45 min'
+    const newDelivery: DeliveryServiceType = {
+      id: crypto.randomUUID(),
+      patientId: request.patientId,
+      serviceType: request.serviceType as any,
+      scheduledDate: request.scheduledDate,
+      address: request.address,
+      status: 'requested',
+      priority: 'normal',
+      estimatedCost: 50,
+      createdAt: new Date().toISOString(),
+      notes: request.notes
     };
+    return newDelivery;
   }
 
-  static async trackDelivery(trackingNumber: string) {
+  static async getDeliveryTracking(deliveryId: string): Promise<any> {
     await delay(200);
     return {
-      trackingNumber,
-      status: 'en_camino',
-      location: 'Cerca de tu ubicación',
-      estimatedTime: '10 min',
-      driver: {
-        name: 'Carlos García',
-        phone: '+1234567890',
-        rating: 4.8
-      },
-      history: [
-        { time: '14:30', status: 'Pedido confirmado' },
-        { time: '14:45', status: 'En preparación' },
-        { time: '15:00', status: 'En camino' }
-      ]
+      id: deliveryId,
+      status: 'in_transit',
+      estimatedArrival: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      currentLocation: 'En camino'
     };
   }
 }
