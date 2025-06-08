@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,6 @@ import {
   Pill,
   Camera,
   Plus,
-  Zap,
   Heart,
   TrendingUp,
   Calendar,
@@ -39,69 +39,60 @@ import {
   CartesianGrid,
   Tooltip
 } from 'recharts';
-import type { IoTDevice as IoTDeviceType, DeviceReading, DeviceAlert } from '@/types/iot';
-
-// Define local interface to avoid conflicts
-interface LocalIoTDevice extends IoTDeviceType {
-  isConnected: boolean;
-  version: string;
-  isResolved?: boolean;
-}
+import type { IoTDevice } from '@/types/iot';
 
 interface IoTDeviceManagerProps {
   patientId: string;
 }
 
-interface IoTDevice {
-  id: string;
-  name: string;
-  type: string;
-  model: string;
-  manufacturer: string;
-  serialNumber: string;
-  firmwareVersion: string;
-  batteryLevel: number;
-  signalStrength: number;
-  isOnline: boolean;
-  lastHeartbeat: string;
-  location: string;
-  settings?: Record<string, boolean>;
-  compartments?: Array<{
-    id: number;
-    medication: string;
-    pillCount: number;
-    capacity: number;
-    nextDispense: string | null;
-  }>;
-  alerts?: Array<{
-    type: string;
-    severity: string;
-    message: string;
-    timestamp: string;
-  }>;
-  metrics?: Array<{
-    timestamp: string;
-    heartRate?: number;
-    bloodPressure?: { systolic: number; diastolic: number };
-    oxygenSaturation?: number;
-  }>;
-}
-
 export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
-  const [devices, setDevices] = useState<LocalIoTDevice[]>([
+  const [devices, setDevices] = useState<IoTDevice[]>([
     {
       id: '1',
       name: 'Smart Pill Dispenser Pro',
       type: 'pill_dispenser',
-      model: 'SPD-2024-V3',
-      manufacturer: 'MedTech Solutions',
-      serialNumber: 'SPD-001-2024',
-      firmwareVersion: '3.2.1',
+      status: 'active',
+      isConnected: true,
+      lastSeen: '2024-06-08T10:30:00Z',
       batteryLevel: 85,
-      signalStrength: 92,
-      isOnline: true,
-      lastHeartbeat: '2024-06-08T10:30:00Z',
+      version: '3.2.1',
       location: 'Sala de estar',
+      serialNumber: 'SPD-001-2024',
+      manufacturer: 'MedTech Solutions',
+      model: 'SPD-2024-V3',
+      firmwareVersion: '3.2.1',
+      connectionType: 'wifi',
+      dataFrequency: 15,
+      configuration: {
+        samplingRate: 60,
+        dataStorageLimit: 1000,
+        alertThresholds: {},
+        encryptionType: 'AES-256',
+        accessControls: []
+      },
+      capabilities: [],
+      alerts: [
+        { 
+          id: 'alert-1',
+          type: 'low_stock', 
+          severity: 'medium', 
+          message: 'Vitamina D - Stock bajo (15 píldoras)', 
+          timestamp: '2024-06-08T09:00:00Z',
+          deviceId: '1',
+          isResolved: false
+        }
+      ],
+      readings: [],
+      healthScore: 85,
+      complianceStatus: 'compliant',
+      encryptionEnabled: true,
+      certifications: [],
+      powerSource: 'mains',
+      expectedLifespan: 60,
+      costPerMonth: 25,
+      isOnline: true,
+      signalStrength: 92,
+      lastHeartbeat: '2024-06-08T10:30:00Z',
       settings: {
         soundAlerts: true,
         visualAlerts: true,
@@ -114,54 +105,111 @@ export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
         { id: 2, medication: 'Lisinopril', pillCount: 28, capacity: 30, nextDispense: '2024-06-09T09:00:00Z' },
         { id: 3, medication: 'Vitamina D', pillCount: 15, capacity: 30, nextDispense: '2024-06-08T10:00:00Z' },
         { id: 4, medication: 'Vacío', pillCount: 0, capacity: 30, nextDispense: null }
-      ],
-      alerts: [
-        { type: 'low_stock', severity: 'medium', message: 'Vitamina D - Stock bajo (15 píldoras)', timestamp: '2024-06-08T09:00:00Z' }
       ]
     },
     {
       id: '2',
       name: 'HealthWatch Vital Monitor',
       type: 'wearable',
-      model: 'HWV-2024',
-      manufacturer: 'VitalTech',
-      serialNumber: 'HWV-002-2024',
-      firmwareVersion: '2.1.0',
+      status: 'active',
+      isConnected: true,
+      lastSeen: '2024-06-08T10:25:00Z',
       batteryLevel: 42,
-      signalStrength: 88,
-      isOnline: true,
-      lastHeartbeat: '2024-06-08T10:25:00Z',
+      version: '2.1.0',
       location: 'Muñeca izquierda',
+      serialNumber: 'HWV-002-2024',
+      manufacturer: 'VitalTech',
+      model: 'HWV-2024',
+      firmwareVersion: '2.1.0',
+      connectionType: 'bluetooth',
+      dataFrequency: 5,
+      configuration: {
+        samplingRate: 300,
+        dataStorageLimit: 5000,
+        alertThresholds: {},
+        encryptionType: 'AES-256',
+        accessControls: []
+      },
+      capabilities: [],
+      alerts: [],
+      readings: [],
+      healthScore: 92,
+      complianceStatus: 'compliant',
+      encryptionEnabled: true,
+      certifications: [],
+      powerSource: 'battery',
+      expectedLifespan: 24,
+      costPerMonth: 15,
+      isOnline: true,
+      signalStrength: 88,
+      lastHeartbeat: '2024-06-08T10:25:00Z',
       metrics: [
         { timestamp: '2024-06-08T10:00:00Z', heartRate: 72, bloodPressure: { systolic: 120, diastolic: 80 }, oxygenSaturation: 98 },
         { timestamp: '2024-06-08T10:15:00Z', heartRate: 75, bloodPressure: { systolic: 118, diastolic: 78 }, oxygenSaturation: 97 },
         { timestamp: '2024-06-08T10:30:00Z', heartRate: 73, bloodPressure: { systolic: 122, diastolic: 82 }, oxygenSaturation: 98 }
-      ],
-      alerts: []
+      ]
     },
     {
       id: '3',
       name: 'Adherence Camera System',
       type: 'environment_sensor',
-      model: 'ACS-2024',
-      manufacturer: 'VisionMed',
-      serialNumber: 'ACS-003-2024',
-      firmwareVersion: '1.5.2',
+      status: 'offline',
+      isConnected: false,
+      lastSeen: '2024-06-08T08:30:00Z',
       batteryLevel: 12,
-      signalStrength: 45,
-      isOnline: false,
-      lastHeartbeat: '2024-06-08T08:30:00Z',
+      version: '1.5.2',
       location: 'Mesa de medicamentos',
+      serialNumber: 'ACS-003-2024',
+      manufacturer: 'VisionMed',
+      model: 'ACS-2024',
+      firmwareVersion: '1.5.2',
+      connectionType: 'wifi',
+      dataFrequency: 60,
+      configuration: {
+        samplingRate: 3600,
+        dataStorageLimit: 500,
+        alertThresholds: {},
+        encryptionType: 'AES-256',
+        accessControls: []
+      },
+      capabilities: [],
+      alerts: [
+        { 
+          id: 'alert-2',
+          type: 'battery_low', 
+          severity: 'high', 
+          message: 'Batería crítica - 12% restante', 
+          timestamp: '2024-06-08T10:00:00Z',
+          deviceId: '3',
+          isResolved: false
+        },
+        { 
+          id: 'alert-3',
+          type: 'device_offline', 
+          severity: 'high', 
+          message: 'Dispositivo desconectado hace 2 horas', 
+          timestamp: '2024-06-08T08:30:00Z',
+          deviceId: '3',
+          isResolved: false
+        }
+      ],
+      readings: [],
+      healthScore: 45,
+      complianceStatus: 'non-compliant',
+      encryptionEnabled: true,
+      certifications: [],
+      powerSource: 'battery',
+      expectedLifespan: 36,
+      costPerMonth: 30,
+      isOnline: false,
+      signalStrength: 45,
+      lastHeartbeat: '2024-06-08T08:30:00Z',
       settings: {
         motionDetection: true,
         photoVerification: true,
         privacyMode: false,
         nightVision: true
-      },
-      alerts: [
-        { type: 'battery_low', severity: 'high', message: 'Batería crítica - 12% restante', timestamp: '2024-06-08T10:00:00Z' },
-        { type: 'device_offline', severity: 'high', message: 'Dispositivo desconectado hace 2 horas', timestamp: '2024-06-08T08:30:00Z' }
-      ]
+      }
     }
   ]);
 
@@ -174,12 +222,12 @@ export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
     { time: '16:00', heartRate: 74, bp: 121 }
   ]);
 
-  const [connectedDevices, setConnectedDevices] = useState<LocalIoTDevice[]>(devices);
-  const [alerts, setAlerts] = useState<LocalIoTDevice[]>(devices);
+  const [connectedDevices, setConnectedDevices] = useState<IoTDevice[]>([]);
+  const [alertDevices, setAlertDevices] = useState<IoTDevice[]>([]);
 
   useEffect(() => {
     setConnectedDevices(devices.filter(d => d.isOnline));
-    setAlerts(devices.filter(d => d.alerts && d.alerts.length > 0));
+    setAlertDevices(devices.filter(d => d.alerts && d.alerts.length > 0));
   }, [devices]);
 
   const getDeviceIcon = (type: string) => {
@@ -191,9 +239,9 @@ export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
     }
   };
 
-  const getStatusColor = (isOnline: boolean, batteryLevel: number) => {
+  const getStatusColor = (isOnline: boolean | undefined, batteryLevel: number | undefined) => {
     if (!isOnline) return 'text-red-500';
-    if (batteryLevel < 20) return 'text-yellow-500';
+    if (batteryLevel && batteryLevel < 20) return 'text-yellow-500';
     return 'text-green-500';
   };
 
@@ -236,7 +284,7 @@ export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Math.round(connectedDevices.reduce((sum, d) => sum + d.batteryLevel, 0) / connectedDevices.length)}%
+              {Math.round(connectedDevices.reduce((sum, d) => sum + (d.batteryLevel || 0), 0) / connectedDevices.length)}%
             </div>
             <p className="text-xs text-muted-foreground">Promedio de todos los dispositivos</p>
           </CardContent>
@@ -249,7 +297,7 @@ export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Math.round(connectedDevices.reduce((sum, d) => sum + d.signalStrength, 0) / connectedDevices.length)}%
+              {Math.round(connectedDevices.reduce((sum, d) => sum + (d.signalStrength || 0), 0) / connectedDevices.length)}%
             </div>
             <p className="text-xs text-muted-foreground">Calidad de conexión</p>
           </CardContent>
@@ -261,7 +309,7 @@ export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
             <AlertTriangle className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{alerts.filter(a => !a.isResolved).length}</div>
+            <div className="text-2xl font-bold">{alertDevices.filter(a => a.alerts.some(alert => !alert.isResolved)).length}</div>
             <p className="text-xs text-muted-foreground">Requieren atención</p>
           </CardContent>
         </Card>
@@ -549,7 +597,7 @@ export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
                         <div>
                           <div className="text-sm text-gray-500">Último sync</div>
                           <div className="font-medium">
-                            {new Date(device.lastHeartbeat).toLocaleTimeString('es-MX', { 
+                            {device.lastHeartbeat && new Date(device.lastHeartbeat).toLocaleTimeString('es-MX', { 
                               hour: '2-digit', 
                               minute: '2-digit' 
                             })}
@@ -561,8 +609,8 @@ export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
                     {/* Battery Progress */}
                     <div className="mb-4">
                       <Progress value={device.batteryLevel} className={`h-2 ${
-                        device.batteryLevel < 20 ? 'bg-red-100' : 
-                        device.batteryLevel < 50 ? 'bg-yellow-100' : 'bg-green-100'
+                        (device.batteryLevel || 0) < 20 ? 'bg-red-100' : 
+                        (device.batteryLevel || 0) < 50 ? 'bg-yellow-100' : 'bg-green-100'
                       }`} />
                     </div>
 

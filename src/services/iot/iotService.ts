@@ -3,7 +3,9 @@ import type {
   IoTDevice,
   DeviceReading,
   DeviceAlert,
-  DeviceMetric
+  DeviceMetric,
+  HealthAnalytics,
+  ClinicalIntegration
 } from '@/types/iot';
 
 export class IoTService {
@@ -14,64 +16,56 @@ export class IoTService {
       {
         id: crypto.randomUUID(),
         patientId,
-        deviceType: 'smartwatch',
-        category: 'wearable',
-        brand: 'Apple',
-        model: 'Watch Series 9',
-        serialNumber: 'AW123456789',
-        macAddress: '00:1B:44:11:3A:B7',
-        firmwareVersion: '10.1.1',
-        hardwareVersion: '2.0',
-        connectivity: ['bluetooth_le', 'wifi'],
+        name: 'Apple Watch Series 9',
+        type: 'wearable',
+        status: 'active',
+        isConnected: true,
+        lastSeen: new Date().toISOString(),
         batteryLevel: 85,
-        signalStrength: 92,
-        isOnline: true,
-        location: {
-          bodyPart: 'left_wrist',
-          room: 'bedroom'
+        version: '10.1.1',
+        location: 'left_wrist',
+        serialNumber: 'AW123456789',
+        manufacturer: 'Apple',
+        model: 'Watch Series 9',
+        firmwareVersion: '10.1.1',
+        connectionType: 'bluetooth',
+        dataFrequency: 5,
+        configuration: {
+          samplingRate: 300,
+          dataStorageLimit: 5000,
+          alertThresholds: {
+            heart_rate: 100,
+            blood_pressure: 140
+          },
+          encryptionType: 'AES-256',
+          accessControls: ['biometric', 'pin']
         },
-        lastSync: new Date().toISOString(),
-        lastHeartbeat: new Date().toISOString(),
-        certifications: ['FDA Class II', 'CE Mark', 'FCC'],
-        fdaApproval: '510(k) K173745',
-        ceMarking: true,
-        clinicalAccuracy: 98.5,
-        calibrationDate: '2024-05-15',
+        capabilities: [
+          {
+            type: 'heart_rate',
+            description: 'Continuous heart rate monitoring',
+            specifications: { accuracy: '±2 bpm', range: '30-200 bpm' }
+          }
+        ],
+        alerts: [],
+        readings: [],
+        healthScore: 95,
         maintenanceSchedule: {
-          calibrationFrequency: 365,
-          cleaningFrequency: 7,
-          firmwareUpdateFrequency: 30,
           lastMaintenance: '2024-05-15',
           nextMaintenance: '2024-06-15',
-          maintenanceHistory: []
+          frequency: 'monthly',
+          tasks: ['calibration', 'cleaning']
         },
-        alerts: [],
-        metrics: [],
-        settings: {
-          measurementFrequency: 5,
-          alertThresholds: {
-            heart_rate: { min: 60, max: 100 },
-            blood_pressure: { min: 90, max: 140 }
-          },
-          connectivityPreferences: ['bluetooth_le'],
-          privacySettings: {
-            dataSharing: true,
-            anonymousAnalytics: true,
-            emergencyOverride: true
-          },
-          powerManagement: {
-            mode: 'balanced',
-            sleepMode: true,
-            wakeUpTriggers: ['movement', 'time']
-          },
-          clinicalSettings: {
-            providerAccess: true,
-            autoReporting: true,
-            emergencyContacts: []
-          }
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        complianceStatus: 'compliant',
+        encryptionEnabled: true,
+        lastCalibration: '2024-05-15',
+        nextCalibration: '2024-08-15',
+        warrantyExpiry: '2025-12-31',
+        certifications: ['FDA Class II', 'CE Mark', 'FCC'],
+        powerSource: 'battery',
+        expectedLifespan: 24,
+        costPerMonth: 15,
+        reimbursementCode: 'RPM-001'
       }
     ];
   }
@@ -87,10 +81,13 @@ export class IoTService {
       
       metrics.push({
         id: crypto.randomUUID(),
+        deviceId,
         timestamp,
         metricType: 'heart_rate',
         value: 70 + Math.random() * 20,
         unit: 'bpm',
+        qualityScore: 98.5,
+        calibrationStatus: 'valid',
         accuracy: 98.5,
         reliability: 99.2,
         context: {
