@@ -104,7 +104,7 @@ export default function AutomatedDeliveryDashboard() {
               <div>
                 <p className="text-sm text-gray-600">Temperatura</p>
                 <p className="text-2xl font-bold">
-                  {weatherData?.current?.temp || '--'}°C
+                  {weatherData?.current?.temperature || '--'}°C
                 </p>
               </div>
               <Thermometer className="h-8 w-8 text-blue-500" />
@@ -184,9 +184,9 @@ export default function AutomatedDeliveryDashboard() {
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-blue-600">
-                        {fleet.drones?.filter(d => d.status === 'active').length || 0}/{fleet.drones?.length || 0}
+                        {fleet.drones?.filter(d => d.status === 'available').length || 0}/{fleet.drones?.length || 0}
                       </p>
-                      <p className="text-sm text-gray-500">Activos</p>
+                      <p className="text-sm text-gray-500">Disponibles</p>
                     </div>
                   </div>
                 </CardHeader>
@@ -195,7 +195,7 @@ export default function AutomatedDeliveryDashboard() {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <p className="text-gray-600">Ubicación:</p>
-                        <p className="font-medium">{fleet.homeBase?.address}</p>
+                        <p className="font-medium">{fleet.baseLocation?.name}</p>
                       </div>
                       <div>
                         <p className="text-gray-600">Radio Operacional:</p>
@@ -207,7 +207,7 @@ export default function AutomatedDeliveryDashboard() {
                       <div 
                         className="bg-blue-600 h-2 rounded-full" 
                         style={{ 
-                          width: `${((fleet.drones?.filter(d => d.status === 'active').length || 0) / (fleet.drones?.length || 1)) * 100}%` 
+                          width: `${((fleet.drones?.filter(d => d.status === 'available').length || 0) / (fleet.drones?.length || 1)) * 100}%` 
                         }}
                       ></div>
                     </div>
@@ -330,7 +330,7 @@ export default function AutomatedDeliveryDashboard() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle>{locker.name}</CardTitle>
+                      <CardTitle>{locker.location.facilityType} Locker</CardTitle>
                       <p className="text-sm text-gray-600">{locker.location.address}</p>
                     </div>
                     <Badge variant={locker.status === 'operational' ? 'default' : 'secondary'}>
@@ -344,13 +344,13 @@ export default function AutomatedDeliveryDashboard() {
                       <div>
                         <p className="text-gray-600">Compartimentos:</p>
                         <p className="font-medium">
-                          {locker.compartments?.filter(c => c.status === 'available').length || 0}/{locker.compartments?.length || 0} disponibles
+                          {locker.lockers?.filter(c => !c.isOccupied).length || 0}/{locker.lockers?.length || 0} disponibles
                         </p>
                       </div>
                       <div>
                         <p className="text-gray-600">Control Temperatura:</p>
                         <p className="font-medium">
-                          {locker.temperatureControl ? '✓ Sí' : '✗ No'}
+                          {locker.temperatureZones?.length > 0 ? '✓ Sí' : '✗ No'}
                         </p>
                       </div>
                     </div>
@@ -358,12 +358,12 @@ export default function AutomatedDeliveryDashboard() {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <p className="text-gray-600">Nivel Seguridad:</p>
-                        <p className="font-medium capitalize">{locker.security?.level || 'Estándar'}</p>
+                        <p className="font-medium capitalize">{locker.securityFeatures?.biometricAccess ? 'Alto' : 'Estándar'}</p>
                       </div>
                       <div>
                         <p className="text-gray-600">Utilización:</p>
                         <p className="font-medium">
-                          {Math.round(((locker.compartments?.length || 0) - (locker.compartments?.filter(c => c.status === 'available').length || 0)) / (locker.compartments?.length || 1) * 100)}%
+                          {Math.round(((locker.lockers?.length || 0) - (locker.lockers?.filter(c => !c.isOccupied).length || 0)) / (locker.lockers?.length || 1) * 100)}%
                         </p>
                       </div>
                     </div>

@@ -1,4 +1,3 @@
-
 import type {
   GenomicProfile,
   PharmacogenomicProfile,
@@ -263,6 +262,7 @@ export class GenomicsService {
         id: 'disease-001',
         disease: 'Coronary Artery Disease',
         riskScore: 68,
+        confidence: 0.85,
         genes: ['rs6725887', 'rs17465637'],
         description: 'Increased risk for coronary artery disease based on genetic variants'
       },
@@ -270,6 +270,7 @@ export class GenomicsService {
         id: 'disease-002',
         disease: "Alzheimer's Disease",
         riskScore: 45,
+        confidence: 0.72,
         genes: ['rs429358 (APOE4)'],
         description: 'Moderate risk for Alzheimer\'s disease due to APOE4 variant'
       }
