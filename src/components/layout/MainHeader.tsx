@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/auth';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotifications, useRealtimeNotifications } from '@/hooks/useNotifications';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -33,10 +33,14 @@ export default function MainHeader({
   quickActions
 }: MainHeaderProps) {
   const { user, logout } = useAuthStore();
-  const { data: notifications } = useNotifications(user?.id || '');
+  const { data: notifications = [] } = useNotifications(user?.id || '');
   const navigate = useNavigate();
   
-  const unreadCount = notifications?.filter(n => !n.isRead).length || 0;
+  // Activar notificaciones en tiempo real
+  useRealtimeNotifications(user?.id || '');
+  
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const urgentCount = notifications.filter(n => n.priority === 'urgent' && !n.isRead).length;
 
   const filteredNavItems = navigationItems.filter(item => 
     item.roles.includes(user?.role || '')
@@ -93,7 +97,7 @@ export default function MainHeader({
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder={`Buscar ${user.role === 'doctor' ? 'pacientes' : 'doctores'}...`}
+                  placeholder={`Buscar ${user.role === 'doctor' ? 'pacientes' : user.role === 'admin' ? 'usuarios' : 'doctores'}...`}
                   className="pl-10 w-64"
                 />
               </div>
@@ -122,7 +126,12 @@ export default function MainHeader({
             >
               <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
-                <Badge variant="destructive" className="absolute -top-1 -right-1 px-1 min-w-[20px] h-5">
+                <Badge 
+                  variant={urgentCount > 0 ? "destructive" : "secondary"} 
+                  className={`absolute -top-1 -right-1 px-1 min-w-[20px] h-5 text-xs ${
+                    urgentCount > 0 ? 'bg-red-500 animate-pulse' : ''
+                  }`}
+                >
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </Badge>
               )}
@@ -149,6 +158,12 @@ export default function MainHeader({
                 <DropdownMenuItem onClick={() => navigate('/settings')}>
                   <span>Configuración</span>
                 </DropdownMenuItem>
+                {unreadCount > 0 && (
+                  <DropdownMenuItem onClick={() => setShowNotifications(true)}>
+                    <Bell className="mr-2 h-4 w-4" />
+                    <span>Notificaciones ({unreadCount})</span>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />

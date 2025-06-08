@@ -2,294 +2,255 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useCreateUser } from '@/hooks/useAdminManagement';
-import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import type { CreateUserForm as CreateUserFormType } from '@/types/admin';
 
 const createUserSchema = z.object({
-  firstName: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
-  lastName: z.string().min(2, 'El apellido debe tener al menos 2 caracteres'),
+  firstName: z.string().min(2, 'Nombre debe tener al menos 2 caracteres'),
+  lastName: z.string().min(2, 'Apellido debe tener al menos 2 caracteres'),
   email: z.string().email('Email inválido'),
   phone: z.string().min(10, 'Teléfono debe tener al menos 10 dígitos'),
-  role: z.enum(['patient', 'doctor', 'admin'], { required_error: 'Selecciona un rol' }),
-  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  role: z.enum(['patient', 'doctor', 'admin']),
+  password: z.string().min(6, 'Contraseña debe tener al menos 6 caracteres'),
   confirmPassword: z.string(),
+  // Campos opcionales para doctores
   medicalLicense: z.string().optional(),
+  specialties: z.array(z.string()).optional(),
+  yearsExperience: z.number().optional(),
   consultationFee: z.number().optional(),
+  // Campos opcionales para pacientes
   dateOfBirth: z.string().optional(),
   gender: z.enum(['male', 'female', 'other']).optional(),
+  bloodType: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: 'Las contraseñas no coinciden',
-  path: ['confirmPassword'],
+  message: "Las contraseñas no coinciden",
+  path: ["confirmPassword"],
 });
 
 type CreateUserFormData = z.infer<typeof createUserSchema>;
 
-interface CreateUserFormProps {
-  onSuccess?: () => void;
-}
-
-export const CreateUserForm = ({ onSuccess }: CreateUserFormProps) => {
-  const { toast } = useToast();
-  const createUserMutation = useCreateUser();
-
-  const form = useForm<CreateUserFormData>({
+export default function CreateUserForm() {
+  const createUser = useCreateUser();
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+  } = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      password: '',
-      confirmPassword: '',
+      role: 'patient',
     },
   });
 
-  const watchedRole = form.watch('role');
+  const selectedRole = watch('role');
 
-  const onSubmit = async (data: CreateUserFormData) => {
-    try {
-      await createUserMutation.mutateAsync(data);
-      toast({
-        title: 'Usuario creado exitosamente',
-        description: `${data.firstName} ${data.lastName} ha sido agregado al sistema.`,
-      });
-      form.reset();
-      onSuccess?.();
-    } catch (error) {
-      toast({
-        title: 'Error al crear usuario',
-        description: 'Hubo un problema al crear el usuario. Inténtalo de nuevo.',
-        variant: 'destructive',
-      });
-    }
+  const onSubmit = (data: CreateUserFormData) => {
+    // Convert form data to match API expectations
+    const userData: CreateUserFormType = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phone: data.phone,
+      role: data.role,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+      medicalLicense: data.medicalLicense,
+      specialties: data.specialties,
+      yearsExperience: data.yearsExperience,
+      consultationFee: data.consultationFee,
+      dateOfBirth: data.dateOfBirth,
+      gender: data.gender,
+      bloodType: data.bloodType,
+    };
+
+    createUser.mutate(userData, {
+      onSuccess: () => {
+        toast.success('Usuario creado exitosamente');
+      },
+      onError: () => {
+        toast.error('Error al crear usuario');
+      },
+    });
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <UserPlus className="h-5 w-5" />
-          Crear Nuevo Usuario
-        </CardTitle>
+        <CardTitle>Crear Nuevo Usuario</CardTitle>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Juan" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Información básica */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="firstName">Nombre *</Label>
+              <Input
+                id="firstName"
+                {...register('firstName')}
+                className={errors.firstName ? 'border-red-500' : ''}
               />
-              
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Apellido</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Pérez" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {errors.firstName && (
+                <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
+              )}
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="usuario@ejemplo.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            <div>
+              <Label htmlFor="lastName">Apellido *</Label>
+              <Input
+                id="lastName"
+                {...register('lastName')}
+                className={errors.lastName ? 'border-red-500' : ''}
               />
-              
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Teléfono</FormLabel>
-                    <FormControl>
-                      <Input placeholder="+52 55 1234 5678" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {errors.lastName && (
+                <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
+              )}
             </div>
+          </div>
 
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Rol</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona un rol" />
-                      </SelectTrigger>
-                    </FormControl>
+          <div>
+            <Label htmlFor="email">Email *</Label>
+            <Input
+              id="email"
+              type="email"
+              {...register('email')}
+              className={errors.email ? 'border-red-500' : ''}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="phone">Teléfono *</Label>
+            <Input
+              id="phone"
+              {...register('phone')}
+              className={errors.phone ? 'border-red-500' : ''}
+            />
+            {errors.phone && (
+              <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="role">Rol *</Label>
+            <Select value={selectedRole} onValueChange={(value) => setValue('role', value as any)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar rol" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="patient">Paciente</SelectItem>
+                <SelectItem value="doctor">Doctor</SelectItem>
+                <SelectItem value="admin">Administrador</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Campos específicos para doctores */}
+          {selectedRole === 'doctor' && (
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-medium">Información del Doctor</h3>
+              <div>
+                <Label htmlFor="medicalLicense">Cédula Profesional</Label>
+                <Input id="medicalLicense" {...register('medicalLicense')} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="yearsExperience">Años de Experiencia</Label>
+                  <Input
+                    id="yearsExperience"
+                    type="number"
+                    {...register('yearsExperience', { valueAsNumber: true })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="consultationFee">Tarifa de Consulta (MXN)</Label>
+                  <Input
+                    id="consultationFee"
+                    type="number"
+                    {...register('consultationFee', { valueAsNumber: true })}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Campos específicos para pacientes */}
+          {selectedRole === 'patient' && (
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-medium">Información del Paciente</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="dateOfBirth">Fecha de Nacimiento</Label>
+                  <Input id="dateOfBirth" type="date" {...register('dateOfBirth')} />
+                </div>
+                <div>
+                  <Label htmlFor="gender">Género</Label>
+                  <Select onValueChange={(value) => setValue('gender', value as any)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar género" />
+                    </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="patient">Paciente</SelectItem>
-                      <SelectItem value="doctor">Doctor</SelectItem>
-                      <SelectItem value="admin">Administrador</SelectItem>
+                      <SelectItem value="male">Masculino</SelectItem>
+                      <SelectItem value="female">Femenino</SelectItem>
+                      <SelectItem value="other">Otro</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contraseña</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirmar Contraseña</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="bloodType">Tipo de Sangre</Label>
+                <Input id="bloodType" {...register('bloodType')} placeholder="Ej: O+, A-, B+, AB-" />
+              </div>
             </div>
+          )}
 
-            {watchedRole === 'doctor' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="medicalLicense"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Cédula Médica</FormLabel>
-                      <FormControl>
-                        <Input placeholder="12345678" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="consultationFee"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tarifa de Consulta (MXN)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          placeholder="800" 
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            )}
-
-            {watchedRole === 'patient' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="dateOfBirth"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Fecha de Nacimiento</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Género</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecciona género" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="male">Masculino</SelectItem>
-                          <SelectItem value="female">Femenino</SelectItem>
-                          <SelectItem value="other">Otro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            )}
-
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={createUserMutation.isPending}
-            >
-              {createUserMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creando usuario...
-                </>
-              ) : (
-                'Crear Usuario'
+          {/* Contraseñas */}
+          <div className="grid grid-cols-2 gap-4 border-t pt-4">
+            <div>
+              <Label htmlFor="password">Contraseña *</Label>
+              <Input
+                id="password"
+                type="password"
+                {...register('password')}
+                className={errors.password ? 'border-red-500' : ''}
+              />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
               )}
-            </Button>
-          </form>
-        </Form>
+            </div>
+            <div>
+              <Label htmlFor="confirmPassword">Confirmar Contraseña *</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                {...register('confirmPassword')}
+                className={errors.confirmPassword ? 'border-red-500' : ''}
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={createUser.isPending}
+          >
+            {createUser.isPending ? 'Creando...' : 'Crear Usuario'}
+          </Button>
+        </form>
       </CardContent>
     </Card>
   );
-};
+}

@@ -2,356 +2,306 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Separator } from '@/components/ui/separator';
 import { useSystemConfig, useUpdateSystemConfig } from '@/hooks/useAdminManagement';
-import { useToast } from '@/hooks/use-toast';
-import { Settings, Save, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
-const configSchema = z.object({
+const systemConfigSchema = z.object({
   consultationFee: z.number().min(0, 'La tarifa debe ser mayor a 0'),
-  emergencyFee: z.number().min(0, 'La tarifa debe ser mayor a 0'),
-  followUpFee: z.number().min(0, 'La tarifa debe ser mayor a 0'),
+  emergencyFee: z.number().min(0, 'La tarifa de emergencia debe ser mayor a 0'),
+  followUpFee: z.number().min(0, 'La tarifa de seguimiento debe ser mayor a 0'),
   businessHours: z.object({
-    start: z.string(),
-    end: z.string(),
+    start: z.string().min(1, 'Hora de inicio es requerida'),
+    end: z.string().min(1, 'Hora de fin es requerida'),
   }),
   weekends: z.boolean(),
-  maxAppointmentsPerDay: z.number().min(1, 'Debe ser al menos 1'),
-  appointmentDuration: z.number().min(15, 'Mínimo 15 minutos'),
-  taxRate: z.number().min(0).max(100, 'Debe estar entre 0 y 100'),
+  maxAppointmentsPerDay: z.number().min(1, 'Mínimo 1 cita por día'),
+  appointmentDuration: z.number().min(15, 'Duración mínima 15 minutos'),
+  taxRate: z.number().min(0).max(100, 'Tasa de impuesto debe estar entre 0 y 100'),
   companyInfo: z.object({
-    name: z.string().min(1, 'El nombre es requerido'),
-    address: z.string().min(1, 'La dirección es requerida'),
-    phone: z.string().min(10, 'Teléfono inválido'),
+    name: z.string().min(1, 'Nombre de la empresa es requerido'),
+    address: z.string().min(1, 'Dirección es requerida'),
+    phone: z.string().min(1, 'Teléfono es requerido'),
     email: z.string().email('Email inválido'),
-    website: z.string().url('URL inválida'),
+    website: z.string().url('URL inválida').optional().or(z.literal('')),
   }),
 });
 
-type ConfigFormData = z.infer<typeof configSchema>;
+type SystemConfigFormData = z.infer<typeof systemConfigSchema>;
 
-export const SystemConfiguration = () => {
-  const { toast } = useToast();
+export default function SystemConfiguration() {
   const { data: config, isLoading } = useSystemConfig();
-  const updateConfigMutation = useUpdateSystemConfig();
+  const updateConfig = useUpdateSystemConfig();
 
-  const form = useForm<ConfigFormData>({
-    resolver: zodResolver(configSchema),
-    defaultValues: config,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+    reset,
+  } = useForm<SystemConfigFormData>({
+    resolver: zodResolver(systemConfigSchema),
   });
 
-  // Actualizar valores del formulario cuando se carga la configuración
   React.useEffect(() => {
     if (config) {
-      form.reset(config);
+      reset({
+        consultationFee: config.consultationFee,
+        emergencyFee: config.emergencyFee,
+        followUpFee: config.followUpFee,
+        businessHours: {
+          start: config.businessHours.start,
+          end: config.businessHours.end,
+        },
+        weekends: config.weekends,
+        maxAppointmentsPerDay: config.maxAppointmentsPerDay,
+        appointmentDuration: config.appointmentDuration,
+        taxRate: config.taxRate,
+        companyInfo: {
+          name: config.companyInfo.name,
+          address: config.companyInfo.address,
+          phone: config.companyInfo.phone,
+          email: config.companyInfo.email,
+          website: config.companyInfo.website,
+        },
+      });
     }
-  }, [config, form]);
+  }, [config, reset]);
 
-  const onSubmit = async (data: ConfigFormData) => {
-    try {
-      await updateConfigMutation.mutateAsync(data);
-      toast({
-        title: 'Configuración actualizada',
-        description: 'Los cambios han sido guardados exitosamente.',
-      });
-    } catch (error) {
-      toast({
-        title: 'Error al guardar',
-        description: 'Hubo un problema al actualizar la configuración.',
-        variant: 'destructive',
-      });
-    }
+  const onSubmit = (data: SystemConfigFormData) => {
+    updateConfig.mutate(data, {
+      onSuccess: () => {
+        toast.success('Configuración actualizada exitosamente');
+      },
+      onError: () => {
+        toast.error('Error al actualizar configuración');
+      },
+    });
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
+    return <div>Cargando configuración...</div>;
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Configuración del Sistema</h2>
-        <p className="text-muted-foreground">Configura las opciones generales de la clínica</p>
-      </div>
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Tarifas */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                Tarifas de Consulta
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="consultationFee"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Consulta General (MXN)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="emergencyFee"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Consulta de Emergencia (MXN)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="followUpFee"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Consulta de Seguimiento (MXN)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Horarios */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Horarios de Atención</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="businessHours.start"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Hora de Inicio</FormLabel>
-                      <FormControl>
-                        <Input type="time" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Configuración del Sistema</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Tarifas */}
+            <div>
+              <h3 className="text-lg font-medium mb-4">Tarifas</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="consultationFee">Consulta General (MXN)</Label>
+                  <Input
+                    id="consultationFee"
+                    type="number"
+                    {...register('consultationFee', { valueAsNumber: true })}
+                    className={errors.consultationFee ? 'border-red-500' : ''}
+                  />
+                  {errors.consultationFee && (
+                    <p className="text-red-500 text-sm mt-1">{errors.consultationFee.message}</p>
                   )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="businessHours.end"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Hora de Fin</FormLabel>
-                      <FormControl>
-                        <Input type="time" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                </div>
+                <div>
+                  <Label htmlFor="emergencyFee">Emergencia (MXN)</Label>
+                  <Input
+                    id="emergencyFee"
+                    type="number"
+                    {...register('emergencyFee', { valueAsNumber: true })}
+                    className={errors.emergencyFee ? 'border-red-500' : ''}
+                  />
+                  {errors.emergencyFee && (
+                    <p className="text-red-500 text-sm mt-1">{errors.emergencyFee.message}</p>
                   )}
-                />
+                </div>
+                <div>
+                  <Label htmlFor="followUpFee">Seguimiento (MXN)</Label>
+                  <Input
+                    id="followUpFee"
+                    type="number"
+                    {...register('followUpFee', { valueAsNumber: true })}
+                    className={errors.followUpFee ? 'border-red-500' : ''}
+                  />
+                  {errors.followUpFee && (
+                    <p className="text-red-500 text-sm mt-1">{errors.followUpFee.message}</p>
+                  )}
+                </div>
               </div>
-              
-              <FormField
-                control={form.control}
-                name="weekends"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">Atención en Fines de Semana</FormLabel>
-                      <div className="text-sm text-muted-foreground">
-                        Permitir citas los sábados y domingos
-                      </div>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Configuración de Citas */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Configuración de Citas</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="maxAppointmentsPerDay"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Máximo de Citas por Día</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="appointmentDuration"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Duración de Cita (minutos)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+            <Separator />
 
-          {/* Información de la Empresa */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Información de la Empresa</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="companyInfo.name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre de la Clínica</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="companyInfo.address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dirección</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="companyInfo.phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Teléfono</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+            {/* Horarios */}
+            <div>
+              <h3 className="text-lg font-medium mb-4">Horarios de Operación</h3>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <Label htmlFor="startTime">Hora de Inicio</Label>
+                  <Input
+                    id="startTime"
+                    type="time"
+                    {...register('businessHours.start')}
+                    className={errors.businessHours?.start ? 'border-red-500' : ''}
+                  />
+                  {errors.businessHours?.start && (
+                    <p className="text-red-500 text-sm mt-1">{errors.businessHours.start.message}</p>
                   )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="companyInfo.email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                </div>
+                <div>
+                  <Label htmlFor="endTime">Hora de Fin</Label>
+                  <Input
+                    id="endTime"
+                    type="time"
+                    {...register('businessHours.end')}
+                    className={errors.businessHours?.end ? 'border-red-500' : ''}
+                  />
+                  {errors.businessHours?.end && (
+                    <p className="text-red-500 text-sm mt-1">{errors.businessHours.end.message}</p>
                   )}
-                />
+                </div>
               </div>
-              
-              <FormField
-                control={form.control}
-                name="companyInfo.website"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sitio Web</FormLabel>
-                    <FormControl>
-                      <Input type="url" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="weekends"
+                  checked={watch('weekends')}
+                  onCheckedChange={(checked) => setValue('weekends', checked)}
+                />
+                <Label htmlFor="weekends">Atender fines de semana</Label>
+              </div>
+            </div>
 
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={updateConfigMutation.isPending}
-          >
-            {updateConfigMutation.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Guardando...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Guardar Configuración
-              </>
-            )}
-          </Button>
-        </form>
-      </Form>
+            <Separator />
+
+            {/* Configuración de Citas */}
+            <div>
+              <h3 className="text-lg font-medium mb-4">Configuración de Citas</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="maxAppointmentsPerDay">Máximo de Citas por Día</Label>
+                  <Input
+                    id="maxAppointmentsPerDay"
+                    type="number"
+                    {...register('maxAppointmentsPerDay', { valueAsNumber: true })}
+                    className={errors.maxAppointmentsPerDay ? 'border-red-500' : ''}
+                  />
+                  {errors.maxAppointmentsPerDay && (
+                    <p className="text-red-500 text-sm mt-1">{errors.maxAppointmentsPerDay.message}</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="appointmentDuration">Duración de Cita (minutos)</Label>
+                  <Input
+                    id="appointmentDuration"
+                    type="number"
+                    {...register('appointmentDuration', { valueAsNumber: true })}
+                    className={errors.appointmentDuration ? 'border-red-500' : ''}
+                  />
+                  {errors.appointmentDuration && (
+                    <p className="text-red-500 text-sm mt-1">{errors.appointmentDuration.message}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Información de la Empresa */}
+            <div>
+              <h3 className="text-lg font-medium mb-4">Información de la Empresa</h3>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="companyName">Nombre de la Empresa</Label>
+                  <Input
+                    id="companyName"
+                    {...register('companyInfo.name')}
+                    className={errors.companyInfo?.name ? 'border-red-500' : ''}
+                  />
+                  {errors.companyInfo?.name && (
+                    <p className="text-red-500 text-sm mt-1">{errors.companyInfo.name.message}</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="companyAddress">Dirección</Label>
+                  <Input
+                    id="companyAddress"
+                    {...register('companyInfo.address')}
+                    className={errors.companyInfo?.address ? 'border-red-500' : ''}
+                  />
+                  {errors.companyInfo?.address && (
+                    <p className="text-red-500 text-sm mt-1">{errors.companyInfo.address.message}</p>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="companyPhone">Teléfono</Label>
+                    <Input
+                      id="companyPhone"
+                      {...register('companyInfo.phone')}
+                      className={errors.companyInfo?.phone ? 'border-red-500' : ''}
+                    />
+                    {errors.companyInfo?.phone && (
+                      <p className="text-red-500 text-sm mt-1">{errors.companyInfo.phone.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="companyEmail">Email</Label>
+                    <Input
+                      id="companyEmail"
+                      type="email"
+                      {...register('companyInfo.email')}
+                      className={errors.companyInfo?.email ? 'border-red-500' : ''}
+                    />
+                    {errors.companyInfo?.email && (
+                      <p className="text-red-500 text-sm mt-1">{errors.companyInfo.email.message}</p>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="companyWebsite">Sitio Web</Label>
+                  <Input
+                    id="companyWebsite"
+                    {...register('companyInfo.website')}
+                    placeholder="https://ejemplo.com"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="taxRate">Tasa de Impuesto (%)</Label>
+                  <Input
+                    id="taxRate"
+                    type="number"
+                    step="0.01"
+                    {...register('taxRate', { valueAsNumber: true })}
+                    className={errors.taxRate ? 'border-red-500' : ''}
+                  />
+                  {errors.taxRate && (
+                    <p className="text-red-500 text-sm mt-1">{errors.taxRate.message}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={updateConfig.isPending}
+            >
+              {updateConfig.isPending ? 'Guardando...' : 'Guardar Configuración'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
-};
+}
