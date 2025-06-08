@@ -1,6 +1,6 @@
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AppointmentService, NotificationService } from '@/services/api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AppointmentService } from '@/services/api';
 import { toast } from 'sonner';
 import type { Appointment } from '@/lib/database';
 
@@ -12,60 +12,65 @@ export const useAppointment = (appointmentId: string) => {
   });
 };
 
+export const usePatientAppointments = (patientId: string) => {
+  return useQuery({
+    queryKey: ['appointments', 'patient', patientId],
+    queryFn: async () => {
+      const appointments = await AppointmentService.getPatientAppointments(patientId);
+      return appointments;
+    },
+    enabled: !!patientId,
+  });
+};
+
+export const useDoctorAppointments = (doctorId: string) => {
+  return useQuery({
+    queryKey: ['appointments', 'doctor', doctorId],
+    queryFn: async () => {
+      const appointments = await AppointmentService.getDoctorAppointments(doctorId);
+      return appointments;
+    },
+    enabled: !!doctorId,
+  });
+};
+
 export const useCreateAppointment = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (appointmentData: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt'>) =>
-      AppointmentService.createAppointment(appointmentData),
-    onSuccess: async (newAppointment) => {
-      // Invalidar queries relacionadas
-      queryClient.invalidateQueries({ queryKey: ['patient-appointments', newAppointment.patientId] });
-      queryClient.invalidateQueries({ queryKey: ['doctor-appointments', newAppointment.doctorId] });
-      
-      // Enviar notificación
-      await NotificationService.sendAppointmentConfirmation(newAppointment.id);
-      
-      toast.success('Cita agendada correctamente');
+    mutationFn: AppointmentService.createAppointment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      toast.success('Cita creada exitosamente');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Error al agendar la cita');
+    onError: () => {
+      toast.error('Error al crear la cita');
     },
   });
 };
 
 export const useUpdateAppointment = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ appointmentId, updates }: { appointmentId: string; updates: Partial<Appointment> }) =>
-      AppointmentService.updateAppointment(appointmentId, updates),
-    onSuccess: (updatedAppointment) => {
-      if (updatedAppointment) {
-        queryClient.setQueryData(['appointment', updatedAppointment.id], updatedAppointment);
-        queryClient.invalidateQueries({ queryKey: ['patient-appointments', updatedAppointment.patientId] });
-        queryClient.invalidateQueries({ queryKey: ['doctor-appointments', updatedAppointment.doctorId] });
-        toast.success('Cita actualizada correctamente');
-      }
-    },
-    onError: () => {
-      toast.error('Error al actualizar la cita');
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Appointment> }) =>
+      AppointmentService.updateAppointment(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      toast.success('Cita actualizada');
     },
   });
 };
 
 export const useCancelAppointment = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({ appointmentId, reason }: { appointmentId: string; reason: string }) =>
       AppointmentService.cancelAppointment(appointmentId, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['appointment', variables.appointmentId] });
-      toast.success('Cita cancelada correctamente');
-    },
-    onError: () => {
-      toast.error('Error al cancelar la cita');
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      toast.success('Cita cancelada');
     },
   });
 };

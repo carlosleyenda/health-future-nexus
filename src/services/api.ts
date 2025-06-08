@@ -1,4 +1,3 @@
-
 import { db } from '@/lib/database';
 import type { 
   Patient, 
@@ -60,11 +59,6 @@ export class PatientService {
     return newMetric;
   }
 
-  static async getAppointments(patientId: string): Promise<Appointment[]> {
-    await delay(300);
-    return db.getPatientAppointments(patientId);
-  }
-
   static async getTransactions(patientId: string): Promise<Transaction[]> {
     await delay(350);
     return db.getPatientTransactions(patientId);
@@ -87,11 +81,6 @@ export class DoctorService {
     return db.getDoctorsBySpecialty(specialty);
   }
 
-  static async getAppointments(doctorId: string): Promise<Appointment[]> {
-    await delay(300);
-    return db.getDoctorAppointments(doctorId);
-  }
-
   static async getPatients(doctorId: string): Promise<Patient[]> {
     await delay(400);
     const appointments = db.getDoctorAppointments(doctorId);
@@ -101,7 +90,6 @@ export class DoctorService {
 
   static async updateAvailability(doctorId: string, availability: any): Promise<boolean> {
     await delay(500);
-    // Simular actualización de disponibilidad
     return true;
   }
 }
@@ -112,10 +100,19 @@ export class AppointmentService {
     return db.getAppointment(appointmentId) || null;
   }
 
+  static async getPatientAppointments(patientId: string): Promise<Appointment[]> {
+    await delay(300);
+    return db.getPatientAppointments(patientId);
+  }
+
+  static async getDoctorAppointments(doctorId: string): Promise<Appointment[]> {
+    await delay(300);
+    return db.getDoctorAppointments(doctorId);
+  }
+
   static async createAppointment(appointmentData: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt'>): Promise<Appointment> {
     await delay(600);
     
-    // Verificar disponibilidad del doctor
     const isAvailable = db.isDoctorAvailable(
       appointmentData.doctorId,
       appointmentData.appointmentDate,
@@ -163,7 +160,6 @@ export class AppointmentService {
     const availability = doctor.availability.find(av => av.dayOfWeek === dayOfWeek && av.isActive);
     if (!availability) return [];
 
-    // Generar slots de 30 minutos
     const slots: string[] = [];
     const startTime = new Date(`${date}T${availability.startTime}:00`);
     const endTime = new Date(`${date}T${availability.endTime}:00`);

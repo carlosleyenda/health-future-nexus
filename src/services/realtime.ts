@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 // Servicio de comunicación en tiempo real para la clínica
 export class RealtimeService {
   private static instance: RealtimeService;
