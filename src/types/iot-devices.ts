@@ -1,4 +1,19 @@
 
+// Interface base para dispositivos de monitoreo médico
+export interface MonitoringDevice {
+  id: string;
+  patientId: string;
+  deviceType: string;
+  brand: string;
+  model: string;
+  serialNumber: string;
+  lastSync: string;
+  batteryLevel?: number;
+  firmwareVersion?: string;
+  isActive: boolean;
+  aiAnalyticsEnabled?: boolean;
+}
+
 // Tipos extendidos para dispositivos IoT médicos
 
 export interface FitbitDevice extends MonitoringDevice {
