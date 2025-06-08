@@ -1,282 +1,142 @@
 
-import React, { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { 
-  ZoomIn, 
-  ZoomOut, 
-  RotateCw, 
-  Download, 
-  Share2, 
-  Maximize,
-  Eye,
-  FileText,
-  Image as ImageIcon,
-  Shield,
-  Clock,
-  User
-} from 'lucide-react';
-import { useDocument, useAddAccessRecord } from '@/hooks/useMedicalRecords';
-import { useAuthStore } from '@/store/auth';
+import { Download, Share2, ZoomIn, ZoomOut, X } from 'lucide-react';
+import type { MedicalDocument } from '@/types/medical-records';
 
 interface DocumentViewerProps {
   documentId: string;
+  onClose: () => void;
   userRole: 'patient' | 'doctor' | 'admin';
 }
 
-export default function DocumentViewer({ documentId, userRole }: DocumentViewerProps) {
-  const [zoom, setZoom] = useState(100);
-  const [rotation, setRotation] = useState(0);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const imageRef = useRef<HTMLImageElement>(null);
+// For backward compatibility, we'll accept both props
+interface LegacyDocumentViewerProps {
+  document: MedicalDocument;
+  onClose: () => void;
+  userRole: 'patient' | 'doctor' | 'admin';
+}
+
+type CombinedProps = DocumentViewerProps | LegacyDocumentViewerProps;
+
+export default function DocumentViewer(props: CombinedProps) {
+  const [zoom, setZoom] = React.useState(100);
   
-  const { user } = useAuthStore();
-  const { data: document } = useDocument(documentId);
-  const addAccessRecord = useAddAccessRecord();
-
-  React.useEffect(() => {
-    if (document && user) {
-      // Log access
-      addAccessRecord.mutate({
-        documentId: document.id,
-        accessRecord: {
-          userId: user.id,
-          userName: `${user.firstName} ${user.lastName}`,
-          userRole: user.role,
-          action: 'view'
-        }
-      });
-    }
-  }, [document, user]);
-
-  if (!document) {
-    return (
-      <Card>
-        <CardContent className="text-center py-12">
-          <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-xl font-medium text-gray-900 mb-2">
-            Documento no encontrado
-          </h3>
-          <p className="text-gray-500">
-            El documento seleccionado no está disponible
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 500));
-  const handleZoomOut = () => setZoom(prev => Math.max(prev - 25, 25));
-  const handleRotate = () => setRotation(prev => (prev + 90) % 360);
-  const handleDownload = () => {
-    console.log('Downloading document:', document.id);
-    // Log download action
-    addAccessRecord.mutate({
-      documentId: document.id,
-      accessRecord: {
-        userId: user?.id || '',
-        userName: user ? `${user.firstName} ${user.lastName}` : 'Unknown',
-        userRole: user?.role || 'patient',
-        action: 'download'
-      }
-    });
+  // Handle both new and legacy prop formats
+  const document = 'document' in props ? props.document : null;
+  const documentId = 'documentId' in props ? props.documentId : props.document?.id;
+  
+  // Mock document if only ID is provided
+  const mockDocument: MedicalDocument = document || {
+    id: documentId || '',
+    title: 'Documento Médico',
+    description: 'Descripción del documento',
+    category: 'consultation',
+    fileType: 'application/pdf',
+    fileSize: 1024000,
+    fileUrl: '/placeholder.svg',
+    patientId: '',
+    uploadedBy: 'Dr. Sistema',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    tags: [],
+    version: 1,
+    isActive: true
   };
 
-  const isImage = document.type === 'image' || document.mimeType.startsWith('image/');
-  const isPDF = document.type === 'pdf' || document.mimeType === 'application/pdf';
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 200));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 25, 50));
+
+  const isImage = mockDocument.fileType.startsWith('image/');
 
   return (
-    <div className="space-y-6">
-      {/* Document Info */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                {isImage ? (
-                  <ImageIcon className="h-6 w-6 text-blue-600" />
-                ) : (
-                  <FileText className="h-6 w-6 text-blue-600" />
-                )}
-              </div>
-              <div>
-                <CardTitle className="text-xl">{document.title}</CardTitle>
-                <p className="text-gray-600">{document.description}</p>
-                <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-1" />
-                    {new Date(document.uploadedAt).toLocaleDateString('es-MX')}
-                  </div>
-                  <div className="flex items-center">
-                    <User className="h-4 w-4 mr-1" />
-                    {document.uploadedBy}
-                  </div>
-                  {document.digitalSignature && (
-                    <Badge variant="outline" className="text-green-600 border-green-600">
-                      <Shield className="h-3 w-3 mr-1" />
-                      Firmado digitalmente
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex space-x-2">
-              <Button variant="outline" onClick={handleDownload}>
-                <Download className="h-4 w-4 mr-1" />
-                Descargar
-              </Button>
-              {userRole === 'doctor' && (
-                <Button variant="outline">
-                  <Share2 className="h-4 w-4 mr-1" />
-                  Compartir
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* Viewer */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="flex items-center">
-              <Eye className="h-5 w-5 mr-2" />
-              Visualizador de Documento
-            </CardTitle>
-            
-            {isImage && (
+    <Dialog open onOpenChange={props.onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogHeader className="p-6 pb-0">
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle className="text-lg font-semibold mb-2">
+                {mockDocument.title}
+              </DialogTitle>
               <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" onClick={handleZoomOut}>
-                  <ZoomOut className="h-4 w-4" />
+                <Badge>{mockDocument.category}</Badge>
+                <span className="text-sm text-gray-500">
+                  {new Date(mockDocument.createdAt).toLocaleDateString()}
+                </span>
+                <span className="text-sm text-gray-500">
+                  por {mockDocument.uploadedBy}
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              {isImage && (
+                <>
+                  <Button variant="outline" size="sm" onClick={handleZoomOut}>
+                    <ZoomOut className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm text-gray-600">{zoom}%</span>
+                  <Button variant="outline" size="sm" onClick={handleZoomIn}>
+                    <ZoomIn className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
+              
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4" />
+              </Button>
+              
+              {props.userRole !== 'patient' && (
+                <Button variant="outline" size="sm">
+                  <Share2 className="h-4 w-4" />
                 </Button>
-                <span className="text-sm font-medium">{zoom}%</span>
-                <Button variant="outline" size="sm" onClick={handleZoomIn}>
-                  <ZoomIn className="h-4 w-4" />
-                </Button>
-                <Separator orientation="vertical" className="h-6" />
-                <Button variant="outline" size="sm" onClick={handleRotate}>
-                  <RotateCw className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setIsFullscreen(!isFullscreen)}>
-                  <Maximize className="h-4 w-4" />
-                </Button>
+              )}
+              
+              <Button variant="ghost" size="sm" onClick={props.onClose}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </DialogHeader>
+        
+        <div className="p-6 pt-4 flex-1 overflow-auto">
+          {mockDocument.description && (
+            <p className="text-gray-600 mb-4">{mockDocument.description}</p>
+          )}
+          
+          <div className="bg-gray-50 rounded-lg min-h-[400px] flex items-center justify-center">
+            {isImage ? (
+              <img
+                src={mockDocument.fileUrl || '/placeholder.svg'}
+                alt={mockDocument.title}
+                style={{ transform: `scale(${zoom / 100})` }}
+                className="max-w-full max-h-full object-contain transition-transform"
+              />
+            ) : (
+              <div className="text-center">
+                <div className="text-6xl mb-4">📄</div>
+                <p className="text-gray-500">Vista previa del documento</p>
+                <p className="text-sm text-gray-400 mt-2">
+                  Tipo: {mockDocument.fileType}
+                </p>
               </div>
             )}
           </div>
-        </CardHeader>
-        
-        <CardContent>
-          <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-black' : 'relative'}`}>
-            {isFullscreen && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute top-4 right-4 z-10 text-white hover:bg-white/20"
-                onClick={() => setIsFullscreen(false)}
-              >
-                Cerrar
-              </Button>
-            )}
-            
-            <div className={`flex items-center justify-center ${isFullscreen ? 'h-full p-8' : 'min-h-[400px] bg-gray-50 rounded-lg'}`}>
-              {isImage ? (
-                <img
-                  ref={imageRef}
-                  src={document.fileUrl}
-                  alt={document.title}
-                  className="max-w-full max-h-full object-contain cursor-zoom-in"
-                  style={{
-                    transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-                    transition: 'transform 0.3s ease'
-                  }}
-                  onClick={handleZoomIn}
-                />
-              ) : isPDF ? (
-                <div className="text-center">
-                  <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Documento PDF
-                  </h3>
-                  <p className="text-gray-500 mb-4">
-                    Haz clic en descargar para ver el documento completo
-                  </p>
-                  <Button onClick={handleDownload}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Descargar PDF
-                  </Button>
-                </div>
-              ) : (
-                <div className="text-center">
-                  <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Archivo no visualizable
-                  </h3>
-                  <p className="text-gray-500 mb-4">
-                    Este tipo de archivo no se puede visualizar en el navegador
-                  </p>
-                  <Button onClick={handleDownload}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Descargar Archivo
-                  </Button>
-                </div>
-              )}
+          
+          {mockDocument.tags && mockDocument.tags.length > 0 && (
+            <div className="mt-4">
+              <h4 className="font-medium mb-2">Etiquetas:</h4>
+              <div className="flex flex-wrap gap-2">
+                {mockDocument.tags.map((tag, index) => (
+                  <Badge key={index} variant="outline">{tag}</Badge>
+                ))}
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Document Metadata */}
-      {document.metadata && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Información Médica</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {document.metadata.studyDate && (
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Fecha del Estudio</label>
-                  <p className="text-sm">{new Date(document.metadata.studyDate).toLocaleDateString('es-MX')}</p>
-                </div>
-              )}
-              {document.metadata.modality && (
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Modalidad</label>
-                  <p className="text-sm">{document.metadata.modality}</p>
-                </div>
-              )}
-              {document.metadata.bodyPart && (
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Parte del Cuerpo</label>
-                  <p className="text-sm">{document.metadata.bodyPart}</p>
-                </div>
-              )}
-              {document.metadata.findings && (
-                <div className="md:col-span-2">
-                  <label className="text-sm font-medium text-gray-500">Hallazgos</label>
-                  <p className="text-sm">{document.metadata.findings}</p>
-                </div>
-              )}
-              {document.metadata.diagnosis && (
-                <div className="md:col-span-2">
-                  <label className="text-sm font-medium text-gray-500">Diagnóstico</label>
-                  <p className="text-sm">{document.metadata.diagnosis}</p>
-                </div>
-              )}
-              {document.metadata.recommendations && (
-                <div className="md:col-span-2">
-                  <label className="text-sm font-medium text-gray-500">Recomendaciones</label>
-                  <p className="text-sm">{document.metadata.recommendations}</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

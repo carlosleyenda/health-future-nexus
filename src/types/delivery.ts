@@ -17,6 +17,8 @@ export interface DeliveryService {
   trackingUrl?: string;
   rating?: number;
   createdAt: string;
+  estimatedArrival?: string;
+  currentLocation?: string;
 }
 
 export type DeliveryStatus = 
@@ -29,23 +31,55 @@ export type DeliveryStatus =
   | 'cancelled';
 
 export type DeliveryServiceType = 
-  | 'home_consultation'
-  | 'specialist_visit'
-  | 'nursing_care'
-  | 'sample_collection'
   | 'medication_delivery'
-  | 'device_installation'
-  | 'emergency_care'
-  | 'mobile_lab'
-  | 'mobile_imaging'
-  | 'mobile_surgery'
-  | 'icu_transport'
-  | 'dialysis_mobile'
-  | 'mental_health_crisis'
-  | 'addiction_treatment'
-  | 'geriatric_care'
-  | 'pediatric_care';
+  | 'sample_collection'
+  | 'home_consultation'
+  | 'nursing_care'
+  | 'medical_equipment'
+  | 'oxygen_delivery'
+  | 'nebulizer_delivery'
+  | 'emergency_care';
 
 export type ServicePriority = 'low' | 'normal' | 'high' | 'urgent' | 'emergency';
 
-import { Address, Coordinates } from './user';
+export interface Address {
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  coordinates?: Coordinates;
+}
+
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+export interface DeliveryTracking {
+  id: string;
+  serviceId: string;
+  currentLocation: string;
+  coordinates: Coordinates;
+  estimatedArrival: string;
+  status: DeliveryStatus;
+  events: TrackingEvent[];
+}
+
+export interface TrackingEvent {
+  id: string;
+  timestamp: string;
+  status: DeliveryStatus;
+  description: string;
+  location: string;
+}
+
+export interface DeliveryStaff {
+  id: string;
+  name: string;
+  phone: string;
+  specialization: string[];
+  rating: number;
+  isAvailable: boolean;
+  currentLocation?: Coordinates;
+}
