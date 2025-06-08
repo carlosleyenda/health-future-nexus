@@ -89,10 +89,6 @@ export default function AppRoutes() {
             <Route path="patients" element={<CompletePatientPortal patientId={user?.id || ''} />} />
             <Route path="schedule" element={<DoctorSchedule doctorId={user?.id || ''} />} />
             
-            {/* Rutas específicas para admin - Fixed routing */}
-            <Route path="admin" element={<AdminDashboard />} />
-            <Route path="admin/dashboard" element={<AdminDashboard />} />
-            
             {/* Rutas compartidas */}
             <Route path="medical-records" element={
               <MedicalRecordsSystem 
@@ -107,6 +103,20 @@ export default function AppRoutes() {
             <Route path="settings" element={<Settings />} />
           </>
         )}
+      </Route>
+
+      {/* Ruta específica para admin que funciona independientemente */}
+      <Route path="/admin/*" element={
+        isAuthenticated ? (
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        ) : (
+          <Navigate to="/auth" replace />
+        )
+      }>
+        <Route index element={<AdminDashboard />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
       </Route>
 
       {/* Auth routes */}
