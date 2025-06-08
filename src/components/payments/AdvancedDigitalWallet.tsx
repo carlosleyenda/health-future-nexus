@@ -3,375 +3,456 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { 
   Wallet, 
   CreditCard, 
-  Coins, 
   TrendingUp, 
   Shield, 
-  Gift, 
-  Target,
-  ExternalLink,
+  Star,
+  Bitcoin,
+  DollarSign,
+  Euro,
   Plus,
-  ArrowUp,
-  ArrowDown,
-  DollarSign
+  Send,
+  Receive,
+  History,
+  Settings,
+  Award,
+  Target
 } from 'lucide-react';
-import { AdvancedPaymentService } from '@/services/financial/paymentService';
-import { HealthWallet, FinancialTransaction } from '@/types/financial';
+import { PaymentService } from '@/services/financial/paymentService';
+import { useAuthStore } from '@/store/auth';
+import { toast } from 'sonner';
+import type { Transaction } from '@/types/financial';
 
-interface AdvancedDigitalWalletProps {
-  userId: string;
-}
+export default function AdvancedDigitalWallet() {
+  const { user } = useAuthStore();
+  const [wallet, setWallet] = useState<any>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [exchangeRates, setExchangeRates] = useState<any[]>([]);
+  const [savingsGoals, setSavingsGoals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function AdvancedDigitalWallet({ userId }: AdvancedDigitalWalletProps) {
-  const [wallet, setWallet] = useState<HealthWallet | null>(null);
-  const [transactions, setTransactions] = useState<FinancialTransaction[]>([]);
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
-  const [isLoading, setIsLoading] = useState(true);
-
-  const currencies = ['USD', 'EUR', 'GBP', 'MXN', 'CAD', 'BTC', 'ETH'];
-  
   useEffect(() => {
-    loadWalletData();
-  }, [userId]);
-
-  const loadWalletData = async () => {
-    try {
-      setIsLoading(true);
+    const loadWalletData = async () => {
+      if (!user) return;
       
-      let walletData = await AdvancedPaymentService.getHealthWallet(userId);
-      if (!walletData) {
-        walletData = await AdvancedPaymentService.createHealthWallet(userId, selectedCurrency);
+      try {
+        const [walletData, transactionsData, ratesData, goalsData] = await Promise.all([
+          PaymentService.getHealthWallet(user.id),
+          PaymentService.getTransactions(user.id),
+          PaymentService.getExchangeRates(),
+          PaymentService.getHealthSavingsGoals(user.id)
+        ]);
+        
+        setWallet(walletData);
+        setTransactions(transactionsData);
+        setExchangeRates(ratesData);
+        setSavingsGoals(goalsData);
+      } catch (error) {
+        toast.error('Error loading wallet data');
+      } finally {
+        setLoading(false);
       }
-      
-      const transactionData = await AdvancedPaymentService.getUserTransactions(userId, 10);
-      
-      setWallet(walletData);
-      setTransactions(transactionData);
-    } catch (error) {
-      console.error('Error loading wallet data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  const handleAddFunds = async (amount: number) => {
-    try {
-      await AdvancedPaymentService.updateWalletBalance(userId, amount, 'add');
-      loadWalletData();
-    } catch (error) {
-      console.error('Error adding funds:', error);
-    }
-  };
-
-  const handleCurrencyExchange = async (fromCurrency: string, toCurrency: string, amount: number) => {
-    try {
-      const exchangeRate = await AdvancedPaymentService.getExchangeRate(fromCurrency, toCurrency);
-      const convertedAmount = amount * exchangeRate;
-      
-      // Update wallet with converted amount
-      await AdvancedPaymentService.updateWalletBalance(userId, convertedAmount, 'add');
-      loadWalletData();
-    } catch (error) {
-      console.error('Error exchanging currency:', error);
-    }
-  };
+    loadWalletData();
+  }, [user]);
 
   const getLoyaltyTierColor = (tier: string) => {
     switch (tier) {
-      case 'bronze': return 'bg-amber-100 text-amber-800';
-      case 'silver': return 'bg-gray-100 text-gray-800';
-      case 'gold': return 'bg-yellow-100 text-yellow-800';
-      case 'platinum': return 'bg-blue-100 text-blue-800';
-      case 'diamond': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'bronze': return 'text-orange-600';
+      case 'silver': return 'text-gray-600';
+      case 'gold': return 'text-yellow-600';
+      case 'platinum': return 'text-purple-600';
+      case 'diamond': return 'text-blue-600';
+      default: return 'text-gray-600';
     }
   };
 
-  const getLoyaltyProgress = (tier: string) => {
-    const tierProgress = {
-      bronze: 20,
-      silver: 40,
-      gold: 60,
-      platinum: 80,
-      diamond: 100
-    };
-    return tierProgress[tier as keyof typeof tierProgress] || 0;
+  const getLoyaltyTierIcon = (tier: string) => {
+    switch (tier) {
+      case 'diamond': return '💎';
+      case 'platinum': return '🏆';
+      case 'gold': return '🥇';
+      case 'silver': return '🥈';
+      case 'bronze': return '🥉';
+      default: return '⭐';
+    }
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-32 bg-gray-200 rounded-lg"></div>
-          <div className="h-64 bg-gray-200 rounded-lg"></div>
-        </div>
-      </div>
-    );
+  if (loading) {
+    return <div className="p-6">Loading wallet...</div>;
   }
+
+  if (!wallet) {
+    return <div className="p-6">No wallet data available</div>;
+  }
+
+  const balanceData = [
+    { name: 'Ene', balance: 1000 },
+    { name: 'Feb', balance: 1100 },
+    { name: 'Mar', balance: 950 },
+    { name: 'Abr', balance: 1200 },
+    { name: 'May', balance: 1250 },
+  ];
+
+  const spendingData = [
+    { name: 'Consultas', value: 45, color: '#3b82f6' },
+    { name: 'Medicamentos', value: 30, color: '#10b981' },
+    { name: 'Laboratorios', value: 15, color: '#f59e0b' },
+    { name: 'Otros', value: 10, color: '#ef4444' },
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Wallet Header with Multi-Currency Balance */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="col-span-1 md:col-span-2">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-blue-100 rounded-full">
-                  <Wallet className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl">Mi Wallet Digital</CardTitle>
-                  <p className="text-sm text-gray-600">Balance principal</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-green-50 border-green-200">
-                  <Shield className="h-3 w-3 mr-1 text-green-600" />
-                  Seguro
-                </Badge>
-                <Badge className={getLoyaltyTierColor(wallet?.loyaltyTier || 'bronze')}>
-                  {wallet?.loyaltyTier?.toUpperCase()}
-                </Badge>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-end gap-2">
-                <span className="text-3xl font-bold text-gray-900">
-                  ${wallet?.balance.toLocaleString() || '0.00'}
-                </span>
-                <span className="text-lg text-gray-500 mb-1">{wallet?.currency}</span>
-              </div>
-              
-              {/* Multi-currency display */}
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t">
-                <div className="text-center">
-                  <div className="text-sm text-gray-500">HealthCoins</div>
-                  <div className="flex items-center justify-center gap-1">
-                    <Coins className="h-4 w-4 text-amber-500" />
-                    <span className="font-semibold">{wallet?.healthCoins || 0}</span>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-sm text-gray-500">Cashback</div>
-                  <div className="flex items-center justify-center gap-1">
-                    <Gift className="h-4 w-4 text-green-500" />
-                    <span className="font-semibold">${wallet?.cashbackEarned || 0}</span>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-sm text-gray-500">Ahorros HSA</div>
-                  <div className="flex items-center justify-center gap-1">
-                    <Target className="h-4 w-4 text-blue-500" />
-                    <span className="font-semibold">$2,450</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Loyalty Tier Progress */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-blue-600" />
-              Programa de Lealtad
+      {/* Wallet Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Main Balance */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Wallet className="h-5 w-5" />
+                Balance Principal
+              </span>
+              <Badge className={getLoyaltyTierColor(wallet.loyaltyTier)}>
+                {getLoyaltyTierIcon(wallet.loyaltyTier)} {wallet.loyaltyTier.toUpperCase()}
+              </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Nivel {wallet?.loyaltyTier?.toUpperCase()}</span>
-                  <span>{getLoyaltyProgress(wallet?.loyaltyTier || 'bronze')}%</span>
+                <div className="text-3xl font-bold">${wallet.balance.toFixed(2)}</div>
+                <div className="text-sm text-gray-500">{wallet.currency}</div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm text-gray-500">HealthCoins</div>
+                  <div className="text-xl font-semibold text-purple-600">
+                    {wallet.healthCoins.toLocaleString()}
+                  </div>
                 </div>
-                <Progress value={getLoyaltyProgress(wallet?.loyaltyTier || 'bronze')} className="h-2" />
+                <div>
+                  <div className="text-sm text-gray-500">Cashback</div>
+                  <div className="text-xl font-semibold text-green-600">
+                    ${wallet.cashbackEarned.toFixed(2)}
+                  </div>
+                </div>
               </div>
               
-              <div className="text-center pt-2">
-                <div className="text-2xl font-bold text-blue-600 mb-1">2,150</div>
-                <div className="text-xs text-gray-500">puntos para siguiente nivel</div>
+              <div className="flex gap-2">
+                <Button className="flex-1">
+                  <Send className="h-4 w-4 mr-2" />
+                  Enviar
+                </Button>
+                <Button variant="outline" className="flex-1">
+                  <Receive className="h-4 w-4 mr-2" />
+                  Recibir
+                </Button>
               </div>
-              
-              <Button variant="outline" size="sm" className="w-full">
-                Ver Beneficios
-              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Stats */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-green-500" />
+              Gasto Mensual
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$543.50</div>
+            <div className="text-sm text-green-600">+12% vs mes anterior</div>
+            <Progress value={65} className="mt-2" />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Award className="h-5 w-5 text-purple-500" />
+              Recompensas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">Este mes</span>
+                <span className="font-medium">+120 HC</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm">Cashback</span>
+                <span className="font-medium">$3.50</span>
+              </div>
+              <Progress value={75} className="mt-2" />
+              <div className="text-xs text-gray-500">75% to next tier</div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Acciones Rápidas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button 
-              onClick={() => handleAddFunds(100)} 
-              className="flex flex-col gap-2 h-20"
-            >
-              <Plus className="h-5 w-5" />
-              <span className="text-sm">Agregar Fondos</span>
-            </Button>
-            
-            <Button variant="outline" className="flex flex-col gap-2 h-20">
-              <ArrowUp className="h-5 w-5" />
-              <span className="text-sm">Enviar Dinero</span>
-            </Button>
-            
-            <Button variant="outline" className="flex flex-col gap-2 h-20">
-              <CreditCard className="h-5 w-5" />
-              <span className="text-sm">Pagar Cita</span>
-            </Button>
-            
-            <Button variant="outline" className="flex flex-col gap-2 h-20">
-              <DollarSign className="h-5 w-5" />
-              <span className="text-sm">Cambiar Divisa</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview">Resumen</TabsTrigger>
+          <TabsTrigger value="transactions">Transacciones</TabsTrigger>
+          <TabsTrigger value="goals">Metas</TabsTrigger>
+          <TabsTrigger value="cards">Tarjetas</TabsTrigger>
+          <TabsTrigger value="crypto">Crypto</TabsTrigger>
+        </TabsList>
 
-      {/* Multi-Currency Exchange */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <ArrowUp className="h-5 w-5 text-green-600" />
-            Intercambio de Divisas
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {currencies.map((currency) => (
-              <div key={currency} className="text-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                <div className="font-semibold">{currency}</div>
-                <div className="text-sm text-gray-500">
-                  {currency === 'USD' ? '$1.00' : 
-                   currency === 'EUR' ? '€0.85' :
-                   currency === 'GBP' ? '£0.73' :
-                   currency === 'MXN' ? '$17.50' :
-                   currency === 'BTC' ? '₿0.000025' :
-                   currency === 'ETH' ? 'Ξ0.0004' : '$1.25'}
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Balance Trend */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Tendencia de Balance</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={balanceData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => [`$${value}`, 'Balance']} />
+                    <Line type="monotone" dataKey="balance" stroke="#3b82f6" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Spending Distribution */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Distribución de Gastos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={spendingData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={120}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {spendingData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => [`${value}%`, 'Porcentaje']} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="grid grid-cols-2 gap-2 mt-4">
+                  {spendingData.map((item) => (
+                    <div key={item.name} className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                      <span className="text-sm">{item.name}</span>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Recent Transactions */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Transacciones Recientes</CardTitle>
-            <Button variant="outline" size="sm">
-              Ver Todas
-              <ExternalLink className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {transactions.length > 0 ? transactions.map((transaction) => (
-              <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${
-                    transaction.type === 'consultation' ? 'bg-blue-100' :
-                    transaction.type === 'cashback' ? 'bg-green-100' :
-                    transaction.type === 'health_coins' ? 'bg-amber-100' :
-                    'bg-gray-100'
-                  }`}>
-                    {transaction.type === 'consultation' ? <CreditCard className="h-4 w-4 text-blue-600" /> :
-                     transaction.type === 'cashback' ? <Gift className="h-4 w-4 text-green-600" /> :
-                     transaction.type === 'health_coins' ? <Coins className="h-4 w-4 text-amber-600" /> :
-                     <DollarSign className="h-4 w-4 text-gray-600" />}
+          {/* Exchange Rates */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5" />
+                Tipos de Cambio
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {exchangeRates.map((rate) => (
+                  <div key={rate.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-2">
+                      {rate.targetCurrency === 'EUR' && <Euro className="h-4 w-4" />}
+                      {rate.targetCurrency === 'BTC' && <Bitcoin className="h-4 w-4" />}
+                      <span className="font-medium">{rate.baseCurrency}/{rate.targetCurrency}</span>
+                    </div>
+                    <span className="text-lg font-bold">{rate.rate}</span>
                   </div>
-                  <div>
-                    <div className="font-medium">{transaction.description}</div>
-                    <div className="text-sm text-gray-500">
-                      {new Date(transaction.createdAt).toLocaleDateString()}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="transactions">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-5 w-5" />
+                Historial de Transacciones
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {transactions.map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <CreditCard className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <div className="font-medium">{transaction.description}</div>
+                        <div className="text-sm text-gray-500">
+                          {new Date(transaction.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold">${transaction.amount}</div>
+                      <Badge variant={
+                        transaction.status === 'completed' ? 'default' : 
+                        transaction.status === 'pending' ? 'secondary' : 'destructive'
+                      }>
+                        {transaction.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="goals">
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Metas de Ahorro</h3>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Nueva Meta
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {savingsGoals.map((goal) => (
+                <Card key={goal.id}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <Target className="h-5 w-5" />
+                        {goal.goalName}
+                      </span>
+                      <Badge variant={goal.isActive ? 'default' : 'secondary'}>
+                        {goal.isActive ? 'Activa' : 'Pausada'}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-sm">
+                          <span>Progreso</span>
+                          <span>{Math.round((goal.currentAmount / goal.targetAmount) * 100)}%</span>
+                        </div>
+                        <Progress 
+                          value={(goal.currentAmount / goal.targetAmount) * 100} 
+                          className="mt-1"
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <div className="text-gray-500">Actual</div>
+                          <div className="font-semibold">${goal.currentAmount}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500">Meta</div>
+                          <div className="font-semibold">${goal.targetAmount}</div>
+                        </div>
+                      </div>
+                      
+                      {goal.autoContributeAmount && (
+                        <div className="text-sm text-green-600">
+                          Auto-ahorro: ${goal.autoContributeAmount} {goal.autoContributeFrequency}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="cards">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Métodos de Pago
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="p-4 border rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <div className="text-sm opacity-90">HealthCard Premium</div>
+                      <div className="text-2xl font-bold">•••• •••• •••• 4242</div>
+                    </div>
+                    <Shield className="h-6 w-6" />
+                  </div>
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <div className="text-sm opacity-90">John Doe</div>
+                      <div className="text-sm">12/27</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm opacity-90">Balance</div>
+                      <div className="text-lg font-bold">${wallet.balance}</div>
                     </div>
                   </div>
                 </div>
                 
-                <div className="text-right">
-                  <div className={`font-semibold ${
-                    transaction.type === 'cashback' || transaction.type === 'health_coins' 
-                      ? 'text-green-600' 
-                      : 'text-gray-900'
-                  }`}>
-                    {transaction.type === 'cashback' || transaction.type === 'health_coins' ? '+' : '-'}
-                    ${transaction.amount.toLocaleString()}
-                  </div>
-                  <Badge variant={
-                    transaction.status === 'completed' ? 'default' :
-                    transaction.status === 'pending' ? 'secondary' :
-                    'destructive'
-                  }>
-                    {transaction.status}
-                  </Badge>
-                </div>
+                <Button variant="outline" className="w-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Agregar Nueva Tarjeta
+                </Button>
               </div>
-            )) : (
-              <div className="text-center py-8 text-gray-500">
-                No hay transacciones recientes
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Health Savings Goals */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Target className="h-5 w-5 text-purple-600" />
-            Metas de Ahorro para Salud
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="p-4 border rounded-lg">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-medium">Cirugía Dental</span>
-                <span className="text-sm text-gray-500">$2,500 / $5,000</span>
+        <TabsContent value="crypto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bitcoin className="h-5 w-5" />
+                Criptomonedas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <Bitcoin className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+                <h3 className="text-lg font-medium mb-2">Crypto Wallet Próximamente</h3>
+                <p className="text-gray-600 mb-4">
+                  Podrás gestionar Bitcoin, Ethereum y otras criptomonedas directamente desde tu wallet.
+                </p>
+                <Button disabled>
+                  <Settings className="h-4 w-4 mr-2" />
+                  Habilitar Crypto
+                </Button>
               </div>
-              <Progress value={50} className="h-2 mb-2" />
-              <div className="flex justify-between text-sm text-gray-500">
-                <span>50% completado</span>
-                <span>Meta: Dic 2024</span>
-              </div>
-            </div>
-            
-            <div className="p-4 border rounded-lg">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-medium">Fondo de Emergencia</span>
-                <span className="text-sm text-gray-500">$1,200 / $2,000</span>
-              </div>
-              <Progress value={60} className="h-2 mb-2" />
-              <div className="flex justify-between text-sm text-gray-500">
-                <span>60% completado</span>
-                <span>Meta: Jun 2024</span>
-              </div>
-            </div>
-            
-            <Button variant="outline" className="w-full">
-              <Plus className="h-4 w-4 mr-2" />
-              Crear Nueva Meta
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

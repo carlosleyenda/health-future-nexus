@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import type { 
   PaymentMethod, 
@@ -6,653 +7,407 @@ import type {
   Invoice, 
   InsuranceClaim,
   Subscription,
+  HealthSavingsGoal,
   CurrencyRate,
   KycVerification,
   FraudAlert,
-  TaxDocument,
-  HealthSavingsGoal
+  TaxDocument
 } from '@/types/financial';
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export class PaymentService {
-  // Health Wallet Management
   static async getHealthWallet(userId: string): Promise<HealthWallet | null> {
-    const { data, error } = await supabase
-      .from('health_wallets')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') return null; // No rows found
-      throw error;
-    }
-
+    await delay(300);
+    
+    // Mock data for development
     return {
-      id: data.id,
-      userId: data.user_id,
-      balance: parseFloat(data.balance),
-      currency: data.currency,
-      healthCoins: data.health_coins,
-      cashbackEarned: parseFloat(data.cashback_earned),
-      loyaltyTier: data.loyalty_tier,
-      hsaConnected: data.hsa_connected,
-      cryptoEnabled: data.crypto_enabled,
-      autoPayEnabled: data.auto_pay_enabled,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at
+      id: crypto.randomUUID(),
+      userId: userId,
+      balance: 1250.75,
+      currency: 'USD',
+      healthCoins: 2840,
+      cashbackEarned: 127.50,
+      loyaltyTier: 'gold',
+      hsaConnected: true,
+      cryptoEnabled: false,
+      autoPayEnabled: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
   }
 
-  static async createHealthWallet(userId: string): Promise<HealthWallet> {
-    const { data, error } = await supabase
-      .from('health_wallets')
-      .insert({
-        user_id: userId,
-        balance: 0.00,
-        currency: 'USD',
-        health_coins: 0,
-        cashback_earned: 0.00,
-        loyalty_tier: 'bronze'
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    return {
-      id: data.id,
-      userId: data.user_id,
-      balance: parseFloat(data.balance),
-      currency: data.currency,
-      healthCoins: data.health_coins,
-      cashbackEarned: parseFloat(data.cashback_earned),
-      loyaltyTier: data.loyalty_tier,
-      hsaConnected: data.hsa_connected,
-      cryptoEnabled: data.crypto_enabled,
-      autoPayEnabled: data.auto_pay_enabled,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at
-    };
-  }
-
-  // Transaction Management
   static async getTransactions(userId: string): Promise<Transaction[]> {
-    const { data, error } = await supabase
-      .from('financial_transactions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+    await delay(400);
+    
+    return [
+      {
+        id: crypto.randomUUID(),
+        userId: userId,
+        type: 'consultation' as const,
+        amount: 150.00,
+        currency: 'USD',
+        status: 'completed' as const,
+        description: 'Consulta médica virtual',
+        appointmentId: crypto.randomUUID(),
+        deliveryServiceId: undefined,
+        pharmacyOrderId: undefined,
+        paymentMethod: 'credit_card',
+        paymentProvider: 'stripe',
+        externalTransactionId: 'txn_' + crypto.randomUUID(),
+        healthCoinsEarned: 15,
+        cashbackAmount: 3.00,
+        taxAmount: 12.00,
+        insuranceCoveredAmount: 120.00,
+        metadata: { consulta_tipo: 'virtual' },
+        createdAt: new Date().toISOString(),
+        completedAt: new Date().toISOString()
+      }
+    ];
+  }
 
-    if (error) throw error;
-
-    return data.map(tx => ({
-      id: tx.id,
-      userId: tx.user_id,
-      type: tx.type,
-      amount: parseFloat(tx.amount),
-      currency: tx.currency,
-      status: tx.status,
-      description: tx.description,
-      appointmentId: tx.appointment_id,
-      deliveryServiceId: tx.delivery_service_id,
-      pharmacyOrderId: tx.pharmacy_order_id,
-      paymentMethod: tx.payment_method,
-      paymentProvider: tx.payment_provider,
-      externalTransactionId: tx.external_transaction_id,
-      healthCoinsEarned: tx.health_coins_earned || 0,
-      cashbackAmount: parseFloat(tx.cashback_amount || '0'),
-      taxAmount: parseFloat(tx.tax_amount || '0'),
-      insuranceCoveredAmount: parseFloat(tx.insurance_covered_amount || '0'),
-      metadata: tx.metadata || {},
-      createdAt: tx.created_at,
-      completedAt: tx.completed_at
-    }));
+  static async getPaymentMethods(userId: string): Promise<PaymentMethod[]> {
+    await delay(300);
+    
+    return [
+      {
+        id: crypto.randomUUID(),
+        userId: userId,
+        type: 'credit_card' as const,
+        provider: 'stripe',
+        externalId: 'pm_' + crypto.randomUUID(),
+        isDefault: true,
+        lastFour: '4242',
+        brand: 'visa',
+        expiryMonth: 12,
+        expiryYear: 2027,
+        country: 'US',
+        currency: 'USD',
+        billingAddress: {
+          line1: '123 Main St',
+          city: 'New York',
+          state: 'NY',
+          postal_code: '10001',
+          country: 'US'
+        },
+        isVerified: true,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
   }
 
   static async createTransaction(transaction: Omit<Transaction, 'id' | 'createdAt' | 'completedAt'>): Promise<Transaction> {
-    const { data, error } = await supabase
-      .from('financial_transactions')
-      .insert({
-        user_id: transaction.userId,
-        type: transaction.type,
-        amount: transaction.amount,
-        currency: transaction.currency,
-        status: transaction.status,
-        description: transaction.description,
-        appointment_id: transaction.appointmentId,
-        delivery_service_id: transaction.deliveryServiceId,
-        pharmacy_order_id: transaction.pharmacyOrderId,
-        payment_method: transaction.paymentMethod,
-        payment_provider: transaction.paymentProvider,
-        external_transaction_id: transaction.externalTransactionId,
-        health_coins_earned: transaction.healthCoinsEarned,
-        cashback_amount: transaction.cashbackAmount,
-        tax_amount: transaction.taxAmount,
-        insurance_covered_amount: transaction.insuranceCoveredAmount,
-        metadata: transaction.metadata
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
+    await delay(500);
+    
     return {
-      id: data.id,
-      userId: data.user_id,
-      type: data.type,
-      amount: parseFloat(data.amount),
-      currency: data.currency,
-      status: data.status,
-      description: data.description,
-      appointmentId: data.appointment_id,
-      deliveryServiceId: data.delivery_service_id,
-      pharmacyOrderId: data.pharmacy_order_id,
-      paymentMethod: data.payment_method,
-      paymentProvider: data.payment_provider,
-      externalTransactionId: data.external_transaction_id,
-      healthCoinsEarned: data.health_coins_earned || 0,
-      cashbackAmount: parseFloat(data.cashback_amount || '0'),
-      taxAmount: parseFloat(data.tax_amount || '0'),
-      insuranceCoveredAmount: parseFloat(data.insurance_covered_amount || '0'),
-      metadata: data.metadata || {},
-      createdAt: data.created_at,
-      completedAt: data.completed_at
+      ...transaction,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      completedAt: transaction.status === 'completed' ? new Date().toISOString() : undefined
     };
-  }
-
-  // Payment Methods
-  static async getPaymentMethods(userId: string): Promise<PaymentMethod[]> {
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return data.map(pm => ({
-      id: pm.id,
-      userId: pm.user_id,
-      type: pm.type,
-      provider: pm.provider,
-      externalId: pm.external_id,
-      isDefault: pm.is_default,
-      lastFour: pm.last_four,
-      brand: pm.brand,
-      expiryMonth: pm.expiry_month,
-      expiryYear: pm.expiry_year,
-      country: pm.country,
-      currency: pm.currency,
-      billingAddress: pm.billing_address,
-      isVerified: pm.is_verified,
-      isActive: pm.is_active,
-      createdAt: pm.created_at,
-      updatedAt: pm.updated_at
-    }));
   }
 
   static async addPaymentMethod(paymentMethod: Omit<PaymentMethod, 'id' | 'createdAt' | 'updatedAt'>): Promise<PaymentMethod> {
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .insert({
-        user_id: paymentMethod.userId,
-        type: paymentMethod.type,
-        provider: paymentMethod.provider,
-        external_id: paymentMethod.externalId,
-        is_default: paymentMethod.isDefault,
-        last_four: paymentMethod.lastFour,
-        brand: paymentMethod.brand,
-        expiry_month: paymentMethod.expiryMonth,
-        expiry_year: paymentMethod.expiryYear,
-        country: paymentMethod.country,
-        currency: paymentMethod.currency,
-        billing_address: paymentMethod.billingAddress,
-        is_verified: paymentMethod.isVerified,
-        is_active: paymentMethod.isActive
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
+    await delay(600);
+    
     return {
-      id: data.id,
-      userId: data.user_id,
-      type: data.type,
-      provider: data.provider,
-      externalId: data.external_id,
-      isDefault: data.is_default,
-      lastFour: data.last_four,
-      brand: data.brand,
-      expiryMonth: data.expiry_month,
-      expiryYear: data.expiry_year,
-      country: data.country,
-      currency: data.currency,
-      billingAddress: data.billing_address,
-      isVerified: data.is_verified,
-      isActive: data.is_active,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at
+      ...paymentMethod,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
   }
 
-  // Invoices
   static async getInvoices(userId: string): Promise<Invoice[]> {
-    const { data, error } = await supabase
-      .from('invoices')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return data.map(inv => ({
-      id: inv.id,
-      invoiceNumber: inv.invoice_number,
-      userId: inv.user_id,
-      doctorId: inv.doctor_id,
-      appointmentId: inv.appointment_id,
-      status: inv.status,
-      subtotal: parseFloat(inv.subtotal),
-      taxAmount: parseFloat(inv.tax_amount),
-      discountAmount: parseFloat(inv.discount_amount || '0'),
-      totalAmount: parseFloat(inv.total_amount),
-      currency: inv.currency,
-      dueDate: inv.due_date,
-      paidAt: inv.paid_at,
-      paymentTerms: inv.payment_terms,
-      notes: inv.notes,
-      billingAddress: inv.billing_address,
-      lineItems: inv.line_items as Array<{
-        description: string;
-        quantity: number;
-        unitPrice: number;
-        totalPrice: number;
-      }>,
-      metadata: inv.metadata || {},
-      createdAt: inv.created_at,
-      updatedAt: inv.updated_at
-    }));
+    await delay(400);
+    
+    return [
+      {
+        id: crypto.randomUUID(),
+        invoiceNumber: 'INV-2024-001',
+        userId: userId,
+        doctorId: crypto.randomUUID(),
+        appointmentId: crypto.randomUUID(),
+        status: 'paid' as const,
+        subtotal: 150.00,
+        taxAmount: 12.00,
+        discountAmount: 0.00,
+        totalAmount: 162.00,
+        currency: 'USD',
+        dueDate: '2024-07-15',
+        paidAt: new Date().toISOString(),
+        paymentTerms: 'Due on receipt',
+        notes: 'Consulta médica virtual',
+        billingAddress: {
+          name: 'John Doe',
+          line1: '123 Main St',
+          city: 'New York',
+          state: 'NY',
+          postal_code: '10001',
+          country: 'US'
+        },
+        lineItems: [
+          {
+            description: 'Consulta médica virtual',
+            quantity: 1,
+            unitPrice: 150.00,
+            totalPrice: 150.00
+          }
+        ],
+        metadata: { tipo_consulta: 'virtual' },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
   }
 
   static async createInvoice(invoice: Omit<Invoice, 'id' | 'createdAt' | 'updatedAt'>): Promise<Invoice> {
-    const { data, error } = await supabase
-      .from('invoices')
-      .insert({
-        invoice_number: invoice.invoiceNumber,
-        user_id: invoice.userId,
-        doctor_id: invoice.doctorId,
-        appointment_id: invoice.appointmentId,
-        status: invoice.status,
-        subtotal: invoice.subtotal,
-        tax_amount: invoice.taxAmount,
-        discount_amount: invoice.discountAmount,
-        total_amount: invoice.totalAmount,
-        currency: invoice.currency,
-        due_date: invoice.dueDate,
-        paid_at: invoice.paidAt,
-        payment_terms: invoice.paymentTerms,
-        notes: invoice.notes,
-        billing_address: invoice.billingAddress,
-        line_items: invoice.lineItems,
-        metadata: invoice.metadata
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
+    await delay(500);
+    
     return {
-      id: data.id,
-      invoiceNumber: data.invoice_number,
-      userId: data.user_id,
-      doctorId: data.doctor_id,
-      appointmentId: data.appointment_id,
-      status: data.status,
-      subtotal: parseFloat(data.subtotal),
-      taxAmount: parseFloat(data.tax_amount),
-      discountAmount: parseFloat(data.discount_amount || '0'),
-      totalAmount: parseFloat(data.total_amount),
-      currency: data.currency,
-      dueDate: data.due_date,
-      paidAt: data.paid_at,
-      paymentTerms: data.payment_terms,
-      notes: data.notes,
-      billingAddress: data.billing_address,
-      lineItems: data.line_items as Array<{
-        description: string;
-        quantity: number;
-        unitPrice: number;
-        totalPrice: number;
-      }>,
-      metadata: data.metadata || {},
-      createdAt: data.created_at,
-      updatedAt: data.updated_at
+      ...invoice,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
   }
 
-  // Insurance Claims
   static async getInsuranceClaims(userId: string): Promise<InsuranceClaim[]> {
-    const { data, error } = await supabase
-      .from('insurance_claims')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return data.map(claim => ({
-      id: claim.id,
-      userId: claim.user_id,
-      invoiceId: claim.invoice_id,
-      claimNumber: claim.claim_number,
-      insuranceProvider: claim.insurance_provider,
-      policyNumber: claim.policy_number,
-      status: claim.status,
-      claimAmount: parseFloat(claim.claim_amount),
-      approvedAmount: claim.approved_amount ? parseFloat(claim.approved_amount) : undefined,
-      diagnosisCodes: claim.diagnosis_codes || [],
-      procedureCodes: claim.procedure_codes || [],
-      submittedAt: claim.submitted_at,
-      processedAt: claim.processed_at,
-      denialReason: claim.denial_reason,
-      metadata: claim.metadata || {},
-      createdAt: claim.created_at,
-      updatedAt: claim.updated_at
-    }));
+    await delay(400);
+    
+    return [
+      {
+        id: crypto.randomUUID(),
+        userId: userId,
+        invoiceId: crypto.randomUUID(),
+        claimNumber: 'CLM-2024-001',
+        insuranceProvider: 'Blue Cross Blue Shield',
+        policyNumber: 'BCBS123456789',
+        status: 'approved' as const,
+        claimAmount: 150.00,
+        approvedAmount: 120.00,
+        diagnosisCodes: ['Z00.00'],
+        procedureCodes: ['99213'],
+        submittedAt: new Date().toISOString(),
+        processedAt: new Date().toISOString(),
+        denialReason: undefined,
+        metadata: { tipo_reclamo: 'consulta' },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
   }
 
   static async submitInsuranceClaim(claim: Omit<InsuranceClaim, 'id' | 'createdAt' | 'updatedAt'>): Promise<InsuranceClaim> {
-    const { data, error } = await supabase
-      .from('insurance_claims')
-      .insert({
-        user_id: claim.userId,
-        invoice_id: claim.invoiceId,
-        claim_number: claim.claimNumber,
-        insurance_provider: claim.insuranceProvider,
-        policy_number: claim.policyNumber,
-        status: claim.status,
-        claim_amount: claim.claimAmount,
-        approved_amount: claim.approvedAmount,
-        diagnosis_codes: claim.diagnosisCodes,
-        procedure_codes: claim.procedureCodes,
-        submitted_at: claim.submittedAt,
-        processed_at: claim.processedAt,
-        denial_reason: claim.denialReason,
-        metadata: claim.metadata
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
+    await delay(600);
+    
     return {
-      id: data.id,
-      userId: data.user_id,
-      invoiceId: data.invoice_id,
-      claimNumber: data.claim_number,
-      insuranceProvider: data.insurance_provider,
-      policyNumber: data.policy_number,
-      status: data.status,
-      claimAmount: parseFloat(data.claim_amount),
-      approvedAmount: data.approved_amount ? parseFloat(data.approved_amount) : undefined,
-      diagnosisCodes: data.diagnosis_codes || [],
-      procedureCodes: data.procedure_codes || [],
-      submittedAt: data.submitted_at,
-      processedAt: data.processed_at,
-      denialReason: data.denial_reason,
-      metadata: data.metadata || {},
-      createdAt: data.created_at,
-      updatedAt: data.updated_at
+      ...claim,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
   }
 
-  // Subscriptions
   static async getSubscriptions(userId: string): Promise<Subscription[]> {
-    const { data, error } = await supabase
-      .from('subscriptions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return data.map(sub => ({
-      id: sub.id,
-      userId: sub.user_id,
-      planName: sub.plan_name,
-      status: sub.status,
-      billingCycle: sub.billing_cycle,
-      amount: parseFloat(sub.amount),
-      currency: sub.currency,
-      trialEndsAt: sub.trial_ends_at,
-      currentPeriodStart: sub.current_period_start,
-      currentPeriodEnd: sub.current_period_end,
-      cancelledAt: sub.cancelled_at,
-      provider: sub.provider,
-      externalSubscriptionId: sub.external_subscription_id,
-      paymentMethodId: sub.payment_method_id,
-      metadata: sub.metadata || {},
-      createdAt: sub.created_at,
-      updatedAt: sub.updated_at
-    }));
+    await delay(300);
+    
+    return [
+      {
+        id: crypto.randomUUID(),
+        userId: userId,
+        planName: 'Premium Health Plan',
+        status: 'active' as const,
+        billingCycle: 'monthly' as const,
+        amount: 29.99,
+        currency: 'USD',
+        trialEndsAt: undefined,
+        currentPeriodStart: new Date().toISOString(),
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        cancelledAt: undefined,
+        provider: 'stripe',
+        externalSubscriptionId: 'sub_' + crypto.randomUUID(),
+        paymentMethodId: crypto.randomUUID(),
+        metadata: { plan_type: 'premium' },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
   }
 
   static async createSubscription(subscription: Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>): Promise<Subscription> {
-    const { data, error } = await supabase
-      .from('subscriptions')
-      .insert({
-        user_id: subscription.userId,
-        plan_name: subscription.planName,
-        status: subscription.status,
-        billing_cycle: subscription.billingCycle,
-        amount: subscription.amount,
-        currency: subscription.currency,
-        trial_ends_at: subscription.trialEndsAt,
-        current_period_start: subscription.currentPeriodStart,
-        current_period_end: subscription.currentPeriodEnd,
-        cancelled_at: subscription.cancelledAt,
-        provider: subscription.provider,
-        external_subscription_id: subscription.externalSubscriptionId,
-        payment_method_id: subscription.paymentMethodId,
-        metadata: subscription.metadata
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
+    await delay(500);
+    
     return {
-      id: data.id,
-      userId: data.user_id,
-      planName: data.plan_name,
-      status: data.status,
-      billingCycle: data.billing_cycle,
-      amount: parseFloat(data.amount),
-      currency: data.currency,
-      trialEndsAt: data.trial_ends_at,
-      currentPeriodStart: data.current_period_start,
-      currentPeriodEnd: data.current_period_end,
-      cancelledAt: data.cancelled_at,
-      provider: data.provider,
-      externalSubscriptionId: data.external_subscription_id,
-      paymentMethodId: data.payment_method_id,
-      metadata: data.metadata || {},
-      createdAt: data.created_at,
-      updatedAt: data.updated_at
+      ...subscription,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
   }
 
-  // Exchange Rates
-  static async getExchangeRates(): Promise<CurrencyRate[]> {
-    const { data, error } = await supabase
-      .from('currency_rates')
-      .select('*')
-      .order('valid_at', { ascending: false });
-
-    if (error) throw error;
-
-    return data.map(rate => ({
-      id: rate.id,
-      baseCurrency: rate.base_currency,
-      targetCurrency: rate.target_currency,
-      rate: parseFloat(rate.rate),
-      provider: rate.provider,
-      validAt: rate.valid_at,
-      createdAt: rate.created_at
-    }));
-  }
-
-  // KYC Verification
-  static async getKycVerification(userId: string): Promise<KycVerification | null> {
-    const { data, error } = await supabase
-      .from('kyc_verifications')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') return null;
-      throw error;
-    }
-
-    return {
-      id: data.id,
-      userId: data.user_id,
-      status: data.status,
-      verificationLevel: data.verification_level,
-      identityVerified: data.identity_verified,
-      addressVerified: data.address_verified,
-      phoneVerified: data.phone_verified,
-      documentType: data.document_type,
-      documentNumber: data.document_number,
-      documentExpiry: data.document_expiry,
-      verificationProvider: data.verification_provider,
-      riskScore: data.risk_score,
-      verificationDate: data.verification_date,
-      rejectionReason: data.rejection_reason,
-      metadata: data.metadata || {},
-      createdAt: data.created_at,
-      updatedAt: data.updated_at
-    };
-  }
-
-  // Fraud Alerts
-  static async getFraudAlerts(): Promise<FraudAlert[]> {
-    const { data, error } = await supabase
-      .from('fraud_alerts')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return data.map(alert => ({
-      id: alert.id,
-      userId: alert.user_id,
-      transactionId: alert.transaction_id,
-      alertType: alert.alert_type,
-      riskScore: alert.risk_score,
-      status: alert.status,
-      description: alert.description,
-      triggeredRules: alert.triggered_rules || [],
-      ipAddress: alert.ip_address,
-      deviceInfo: alert.device_info,
-      reviewedBy: alert.reviewed_by,
-      reviewedAt: alert.reviewed_at,
-      resolutionNotes: alert.resolution_notes,
-      createdAt: alert.created_at
-    }));
-  }
-
-  // Tax Documents
-  static async getTaxDocuments(userId: string): Promise<TaxDocument[]> {
-    const { data, error } = await supabase
-      .from('tax_documents')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return data.map(doc => ({
-      id: doc.id,
-      userId: doc.user_id,
-      documentType: doc.document_type,
-      taxYear: doc.tax_year,
-      totalAmount: parseFloat(doc.total_amount),
-      taxAmount: parseFloat(doc.tax_amount),
-      currency: doc.currency,
-      jurisdiction: doc.jurisdiction,
-      documentUrl: doc.document_url,
-      status: doc.status,
-      metadata: doc.metadata || {},
-      createdAt: doc.created_at,
-      updatedAt: doc.updated_at
-    }));
-  }
-
-  // Health Savings Goals
   static async getHealthSavingsGoals(userId: string): Promise<HealthSavingsGoal[]> {
-    const { data, error } = await supabase
-      .from('health_savings_goals')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return data.map(goal => ({
-      id: goal.id,
-      userId: goal.user_id,
-      goalName: goal.goal_name,
-      targetAmount: parseFloat(goal.target_amount),
-      currentAmount: parseFloat(goal.current_amount),
-      currency: goal.currency,
-      targetDate: goal.target_date,
-      category: goal.category,
-      isActive: goal.is_active,
-      autoContributeAmount: goal.auto_contribute_amount ? parseFloat(goal.auto_contribute_amount) : undefined,
-      autoContributeFrequency: goal.auto_contribute_frequency,
-      createdAt: goal.created_at,
-      updatedAt: goal.updated_at
-    }));
+    await delay(300);
+    
+    return [
+      {
+        id: crypto.randomUUID(),
+        userId: userId,
+        goalName: 'Emergency Medical Fund',
+        targetAmount: 5000.00,
+        currentAmount: 1250.75,
+        currency: 'USD',
+        targetDate: '2024-12-31',
+        category: 'emergency',
+        isActive: true,
+        autoContributeAmount: 100.00,
+        autoContributeFrequency: 'monthly' as const,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
   }
 
   static async createHealthSavingsGoal(goal: Omit<HealthSavingsGoal, 'id' | 'createdAt' | 'updatedAt'>): Promise<HealthSavingsGoal> {
-    const { data, error } = await supabase
-      .from('health_savings_goals')
-      .insert({
-        user_id: goal.userId,
-        goal_name: goal.goalName,
-        target_amount: goal.targetAmount,
-        current_amount: goal.currentAmount,
-        currency: goal.currency,
-        target_date: goal.targetDate,
-        category: goal.category,
-        is_active: goal.isActive,
-        auto_contribute_amount: goal.autoContributeAmount,
-        auto_contribute_frequency: goal.autoContributeFrequency
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
+    await delay(500);
+    
     return {
-      id: data.id,
-      userId: data.user_id,
-      goalName: data.goal_name,
-      targetAmount: parseFloat(data.target_amount),
-      currentAmount: parseFloat(data.current_amount),
-      currency: data.currency,
-      targetDate: data.target_date,
-      category: data.category,
-      isActive: data.is_active,
-      autoContributeAmount: data.auto_contribute_amount ? parseFloat(data.auto_contribute_amount) : undefined,
-      autoContributeFrequency: data.auto_contribute_frequency,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at
+      ...goal,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  static async getExchangeRates(): Promise<CurrencyRate[]> {
+    await delay(200);
+    
+    return [
+      {
+        id: crypto.randomUUID(),
+        baseCurrency: 'USD',
+        targetCurrency: 'EUR',
+        rate: 0.85,
+        provider: 'xe.com',
+        validAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: crypto.randomUUID(),
+        baseCurrency: 'USD',
+        targetCurrency: 'MXN',
+        rate: 17.50,
+        provider: 'xe.com',
+        validAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      }
+    ];
+  }
+
+  static async getKycVerification(userId: string): Promise<KycVerification | null> {
+    await delay(300);
+    
+    return {
+      id: crypto.randomUUID(),
+      userId: userId,
+      status: 'verified' as const,
+      verificationLevel: 'enhanced' as const,
+      identityVerified: true,
+      addressVerified: true,
+      phoneVerified: true,
+      documentType: 'passport',
+      documentNumber: 'P123456789',
+      documentExpiry: '2029-12-31',
+      verificationProvider: 'jumio',
+      riskScore: 15,
+      verificationDate: new Date().toISOString(),
+      rejectionReason: undefined,
+      metadata: { verification_method: 'automated' },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  static async getFraudAlerts(): Promise<FraudAlert[]> {
+    await delay(300);
+    
+    return [
+      {
+        id: crypto.randomUUID(),
+        userId: crypto.randomUUID(),
+        transactionId: crypto.randomUUID(),
+        alertType: 'velocity_check' as const,
+        riskScore: 75,
+        status: 'investigating' as const,
+        description: 'Multiple transactions in short time period',
+        triggeredRules: ['velocity_rule_1', 'amount_threshold_rule'],
+        ipAddress: '192.168.1.1',
+        deviceInfo: { browser: 'Chrome', os: 'Windows' },
+        reviewedBy: undefined,
+        reviewedAt: undefined,
+        resolutionNotes: undefined,
+        createdAt: new Date().toISOString()
+      }
+    ];
+  }
+
+  static async getTaxDocuments(userId: string): Promise<TaxDocument[]> {
+    await delay(300);
+    
+    return [
+      {
+        id: crypto.randomUUID(),
+        userId: userId,
+        documentType: '1099' as const,
+        taxYear: 2024,
+        totalAmount: 1500.00,
+        taxAmount: 120.00,
+        currency: 'USD',
+        jurisdiction: 'US',
+        documentUrl: 'https://example.com/tax-doc.pdf',
+        status: 'generated' as const,
+        metadata: { form_type: '1099-MISC' },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
+  }
+}
+
+// Export individual service classes for specific functionality
+export class AdvancedPaymentService extends PaymentService {
+  static async processMultiCurrencyPayment(amount: number, fromCurrency: string, toCurrency: string) {
+    await delay(800);
+    const rates = await this.getExchangeRates();
+    const rate = rates.find(r => r.baseCurrency === fromCurrency && r.targetCurrency === toCurrency);
+    
+    if (!rate) {
+      throw new Error(`Exchange rate not found for ${fromCurrency} to ${toCurrency}`);
+    }
+    
+    return {
+      originalAmount: amount,
+      convertedAmount: amount * rate.rate,
+      exchangeRate: rate.rate,
+      fees: amount * 0.029, // 2.9% processing fee
+      totalCost: amount + (amount * 0.029)
+    };
+  }
+
+  static async validatePaymentCompliance(paymentData: any) {
+    await delay(400);
+    
+    return {
+      isCompliant: true,
+      checks: {
+        amlCompliant: true,
+        kycVerified: true,
+        sanctionsChecked: true,
+        riskAssessment: 'low'
+      },
+      requiredActions: []
     };
   }
 }

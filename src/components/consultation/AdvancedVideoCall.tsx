@@ -1,54 +1,43 @@
-
-import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Video, VideoOff, Mic, MicOff, Phone, PhoneOff, 
-  Monitor, Settings, Users, MessageSquare, FileText,
-  Camera, Download, Maximize2, Volume2, VolumeX,
-  Clock, Wifi, AlertTriangle, UserPlus
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Slider } from '@/components/ui/slider';
 import { useAdvancedVideoCall } from '@/hooks/useAdvancedVideoCall';
-import ParticipantsList from './ParticipantsList';
-import TranscriptionPanel from './TranscriptionPanel';
+import { 
+  Video, 
+  VideoOff, 
+  Mic, 
+  MicOff, 
+  ScreenShare, 
+  ScreenShareOff,
+  Users,
+  FileText,
+  Camera,
+  MessageSquare,
+  Heart,
+  Activity
+} from 'lucide-react';
 
 interface AdvancedVideoCallProps {
-  appointmentId: string;
-  doctorId: string;
-  patientId: string;
-  userId: string;
-  userRole: 'doctor' | 'patient';
-  onCallEnd?: () => void;
+  sessionId: string;
+  isDoctor?: boolean;
 }
 
-export default function AdvancedVideoCall({
-  appointmentId,
-  doctorId,
-  patientId,
-  userId,
-  userRole,
-  onCallEnd
-}: AdvancedVideoCallProps) {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [volume, setVolume] = useState(50);
-  const [showSettings, setShowSettings] = useState(false);
-  const [activeTab, setActiveTab] = useState('participants');
-  
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
+export default function AdvancedVideoCall({ sessionId, isDoctor = false }: AdvancedVideoCallProps) {
   const {
-    callState,
-    medicalNotes,
     participants,
+    isRecording,
     transcript,
+    medicalNotes,
+    callState,
     isTranscribing,
-    localVideoRef: setLocalVideoRef,
-    remoteVideoRef: setRemoteVideoRef,
+    localVideoRef,
+    remoteVideoRef,
+    startRecording,
+    stopRecording,
+    addTranscript,
+    addMedicalNote,
     startCall,
     endCall,
     toggleVideo,
@@ -56,285 +45,321 @@ export default function AdvancedVideoCall({
     toggleScreenShare,
     sendMessage,
     saveMedicalNote,
-    startRecording,
     takeScreenshot,
     startTranscription,
     stopTranscription,
-    loadParticipants,
-  } = useAdvancedVideoCall(appointmentId, userId, userRole);
+    loadParticipants
+  } = useAdvancedVideoCall(sessionId);
+
+  const [newNote, setNewNote] = useState('');
+  const [chatMessage, setChatMessage] = useState('');
 
   useEffect(() => {
-    setLocalVideoRef(localVideoRef.current);
-    setRemoteVideoRef(remoteVideoRef.current);
-  }, [setLocalVideoRef, setRemoteVideoRef]);
+    loadParticipants();
+  }, [loadParticipants]);
 
-  useEffect(() => {
-    // Auto-start call when component mounts
-    startCall(doctorId, patientId);
-  }, [startCall, doctorId, patientId]);
-
-  const handleEndCall = async () => {
-    await endCall();
-    onCallEnd?.();
+  // Handlers
+  const handleStartCall = () => {
+    startCall();
   };
 
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      containerRef.current?.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
-    }
+  const handleEndCall = () => {
+    endCall();
   };
 
-  const formatDuration = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  const handleToggleVideo = () => {
+    toggleVideo();
   };
 
-  const getConnectionQualityColor = (quality: string) => {
-    switch (quality) {
-      case 'excellent': return 'text-green-600';
-      case 'good': return 'text-blue-600';
-      case 'fair': return 'text-yellow-600';
-      case 'poor': return 'text-red-600';
-      default: return 'text-gray-600';
-    }
+  const handleToggleAudio = () => {
+    toggleAudio();
   };
 
-  const getConnectionQualityIcon = (quality: string) => {
-    switch (quality) {
-      case 'poor': return <AlertTriangle className="h-4 w-4" />;
-      default: return <Wifi className="h-4 w-4" />;
-    }
+  const handleToggleScreenShare = () => {
+    toggleScreenShare();
+  };
+
+  const handleSendMessage = (message: string) => {
+    sendMessage(message);
+  };
+
+  const handleSaveMedicalNote = (note: string) => {
+    saveMedicalNote(note);
+  };
+
+  const handleTakeScreenshot = () => {
+    takeScreenshot();
+  };
+
+  const handleStartRecording = () => {
+    startRecording();
+  };
+
+  const handleStopRecording = () => {
+    stopRecording();
+  };
+
+  const handleStartTranscription = () => {
+    startTranscription();
+  };
+
+  const handleStopTranscription = () => {
+    stopTranscription();
   };
 
   return (
-    <div ref={containerRef} className="h-full bg-gray-900 text-white flex flex-col">
-      {/* Header with call info and controls */}
-      <div className="flex items-center justify-between p-4 bg-gray-800">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            <span className="font-mono text-sm">{formatDuration(callState.callDuration)}</span>
-          </div>
-          
-          <div className={`flex items-center gap-2 ${getConnectionQualityColor(callState.connectionQuality)}`}>
-            {getConnectionQualityIcon(callState.connectionQuality)}
-            <span className="text-sm capitalize">{callState.connectionQuality}</span>
-          </div>
-
-          <Badge variant={callState.isConnected ? 'default' : 'destructive'}>
-            {callState.isConnected ? 'Conectado' : 'Conectando...'}
-          </Badge>
-
-          {callState.isRecording && (
-            <Badge variant="destructive" className="animate-pulse">
-              <div className="h-2 w-2 bg-white rounded-full mr-1" />
-              GRABANDO
-            </Badge>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button onClick={toggleFullscreen} variant="ghost" size="sm">
-            <Maximize2 className="h-4 w-4" />
-          </Button>
-          
-          <Button onClick={() => setShowSettings(!showSettings)} variant="ghost" size="sm">
-            <Settings className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex-1 flex">
-        {/* Main video area */}
-        <div className="flex-1 relative">
-          {/* Remote video (main) */}
-          <video
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-            className="w-full h-full object-cover bg-gray-800"
-          />
-
-          {/* Local video (picture-in-picture) */}
-          <div className="absolute top-4 right-4 w-48 h-36 bg-gray-700 rounded-lg overflow-hidden">
-            <video
-              ref={localVideoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Volume control overlay */}
-          {volume !== 50 && (
-            <div className="absolute top-4 left-4 bg-black bg-opacity-50 p-2 rounded-lg">
-              <div className="flex items-center gap-2">
-                {volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                <span className="text-sm">{volume}%</span>
+    <div className="min-h-screen bg-gray-50 p-4">
+      {/* Video Call Interface */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Main Video Area */}
+        <div className="lg:col-span-2">
+          <Card>
+            <CardContent className="p-0 relative">
+              <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
+                <video
+                  ref={remoteVideoRef}
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  playsInline
+                />
+                <div className="absolute bottom-4 right-4 w-32 h-24 bg-gray-800 rounded-lg overflow-hidden">
+                  <video
+                    ref={localVideoRef}
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    playsInline
+                    muted
+                  />
+                </div>
+                
+                {/* Call Status Overlay */}
+                <div className="absolute top-4 left-4">
+                  <Badge variant={callState.status === 'connected' ? 'default' : 'secondary'}>
+                    {callState.status === 'connected' ? 'Conectado' : 'Desconectado'}
+                  </Badge>
+                </div>
+                
+                {/* Recording Indicator */}
+                {isRecording && (
+                  <div className="absolute top-4 right-4">
+                    <Badge variant="destructive" className="animate-pulse">
+                      🔴 Grabando
+                    </Badge>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
-
-          {/* Call controls */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-            <div className="flex items-center gap-2 bg-black bg-opacity-50 p-2 rounded-lg">
-              {/* Video toggle */}
-              <Button
-                onClick={toggleVideo}
-                variant={callState.isVideoEnabled ? "default" : "destructive"}
-                size="sm"
-              >
-                {callState.isVideoEnabled ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
-              </Button>
-
-              {/* Audio toggle */}
-              <Button
-                onClick={toggleAudio}
-                variant={callState.isAudioEnabled ? "default" : "destructive"}
-                size="sm"
-              >
-                {callState.isAudioEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-              </Button>
-
-              {/* Screen share */}
-              <Button
-                onClick={toggleScreenShare}
-                variant={callState.isScreenSharing ? "secondary" : "default"}
-                size="sm"
-              >
-                <Monitor className="h-4 w-4" />
-              </Button>
-
-              {/* Doctor-only controls */}
-              {userRole === 'doctor' && (
-                <>
-                  <Button
-                    onClick={startRecording}
-                    variant={callState.isRecording ? "destructive" : "default"}
-                    size="sm"
-                    disabled={callState.isRecording}
-                  >
-                    <div className="h-2 w-2 bg-red-500 rounded-full" />
-                  </Button>
-
-                  <Button onClick={() => takeScreenshot()} variant="default" size="sm">
-                    <Camera className="h-4 w-4" />
-                  </Button>
-                </>
-              )}
-
-              {/* End call */}
-              <Button onClick={handleEndCall} variant="destructive" size="sm">
-                <PhoneOff className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Side panel */}
-        <div className="w-80 bg-white text-black border-l">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="participants" className="flex items-center gap-1">
-                <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">Participantes</span>
-              </TabsTrigger>
-              <TabsTrigger value="transcription" className="flex items-center gap-1">
-                <FileText className="h-4 w-4" />
-                <span className="hidden sm:inline">Transcripción</span>
-              </TabsTrigger>
-              <TabsTrigger value="chat" className="flex items-center gap-1">
-                <MessageSquare className="h-4 w-4" />
-                <span className="hidden sm:inline">Chat</span>
-              </TabsTrigger>
-            </TabsList>
-
-            <div className="flex-1 overflow-hidden">
-              <TabsContent value="participants" className="h-full m-0">
-                <ParticipantsList
-                  sessionId={callState.sessionId || ''}
-                  currentUserId={userId}
-                  userRole={userRole}
-                  onInviteParticipant={() => {
-                    // TODO: Implement invite modal
-                    console.log('Invite participant clicked');
-                  }}
-                />
-              </TabsContent>
-
-              <TabsContent value="transcription" className="h-full m-0">
-                <TranscriptionPanel
-                  sessionId={callState.sessionId || ''}
-                  isRecording={isTranscribing}
-                />
-              </TabsContent>
-
-              <TabsContent value="chat" className="h-full m-0">
-                <Card className="h-full">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MessageSquare className="h-5 w-5" />
-                      Chat de la consulta
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-4 text-gray-500">
-                      <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p>Chat en tiempo real</p>
-                      <p className="text-xs mt-1">Función próximamente disponible</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </div>
-          </Tabs>
-        </div>
-      </div>
-
-      {/* Settings panel */}
-      {showSettings && (
-        <div className="absolute top-16 right-4 w-64 bg-white text-black rounded-lg shadow-lg p-4 z-50">
-          <h3 className="font-semibold mb-3">Configuración de llamada</h3>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Volumen</label>
-              <Slider
-                value={[volume]}
-                onValueChange={(value) => setVolume(value[0])}
-                max={100}
-                step={1}
-                className="w-full"
-              />
-            </div>
-
-            {userRole === 'doctor' && (
-              <div className="space-y-2">
+              
+              {/* Call Controls */}
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
                 <Button
-                  onClick={() => startTranscription(callState.sessionId || '', new MediaStream())}
-                  variant={isTranscribing ? "destructive" : "default"}
+                  variant={callState.isVideoEnabled ? "default" : "secondary"}
                   size="sm"
-                  className="w-full"
-                  disabled={!callState.sessionId}
+                  onClick={toggleVideo}
                 >
-                  {isTranscribing ? 'Detener transcripción' : 'Iniciar transcripción'}
+                  {callState.isVideoEnabled ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
+                </Button>
+                <Button
+                  variant={callState.isAudioEnabled ? "default" : "secondary"}
+                  size="sm"
+                  onClick={toggleAudio}
+                >
+                  {callState.isAudioEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+                </Button>
+                <Button
+                  variant={callState.isScreenSharing ? "default" : "secondary"}
+                  size="sm"
+                  onClick={toggleScreenShare}
+                >
+                  {callState.isScreenSharing ? <ScreenShareOff className="h-4 w-4" /> : <ScreenShare className="h-4 w-4" />}
+                </Button>
+                {!isRecording ? (
+                  <Button variant="outline" size="sm" onClick={startRecording}>
+                    Grabar
+                  </Button>
+                ) : (
+                  <Button variant="destructive" size="sm" onClick={stopRecording}>
+                    Detener
+                  </Button>
+                )}
+                <Button variant="outline" size="sm" onClick={takeScreenshot}>
+                  <Camera className="h-4 w-4" />
+                </Button>
+                <Button variant="destructive" size="sm" onClick={endCall}>
+                  Finalizar
                 </Button>
               </div>
-            )}
-          </div>
+            </CardContent>
+          </Card>
         </div>
-      )}
+
+        {/* Side Panel */}
+        <div className="space-y-6">
+          {/* Participants */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Participantes ({participants.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {participants.map((participant) => (
+                  <div key={participant.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-sm font-medium">{participant.user_id}</span>
+                    <Badge variant={participant.is_active ? "default" : "secondary"}>
+                      {participant.is_active ? 'Activo' : 'Inactivo'}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Acciones Rápidas</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {!isTranscribing ? (
+                <Button variant="outline" className="w-full" onClick={startTranscription}>
+                  Iniciar Transcripción
+                </Button>
+              ) : (
+                <Button variant="secondary" className="w-full" onClick={stopTranscription}>
+                  Detener Transcripción
+                </Button>
+              )}
+              <Button variant="outline" className="w-full" onClick={() => addMedicalNote('Nota rápida')}>
+                <FileText className="h-4 w-4 mr-2" />
+                Nota Médica
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Bottom Tabs */}
+      <Tabs defaultValue="transcript" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="transcript">Transcripción</TabsTrigger>
+          <TabsTrigger value="notes">Notas Médicas</TabsTrigger>
+          <TabsTrigger value="chat">Chat</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="transcript">
+          <Card>
+            <CardHeader>
+              <CardTitle>Transcripción en Tiempo Real</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {transcript.map((item, index) => (
+                  <div key={index} className="p-2 bg-gray-50 rounded text-sm">
+                    <span className="font-medium">{new Date(item.timestamp).toLocaleTimeString()}: </span> 
+                    {item.text}
+                  </div>
+                ))}
+                {transcript.length === 0 && (
+                  <p className="text-gray-500 text-center py-4">
+                    {isTranscribing ? 'Esperando transcripción...' : 'Inicia la transcripción para ver el contenido aquí'}
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="notes">
+          <Card>
+            <CardHeader>
+              <CardTitle>Notas Médicas</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <textarea
+                    value={newNote}
+                    onChange={(e) => setNewNote(e.target.value)}
+                    placeholder="Escribir nueva nota médica..."
+                    className="w-full p-2 border rounded resize-none"
+                    rows={3}
+                  />
+                  <Button 
+                    onClick={() => {
+                      if (newNote.trim()) {
+                        saveMedicalNote(newNote);
+                        setNewNote('');
+                      }
+                    }}
+                    className="w-full"
+                  >
+                    Guardar Nota
+                  </Button>
+                </div>
+                
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {medicalNotes.map((note, index) => (
+                    <div key={index} className="p-3 bg-blue-50 rounded border-l-4 border-blue-400">
+                      <div className="text-xs text-gray-500 mb-1">
+                        {new Date(note.timestamp).toLocaleString()}
+                      </div>
+                      <div className="text-sm">{note.note}</div>
+                    </div>
+                  ))}
+                  {medicalNotes.length === 0 && (
+                    <p className="text-gray-500 text-center py-4">No hay notas médicas aún</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="chat">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                Chat de la Consulta
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={chatMessage}
+                    onChange={(e) => setChatMessage(e.target.value)}
+                    placeholder="Escribir mensaje..."
+                    className="flex-1 p-2 border rounded"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && chatMessage.trim()) {
+                        sendMessage(chatMessage);
+                        setChatMessage('');
+                      }
+                    }}
+                  />
+                  <Button 
+                    onClick={() => {
+                      if (chatMessage.trim()) {
+                        sendMessage(chatMessage);
+                        setChatMessage('');
+                      }
+                    }}
+                  >
+                    Enviar
+                  </Button>
+                </div>
+                <div className="text-sm text-gray-500">
+                  Los mensajes del chat aparecerán aquí durante la consulta
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
