@@ -28,10 +28,10 @@ import type { UserRole } from '@/types/user';
 export default function AppRoutes() {
   const { user, isAuthenticated } = useAuthStore();
 
-  const getUserRole = (role: UserRole): 'patient' | 'doctor' | 'admin' => {
+  const getUserRole = (role: UserRole): 'patient' | 'doctor' => {
     if (role === 'specialist') return 'doctor';
-    if (role === 'coordinator' || role === 'delivery_staff' || role === 'pharmacist') return 'admin';
-    return role as 'patient' | 'doctor' | 'admin';
+    if (role === 'coordinator' || role === 'delivery_staff' || role === 'pharmacist' || role === 'admin') return 'doctor'; // Treating admin roles as doctor for consultation purposes
+    return role as 'patient' | 'doctor';
   };
 
   // Función para determinar qué dashboard mostrar
