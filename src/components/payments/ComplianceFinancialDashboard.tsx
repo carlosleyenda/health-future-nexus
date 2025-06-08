@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,113 +8,105 @@ import {
   Shield, 
   AlertTriangle, 
   FileText, 
-  TrendingUp, 
-  DollarSign, 
   Users, 
+  TrendingUp, 
   Eye,
   Download,
   RefreshCw,
-  AlertCircle
+  CheckCircle,
+  XCircle,
+  Clock
 } from 'lucide-react';
-import { AdvancedPaymentService } from '@/services/financial/paymentService';
 
 export default function ComplianceFinancialDashboard() {
-  const [fraudAlerts, setFraudAlerts] = useState([]);
-  const [complianceStatus, setComplianceStatus] = useState({
-    pciCompliance: true,
-    amlChecks: true,
-    kycVerification: 85,
-    taxReporting: true
-  });
-  const [auditLogs, setAuditLogs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
 
-  useEffect(() => {
-    loadComplianceData();
-  }, []);
+  const fraudAlerts = [
+    {
+      id: '1',
+      type: 'suspicious_activity',
+      severity: 'high',
+      user: 'user@example.com',
+      amount: 5000,
+      description: 'Unusual transaction pattern detected',
+      timestamp: '2024-01-15 14:30:00',
+      status: 'open'
+    },
+    {
+      id: '2',
+      type: 'velocity_check',
+      severity: 'medium',
+      user: 'another@example.com',
+      amount: 1200,
+      description: 'Multiple rapid transactions',
+      timestamp: '2024-01-15 13:45:00',
+      status: 'investigating'
+    }
+  ];
 
-  const loadComplianceData = async () => {
-    try {
-      setIsLoading(true);
-      // Load fraud alerts, audit logs, etc.
-      // This would integrate with the actual services
-      
-      // Mock data for demonstration
-      setFraudAlerts([
-        {
-          id: '1',
-          type: 'suspicious_activity',
-          riskScore: 85,
-          description: 'Multiple transactions from different locations',
-          status: 'investigating',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: '2',
-          type: 'velocity_check',
-          riskScore: 72,
-          description: 'High transaction velocity detected',
-          status: 'resolved',
-          createdAt: new Date().toISOString()
-        }
-      ]);
+  const kycVerifications = [
+    {
+      id: '1',
+      user: 'user1@example.com',
+      status: 'verified',
+      level: 'enhanced',
+      verifiedAt: '2024-01-10',
+      riskScore: 15
+    },
+    {
+      id: '2',
+      user: 'user2@example.com',
+      status: 'pending',
+      level: 'basic',
+      verifiedAt: null,
+      riskScore: null
+    }
+  ];
 
-      setAuditLogs([
-        {
-          id: '1',
-          action: 'payment_processed',
-          userId: 'user123',
-          amount: 800,
-          timestamp: new Date().toISOString()
-        },
-        {
-          id: '2',
-          action: 'kyc_verification',
-          userId: 'user456',
-          timestamp: new Date().toISOString()
-        }
-      ]);
-    } catch (error) {
-      console.error('Error loading compliance data:', error);
-    } finally {
-      setIsLoading(false);
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'high': return 'destructive';
+      case 'medium': return 'secondary';
+      case 'low': return 'outline';
+      default: return 'outline';
     }
   };
 
-  const getAlertSeverity = (riskScore: number) => {
-    if (riskScore >= 80) return { color: 'destructive', label: 'Alto' };
-    if (riskScore >= 60) return { color: 'secondary', label: 'Medio' };
-    return { color: 'default', label: 'Bajo' };
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'verified': return 'bg-green-100 text-green-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'rejected': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-32 bg-gray-200 rounded-lg"></div>
-          <div className="h-64 bg-gray-200 rounded-lg"></div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
-      {/* Compliance Status Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Compliance & Financial Dashboard</h2>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+          <Button variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export Report
+          </Button>
+        </div>
+      </div>
+
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">PCI DSS</p>
-                <div className="flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-green-600" />
-                  <span className="text-lg font-semibold">Level 1</span>
-                </div>
+                <p className="text-sm font-medium text-muted-foreground">Active Fraud Alerts</p>
+                <p className="text-2xl font-bold text-red-600">12</p>
               </div>
-              <Badge variant="default" className="bg-green-100 text-green-800">
-                Compliant
-              </Badge>
+              <AlertTriangle className="h-8 w-8 text-red-600" />
             </div>
           </CardContent>
         </Card>
@@ -123,15 +115,10 @@ export default function ComplianceFinancialDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">AML/KYC</p>
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-blue-600" />
-                  <span className="text-lg font-semibold">{complianceStatus.kycVerification}%</span>
-                </div>
+                <p className="text-sm font-medium text-muted-foreground">KYC Verified Users</p>
+                <p className="text-2xl font-bold text-green-600">1,234</p>
               </div>
-              <Badge variant="default" className="bg-blue-100 text-blue-800">
-                Active
-              </Badge>
+              <Shield className="h-8 w-8 text-green-600" />
             </div>
           </CardContent>
         </Card>
@@ -140,15 +127,10 @@ export default function ComplianceFinancialDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Fraud Score</p>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-600" />
-                  <span className="text-lg font-semibold">2.3%</span>
-                </div>
+                <p className="text-sm font-medium text-muted-foreground">Compliance Score</p>
+                <p className="text-2xl font-bold text-blue-600">98.5%</p>
               </div>
-              <Badge variant="secondary" className="bg-amber-100 text-amber-800">
-                Low Risk
-              </Badge>
+              <CheckCircle className="h-8 w-8 text-blue-600" />
             </div>
           </CardContent>
         </Card>
@@ -157,231 +139,224 @@ export default function ComplianceFinancialDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Tax Reports</p>
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-purple-600" />
-                  <span className="text-lg font-semibold">Up to Date</span>
-                </div>
+                <p className="text-sm font-medium text-muted-foreground">Monthly AML Checks</p>
+                <p className="text-2xl font-bold text-purple-600">2,567</p>
               </div>
-              <Badge variant="default" className="bg-purple-100 text-purple-800">
-                Current
-              </Badge>
+              <Users className="h-8 w-8 text-purple-600" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Compliance Dashboard */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <Shield className="h-6 w-6 text-blue-600" />
-              Dashboard de Compliance Financiero
-            </CardTitle>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={loadComplianceData}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Actualizar
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Exportar Reporte
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="fraud" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="fraud">Detección de Fraude</TabsTrigger>
-              <TabsTrigger value="kyc">Verificación KYC</TabsTrigger>
-              <TabsTrigger value="audit">Audit Trail</TabsTrigger>
-              <TabsTrigger value="reports">Reportes</TabsTrigger>
-            </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="fraud">Fraud Detection</TabsTrigger>
+          <TabsTrigger value="kyc">KYC Management</TabsTrigger>
+          <TabsTrigger value="audit">Audit Trail</TabsTrigger>
+          <TabsTrigger value="reports">Compliance Reports</TabsTrigger>
+        </TabsList>
 
-            <TabsContent value="fraud" className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Alertas de Fraude</h3>
-                <Badge variant="secondary">{fraudAlerts.length} alertas activas</Badge>
-              </div>
-              
-              <div className="space-y-3">
-                {fraudAlerts.map((alert: any) => (
-                  <div key={alert.id} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <AlertCircle className="h-5 w-5 text-red-500" />
-                        <div>
-                          <div className="font-medium">{alert.description}</div>
-                          <div className="text-sm text-gray-500">
-                            {alert.type.replace('_', ' ').toUpperCase()} • 
-                            {new Date(alert.createdAt).toLocaleDateString()}
-                          </div>
-                        </div>
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Risk Trends
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">High Risk Transactions</span>
+                    <span className="text-sm font-medium text-red-600">↑ 12%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">KYC Completion Rate</span>
+                    <span className="text-sm font-medium text-green-600">↑ 8%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">False Positive Rate</span>
+                    <span className="text-sm font-medium text-blue-600">↓ 5%</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Security Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">PCI DSS Compliance</span>
+                    <Badge className="bg-green-100 text-green-800">Active</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Data Encryption</span>
+                    <Badge className="bg-green-100 text-green-800">AES-256</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Last Security Audit</span>
+                    <span className="text-sm text-muted-foreground">2024-01-01</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="fraud" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                Fraud Alerts
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {fraudAlerts.map((alert) => (
+                  <div key={alert.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <AlertTriangle className="h-5 w-5 text-orange-500" />
+                      <div>
+                        <p className="font-medium">{alert.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {alert.user} • ${alert.amount.toLocaleString()} • {alert.timestamp}
+                        </p>
                       </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Badge variant={getAlertSeverity(alert.riskScore).color}>
-                          Riesgo {getAlertSeverity(alert.riskScore).label}
-                        </Badge>
-                        <Badge variant={alert.status === 'resolved' ? 'default' : 'secondary'}>
-                          {alert.status}
-                        </Badge>
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4 mr-1" />
-                          Revisar
-                        </Button>
-                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={getSeverityColor(alert.severity)}>
+                        {alert.severity}
+                      </Badge>
+                      <Button variant="outline" size="sm">
+                        <Eye className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 ))}
               </div>
-            </TabsContent>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-            <TabsContent value="kyc" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">1,247</div>
-                      <div className="text-sm text-gray-600">Usuarios Verificados</div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-amber-600">156</div>
-                      <div className="text-sm text-gray-600">Pendientes</div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-red-600">23</div>
-                      <div className="text-sm text-gray-600">Rechazados</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="space-y-3">
-                <h4 className="font-medium">Verificaciones Recientes</h4>
-                <div className="space-y-2">
-                  {[1, 2, 3].map((item) => (
-                    <div key={item} className="flex items-center justify-between p-3 border rounded">
+        <TabsContent value="kyc" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                KYC Verifications
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {kycVerifications.map((kyc) => (
+                  <div key={kyc.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <Shield className="h-5 w-5 text-blue-500" />
                       <div>
-                        <div className="font-medium">Usuario {item}</div>
-                        <div className="text-sm text-gray-500">
-                          Documento: Pasaporte • Nivel: Premium
-                        </div>
+                        <p className="font-medium">{kyc.user}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Level: {kyc.level} • Risk Score: {kyc.riskScore || 'N/A'}
+                        </p>
                       </div>
-                      <Badge variant="default">Verificado</Badge>
                     </div>
-                  ))}
+                    <div className="flex items-center gap-2">
+                      <Badge className={getStatusColor(kyc.status)}>
+                        {kyc.status}
+                      </Badge>
+                      <Button variant="outline" size="sm">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="audit" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Audit Trail
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <Clock className="h-5 w-5 text-blue-500" />
+                    <div>
+                      <p className="font-medium">Payment Method Added</p>
+                      <p className="text-sm text-muted-foreground">
+                        user@example.com • 2024-01-15 14:30:00
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <div>
+                      <p className="font-medium">KYC Verification Completed</p>
+                      <p className="text-sm text-muted-foreground">
+                        another@example.com • 2024-01-15 13:45:00
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    <Eye className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-            </TabsContent>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-            <TabsContent value="audit" className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Registro de Auditoría</h3>
-                <Button variant="outline" size="sm">
-                  Filtrar por Fecha
+        <TabsContent value="reports" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Compliance Reports
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
+                  <FileText className="h-6 w-6 mb-2" />
+                  Monthly AML Report
+                </Button>
+                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
+                  <Shield className="h-6 w-6 mb-2" />
+                  KYC Status Report
+                </Button>
+                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 mb-2" />
+                  Fraud Summary
+                </Button>
+                <Button variant="outline" className="h-24 flex flex-col items-center justify-center">
+                  <TrendingUp className="h-6 w-6 mb-2" />
+                  Risk Assessment
                 </Button>
               </div>
-              
-              <div className="space-y-2">
-                {auditLogs.map((log: any) => (
-                  <div key={log.id} className="flex items-center justify-between p-3 border rounded text-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="font-medium">{log.action.replace('_', ' ').toUpperCase()}</span>
-                      <span className="text-gray-500">Usuario: {log.userId}</span>
-                      {log.amount && <span className="text-gray-500">Monto: ${log.amount}</span>}
-                    </div>
-                    <span className="text-gray-500">
-                      {new Date(log.timestamp).toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="reports" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <FileText className="h-5 w-5 text-blue-600" />
-                      <span className="font-medium">Reporte PCI DSS</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Reporte de compliance PCI DSS trimestral
-                    </p>
-                    <Button size="sm" className="w-full">
-                      <Download className="h-4 w-4 mr-2" />
-                      Descargar PDF
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <TrendingUp className="h-5 w-5 text-green-600" />
-                      <span className="font-medium">Reporte AML</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Actividades de anti-lavado de dinero
-                    </p>
-                    <Button size="sm" className="w-full">
-                      <Download className="h-4 w-4 mr-2" />
-                      Generar Reporte
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <DollarSign className="h-5 w-5 text-purple-600" />
-                      <span className="font-medium">Reporte Fiscal</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Documentos fiscales y 1099 forms
-                    </p>
-                    <Button size="sm" className="w-full">
-                      <Download className="h-4 w-4 mr-2" />
-                      Ver Documentos
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <Shield className="h-5 w-5 text-red-600" />
-                      <span className="font-medium">Reporte de Fraude</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Análisis de detección de fraude mensual
-                    </p>
-                    <Button size="sm" className="w-full">
-                      <Download className="h-4 w-4 mr-2" />
-                      Exportar Datos
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

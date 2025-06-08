@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
+
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ParticipantsService } from '@/services/participants/participantsService';
 
@@ -17,18 +18,38 @@ interface UseAdvancedVideoCall {
   isRecording: boolean;
   transcript: any[];
   medicalNotes: any[];
+  callState: 'idle' | 'connecting' | 'connected' | 'ended';
+  isTranscribing: boolean;
+  localVideoRef: React.RefObject<HTMLVideoElement>;
+  remoteVideoRef: React.RefObject<HTMLVideoElement>;
   fetchParticipants: () => Promise<void>;
   startRecording: () => void;
   stopRecording: () => void;
   addTranscript: (text: string) => void;
   addMedicalNote: (note: string) => void;
+  startCall: () => void;
+  endCall: () => void;
+  toggleVideo: () => void;
+  toggleAudio: () => void;
+  toggleScreenShare: () => void;
+  sendMessage: (message: string) => void;
+  saveMedicalNote: (note: string) => void;
+  takeScreenshot: () => void;
+  startTranscription: () => void;
+  stopTranscription: () => void;
+  loadParticipants: () => Promise<void>;
 }
 
-export const useAdvancedVideoCall = (sessionId: string) => {
+export const useAdvancedVideoCall = (sessionId: string): UseAdvancedVideoCall => {
   const [participants, setParticipants] = useState<any[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState<any[]>([]);
   const [medicalNotes, setMedicalNotes] = useState<any[]>([]);
+  const [callState, setCallState] = useState<'idle' | 'connecting' | 'connected' | 'ended'>('idle');
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
 
   const startRecording = () => {
     setIsRecording(true);
@@ -48,6 +69,50 @@ export const useAdvancedVideoCall = (sessionId: string) => {
     setMedicalNotes(prev => [...prev, { note, timestamp: Date.now() }]);
   };
 
+  const startCall = () => {
+    setCallState('connecting');
+    setTimeout(() => setCallState('connected'), 1000);
+  };
+
+  const endCall = () => {
+    setCallState('ended');
+  };
+
+  const toggleVideo = () => {
+    console.log('Video toggled');
+  };
+
+  const toggleAudio = () => {
+    console.log('Audio toggled');
+  };
+
+  const toggleScreenShare = () => {
+    console.log('Screen share toggled');
+  };
+
+  const sendMessage = (message: string) => {
+    console.log('Message sent:', message);
+  };
+
+  const saveMedicalNote = (note: string) => {
+    addMedicalNote(note);
+    console.log('Medical note saved:', note);
+  };
+
+  const takeScreenshot = () => {
+    console.log('Screenshot taken');
+  };
+
+  const startTranscription = () => {
+    setIsTranscribing(true);
+    console.log('Transcription started');
+  };
+
+  const stopTranscription = () => {
+    setIsTranscribing(false);
+    console.log('Transcription stopped');
+  };
+
   const fetchParticipants = useCallback(async () => {
     try {
       const data = await ParticipantsService.getSessionParticipants(sessionId);
@@ -56,6 +121,8 @@ export const useAdvancedVideoCall = (sessionId: string) => {
       console.error('Error fetching participants:', error);
     }
   }, [sessionId]);
+
+  const loadParticipants = fetchParticipants;
 
   useEffect(() => {
     fetchParticipants();
@@ -107,10 +174,25 @@ export const useAdvancedVideoCall = (sessionId: string) => {
     isRecording,
     transcript,
     medicalNotes,
+    callState,
+    isTranscribing,
+    localVideoRef,
+    remoteVideoRef,
     fetchParticipants,
     startRecording,
     stopRecording,
     addTranscript,
-    addMedicalNote
+    addMedicalNote,
+    startCall,
+    endCall,
+    toggleVideo,
+    toggleAudio,
+    toggleScreenShare,
+    sendMessage,
+    saveMedicalNote,
+    takeScreenshot,
+    startTranscription,
+    stopTranscription,
+    loadParticipants
   };
 };
