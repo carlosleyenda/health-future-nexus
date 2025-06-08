@@ -89,8 +89,9 @@ export default function AppRoutes() {
             <Route path="patients" element={<CompletePatientPortal patientId={user?.id || ''} />} />
             <Route path="schedule" element={<DoctorSchedule doctorId={user?.id || ''} />} />
             
-            {/* Rutas específicas para admin */}
+            {/* Rutas específicas para admin - Fixed routing */}
             <Route path="admin" element={<AdminDashboard />} />
+            <Route path="admin/dashboard" element={<AdminDashboard />} />
             
             {/* Rutas compartidas */}
             <Route path="medical-records" element={

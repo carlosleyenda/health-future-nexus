@@ -55,7 +55,7 @@ export default function MainLayout() {
     if (user.role === 'admin' || user.role === 'coordinator' || user.role === 'delivery_staff' || user.role === 'pharmacist') {
       return [
         ...baseItems,
-        { label: 'Administración', path: '/admin', roles: ['admin'] },
+        { label: 'Panel de Admin', path: '/admin', roles: ['admin'] },
         { label: 'Historial Médico', path: '/medical-records', roles: ['admin'] },
         { label: 'Asistente IA', path: '/ai-assistant', roles: ['admin'] },
         { label: 'Delivery Médico', path: '/delivery', roles: ['admin'] },
@@ -70,7 +70,7 @@ export default function MainLayout() {
   const quickActions = [
     { label: 'Nueva Cita', icon: Plus, action: () => navigate('/appointments'), roles: ['patient'] },
     { label: 'Consulta Virtual', icon: Plus, action: () => navigate('/consultations'), roles: ['doctor'] },
-    { label: 'Nuevo Paciente', icon: Plus, action: () => navigate('/patients'), roles: ['admin'] },
+    { label: 'Panel Admin', icon: Plus, action: () => navigate('/admin'), roles: ['admin'] },
   ];
 
   if (!user) {
