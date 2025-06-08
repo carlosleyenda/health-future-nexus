@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { ReportsGenerator } from '@/components/admin/ReportsGenerator';
 import { DatabaseManagement } from '@/components/admin/DatabaseManagement';
 import AdvancedAnalytics from '@/components/admin/AdvancedAnalytics';
 import SystemMonitoring from '@/components/admin/SystemMonitoring';
-import { ExecutiveDashboard } from '@/components/analytics/ExecutiveDashboard';
+import ExecutiveDashboard from '@/components/analytics/ExecutiveDashboard';
 import GlobalHealthcareDashboard from '@/components/global-marketplace/GlobalHealthcareDashboard';
 import AutomationDashboard from '@/components/automation/AutomationDashboard';
 import QualityAssuranceDashboard from '@/components/testing/QualityAssuranceDashboard';
@@ -78,9 +79,9 @@ export default function AdminDashboard() {
       case 'qa':
         return <QualityAssuranceDashboard />;
       case 'compliance':
-        return <ComplianceDashboard />;
+        return <ComplianceDashboard organizationId="org-1" />;
       case 'iot':
-        return <IoTDashboard />;
+        return <IoTDashboard patientId="patient-1" />;
       default:
         return (
           <div className="space-y-6">
