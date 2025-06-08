@@ -1,118 +1,65 @@
 
 import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
 import { useAuthStore } from '@/store/auth';
 import { useRealtime } from '@/services/realtime';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import MainHeader from './MainHeader';
-import MobileNavigation from './MobileNavigation';
+import { Outlet } from 'react-router-dom';
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { AppSidebar } from './AppSidebar';
 import ConnectionStatus from './ConnectionStatus';
+import { Separator } from '@/components/ui/separator';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 
 export default function MainLayout() {
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { user } = useAuthStore();
-  const navigate = useNavigate();
-  const location = useLocation();
   
   // Conectar al servicio de tiempo real
   useRealtime(user?.id || '');
-
-  const getNavigationItems = () => {
-    if (!user) return [];
-    
-    const baseItems = [
-      { label: 'Dashboard', path: '/', roles: ['patient', 'doctor', 'admin'] },
-    ];
-    
-    if (user.role === 'patient') {
-      return [
-        ...baseItems,
-        { label: 'Citas', path: '/appointments', roles: ['patient'] },
-        { label: 'Consultas', path: '/consultations', roles: ['patient'] },
-        { label: 'Salud', path: '/health', roles: ['patient'] },
-        { label: 'Farmacia', path: '/pharmacy', roles: ['patient'] },
-        { label: 'Historial Médico', path: '/medical-records', roles: ['patient'] },
-        { label: 'Asistente IA', path: '/ai-assistant', roles: ['patient'] },
-        { label: 'Delivery Médico', path: '/delivery', roles: ['patient'] },
-        { label: 'Pagos', path: '/payments', roles: ['patient'] },
-      ];
-    }
-    
-    if (user.role === 'doctor' || user.role === 'specialist') {
-      return [
-        ...baseItems,
-        { label: 'Pacientes', path: '/patients', roles: ['doctor'] },
-        { label: 'Agenda', path: '/schedule', roles: ['doctor'] },
-        { label: 'Consultas', path: '/consultations', roles: ['doctor'] },
-        { label: 'Historial Médico', path: '/medical-records', roles: ['doctor'] },
-        { label: 'Asistente IA', path: '/ai-assistant', roles: ['doctor'] },
-        { label: 'Delivery Médico', path: '/delivery', roles: ['doctor'] },
-      ];
-    }
-    
-    if (user.role === 'admin' || user.role === 'coordinator' || user.role === 'delivery_staff' || user.role === 'pharmacist') {
-      return [
-        ...baseItems,
-        { label: 'Panel de Admin', path: '/admin', roles: ['admin'] },
-        { label: 'Historial Médico', path: '/medical-records', roles: ['admin'] },
-        { label: 'Asistente IA', path: '/ai-assistant', roles: ['admin'] },
-        { label: 'Delivery Médico', path: '/delivery', roles: ['admin'] },
-      ];
-    }
-    
-    return baseItems;
-  };
-
-  const navigationItems = getNavigationItems();
-
-  const quickActions = [
-    { label: 'Nueva Cita', icon: Plus, action: () => navigate('/appointments'), roles: ['patient'] },
-    { label: 'Consulta Virtual', icon: Plus, action: () => navigate('/consultations'), roles: ['doctor'] },
-    { label: 'Panel Admin', icon: Plus, action: () => navigate('/admin'), roles: ['admin'] },
-  ];
 
   if (!user) {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <MainHeader
-        showNotifications={showNotifications}
-        setShowNotifications={setShowNotifications}
-        showMobileMenu={showMobileMenu}
-        setShowMobileMenu={setShowMobileMenu}
-        navigationItems={navigationItems}
-        quickActions={quickActions}
-      />
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AppSidebar />
+        <SidebarInset>
+          {/* Header simplificado */}
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="/">
+                    Clínica Virtual
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </header>
 
-      <MobileNavigation
-        showMobileMenu={showMobileMenu}
-        setShowMobileMenu={setShowMobileMenu}
-        navigationItems={navigationItems}
-      />
+          {/* Contenido principal */}
+          <main className="flex-1 p-6" role="main" aria-label="Contenido principal">
+            <Outlet />
+          </main>
+        </SidebarInset>
 
-      {/* Contenido principal con mejor responsive */}
-      <main 
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
-        role="main"
-        aria-label="Contenido principal"
-      >
-        <div className="min-h-screen">
-          <Outlet />
-        </div>
-      </main>
+        {/* Centro de notificaciones */}
+        <NotificationCenter
+          userId={user.id}
+          isOpen={showNotifications}
+          onClose={() => setShowNotifications(false)}
+        />
 
-      {/* Centro de notificaciones */}
-      <NotificationCenter
-        userId={user.id}
-        isOpen={showNotifications}
-        onClose={() => setShowNotifications(false)}
-      />
-
-      <ConnectionStatus />
-    </div>
+        <ConnectionStatus />
+      </div>
+    </SidebarProvider>
   );
 }
