@@ -1,176 +1,405 @@
 
 import React, { useState } from 'react';
-import { Calendar, Clock, User, CreditCard } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { Calendar, Clock, User, Check, CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAllDoctors, useDoctorsBySpecialty } from '@/hooks/useDoctor';
-import { useAvailableSlots, useCreateAppointment } from '@/hooks/useAppointments';
-import { useCreatePaymentIntent } from '@/hooks/usePayments';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import type { Specialty } from '@/types';
 
-interface AppointmentBookingProps {
-  patientId: string;
+const appointmentSchema = z.object({
+  specialty: z.string().min(1, 'Selecciona una especialidad'),
+  doctorId: z.string().min(1, 'Selecciona un doctor'),
+  date: z.date({
+    required_error: 'Selecciona una fecha',
+  }),
+  time: z.string().min(1, 'Selecciona una hora'),
+  reason: z.string().min(10, 'Describe el motivo de la consulta (mínimo 10 caracteres)'),
+  patientName: z.string().min(2, 'Nombre requerido'),
+  patientPhone: z.string().min(10, 'Teléfono válido requerido'),
+  patientEmail: z.string().email('Email válido requerido'),
+});
+
+type AppointmentFormData = z.infer<typeof appointmentSchema>;
+
+interface Doctor {
+  id: string;
+  name: string;
+  specialty: Specialty;
+  consultationFee: number;
+  availability: string[];
 }
 
-export default function AppointmentBooking({ patientId }: AppointmentBookingProps) {
-  const [selectedSpecialty, setSelectedSpecialty] = useState('');
-  const [selectedDoctor, setSelectedDoctor] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
-  const [reason, setReason] = useState('');
+const mockDoctors: Doctor[] = [
+  {
+    id: '1',
+    name: 'Dr. María González',
+    specialty: 'general_medicine',
+    consultationFee: 800,
+    availability: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00']
+  },
+  {
+    id: '2',
+    name: 'Dr. Carlos Hernández',
+    specialty: 'cardiology',
+    consultationFee: 1200,
+    availability: ['08:00', '09:00', '10:00', '14:00', '15:00']
+  },
+  {
+    id: '3',
+    name: 'Dra. Ana Martínez',
+    specialty: 'dermatology',
+    consultationFee: 1000,
+    availability: ['09:00', '11:00', '12:00', '15:00', '16:00', '17:00']
+  },
+  {
+    id: '4',
+    name: 'Dr. Luis Rodríguez',
+    specialty: 'pediatrics',
+    consultationFee: 900,
+    availability: ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00']
+  },
+];
 
-  const { data: allDoctors } = useAllDoctors();
-  const { data: specialtyDoctors } = useDoctorsBySpecialty(selectedSpecialty);
-  const { data: availableSlots } = useAvailableSlots(selectedDoctor, selectedDate);
-  const createAppointment = useCreateAppointment();
-  const createPaymentIntent = useCreatePaymentIntent();
+const specialties: { value: Specialty; label: string }[] = [
+  { value: 'general_medicine', label: 'Medicina General' },
+  { value: 'cardiology', label: 'Cardiología' },
+  { value: 'dermatology', label: 'Dermatología' },
+  { value: 'endocrinology', label: 'Endocrinología' },
+  { value: 'gynecology', label: 'Ginecología' },
+  { value: 'neurology', label: 'Neurología' },
+  { value: 'pediatrics', label: 'Pediatría' },
+  { value: 'psychiatry', label: 'Psiquiatría' },
+];
 
-  const specialties = [
-    'general_medicine', 'cardiology', 'dermatology', 'endocrinology',
-    'gynecology', 'neurology', 'pediatrics', 'psychiatry'
-  ];
+interface AppointmentBookingProps {
+  onClose?: () => void;
+}
 
-  const handleBookAppointment = async () => {
-    if (!selectedDoctor || !selectedDate || !selectedTime || !reason) {
-      toast.error('Por favor completa todos los campos');
-      return;
-    }
+export default function AppointmentBooking({ onClose }: AppointmentBookingProps) {
+  const [step, setStep] = useState<'form' | 'confirmation'>('form');
+  const [confirmedAppointment, setConfirmedAppointment] = useState<any>(null);
 
+  const form = useForm<AppointmentFormData>({
+    resolver: zodResolver(appointmentSchema),
+    defaultValues: {
+      specialty: '',
+      doctorId: '',
+      reason: '',
+      patientName: '',
+      patientPhone: '',
+      patientEmail: '',
+    },
+  });
+
+  const selectedSpecialty = form.watch('specialty');
+  const selectedDoctorId = form.watch('doctorId');
+  const selectedDate = form.watch('date');
+
+  const availableDoctors = mockDoctors.filter(
+    doctor => doctor.specialty === selectedSpecialty
+  );
+
+  const selectedDoctor = mockDoctors.find(doctor => doctor.id === selectedDoctorId);
+
+  const onSubmit = (data: AppointmentFormData) => {
     try {
-      const appointmentDate = new Date(`${selectedDate}T${selectedTime}:00`).toISOString();
-      
-      const appointmentData = {
-        patientId,
-        doctorId: selectedDoctor,
-        appointmentDate,
-        duration: 30,
-        type: 'virtual' as const,
-        status: 'scheduled' as const,
-        reason,
-        totalCost: 800
+      const appointment = {
+        id: Date.now().toString(),
+        ...data,
+        doctor: selectedDoctor,
+        status: 'scheduled',
+        createdAt: new Date().toISOString(),
       };
 
-      const appointment = await createAppointment.mutateAsync(appointmentData);
-      
-      // Crear intención de pago
-      await createPaymentIntent.mutateAsync({
-        amount: appointment.totalCost,
-        appointmentId: appointment.id
-      });
+      // Guardar en localStorage
+      const existingAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+      existingAppointments.push(appointment);
+      localStorage.setItem('appointments', JSON.stringify(existingAppointments));
 
-      toast.success('Cita agendada correctamente');
+      setConfirmedAppointment(appointment);
+      setStep('confirmation');
+      toast.success('¡Cita agendada exitosamente!');
     } catch (error) {
       toast.error('Error al agendar la cita');
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Agendar Nueva Cita
-          </CardTitle>
+  if (step === 'confirmation') {
+    return (
+      <Card className="max-w-md mx-auto">
+        <CardHeader className="text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Check className="h-8 w-8 text-green-600" />
+          </div>
+          <CardTitle className="text-green-700">¡Cita Confirmada!</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Selección de especialidad */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Especialidad</label>
-            <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona una especialidad" />
-              </SelectTrigger>
-              <SelectContent>
-                {specialties.map((specialty) => (
-                  <SelectItem key={specialty} value={specialty}>
-                    {specialty.replace('_', ' ').toUpperCase()}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <CardContent className="space-y-4 text-center">
+          <div className="space-y-2">
+            <p><strong>Doctor:</strong> {confirmedAppointment?.doctor?.name}</p>
+            <p><strong>Fecha:</strong> {confirmedAppointment?.date && format(confirmedAppointment.date, 'dd/MM/yyyy', { locale: es })}</p>
+            <p><strong>Hora:</strong> {confirmedAppointment?.time}</p>
+            <p><strong>Costo:</strong> ${confirmedAppointment?.doctor?.consultationFee} MXN</p>
           </div>
-
-          {/* Selección de médico */}
-          {selectedSpecialty && (
-            <div>
-              <label className="block text-sm font-medium mb-2">Médico</label>
-              <Select value={selectedDoctor} onValueChange={setSelectedDoctor}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona un médico" />
-                </SelectTrigger>
-                <SelectContent>
-                  {specialtyDoctors?.map((doctor) => (
-                    <SelectItem key={doctor.id} value={doctor.id}>
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        Dr. {doctor.firstName} {doctor.lastName} - ${doctor.consultationFee}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {/* Selección de fecha */}
-          {selectedDoctor && (
-            <div>
-              <label className="block text-sm font-medium mb-2">Fecha</label>
-              <input
-                type="date"
-                className="w-full p-2 border rounded-md"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-              />
-            </div>
-          )}
-
-          {/* Selección de hora */}
-          {selectedDate && availableSlots && (
-            <div>
-              <label className="block text-sm font-medium mb-2">Hora Disponible</label>
-              <div className="grid grid-cols-4 gap-2">
-                {availableSlots.map((slot) => (
-                  <Button
-                    key={slot}
-                    variant={selectedTime === slot ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedTime(slot)}
-                    className="flex items-center gap-1"
-                  >
-                    <Clock className="h-3 w-3" />
-                    {slot}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Motivo de consulta */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Motivo de la consulta</label>
-            <textarea
-              className="w-full p-2 border rounded-md"
-              rows={3}
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="Describe brevemente el motivo de tu consulta..."
-            />
+          <div className="pt-4 space-y-2">
+            <Button onClick={() => {
+              setStep('form');
+              form.reset();
+              setConfirmedAppointment(null);
+            }} variant="outline" className="w-full">
+              Agendar Otra Cita
+            </Button>
+            {onClose && (
+              <Button onClick={onClose} className="w-full">
+                Cerrar
+              </Button>
+            )}
           </div>
-
-          <Button 
-            onClick={handleBookAppointment}
-            disabled={!selectedDoctor || !selectedDate || !selectedTime || !reason}
-            className="w-full flex items-center gap-2"
-          >
-            <CreditCard className="h-4 w-4" />
-            Agendar Cita - $800 MXN
-          </Button>
         </CardContent>
       </Card>
-    </div>
+    );
+  }
+
+  return (
+    <Card className="max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Calendar className="h-5 w-5" />
+          Agendar Nueva Cita
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Información del Paciente */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Información del Paciente</h3>
+                
+                <FormField
+                  control={form.control}
+                  name="patientName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre Completo</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Tu nombre completo" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="patientPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Teléfono</FormLabel>
+                      <FormControl>
+                        <Input placeholder="55 1234 5678" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="patientEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="tu@email.com" type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Información de la Cita */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Detalles de la Cita</h3>
+                
+                <FormField
+                  control={form.control}
+                  name="specialty"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Especialidad</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona una especialidad" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {specialties.map((specialty) => (
+                            <SelectItem key={specialty.value} value={specialty.value}>
+                              {specialty.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {selectedSpecialty && (
+                  <FormField
+                    control={form.control}
+                    name="doctorId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Doctor</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona un doctor" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {availableDoctors.map((doctor) => (
+                              <SelectItem key={doctor.id} value={doctor.id}>
+                                <div className="flex items-center gap-2">
+                                  <User className="h-4 w-4" />
+                                  {doctor.name} - ${doctor.consultationFee}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {selectedDoctorId && (
+                  <FormField
+                    control={form.control}
+                    name="date"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Fecha</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP", { locale: es })
+                                ) : (
+                                  <span>Selecciona una fecha</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) =>
+                                date < new Date() || date.getDay() === 0
+                              }
+                              initialFocus
+                              className="p-3 pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {selectedDate && selectedDoctor && (
+                  <FormField
+                    control={form.control}
+                    name="time"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Hora Disponible</FormLabel>
+                        <div className="grid grid-cols-3 gap-2">
+                          {selectedDoctor.availability.map((time) => (
+                            <Button
+                              key={time}
+                              type="button"
+                              variant={field.value === time ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => field.onChange(time)}
+                              className="flex items-center gap-1"
+                            >
+                              <Clock className="h-3 w-3" />
+                              {time}
+                            </Button>
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+            </div>
+
+            <FormField
+              control={form.control}
+              name="reason"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Motivo de la consulta</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Describe brevemente el motivo de tu consulta..."
+                      className="min-h-[100px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex gap-4">
+              {onClose && (
+                <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+                  Cancelar
+                </Button>
+              )}
+              <Button 
+                type="submit" 
+                className="flex-1"
+                disabled={!form.formState.isValid}
+              >
+                Confirmar Cita
+                {selectedDoctor && ` - $${selectedDoctor.consultationFee} MXN`}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
