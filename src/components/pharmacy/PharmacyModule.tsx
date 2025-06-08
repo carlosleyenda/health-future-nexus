@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Search, FileText, ShoppingCart, History } from 'lucide-react';
+import { Search, FileText, ShoppingCart as ShoppingCartIcon, History } from 'lucide-react';
 import MedicationSearch from './MedicationSearch';
 import PrescriptionView from './PrescriptionView';
 import ShoppingCart from './ShoppingCart';
@@ -99,7 +99,7 @@ export default function PharmacyModule() {
             Recetas
           </TabsTrigger>
           <TabsTrigger value="cart" className="flex items-center gap-2">
-            <ShoppingCart className="w-4 h-4" />
+            <ShoppingCartIcon className="w-4 h-4" />
             Carrito
             {cartItems.length > 0 && (
               <Badge variant="destructive" className="ml-1">

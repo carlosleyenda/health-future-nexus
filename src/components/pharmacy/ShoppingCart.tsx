@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, Plus, Minus, Trash2, AlertCircle } from 'lucide-react';
+import { ShoppingCart as ShoppingCartIcon, Plus, Minus, Trash2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import type { CartItem } from '@/types/pharmacy';
 
@@ -47,7 +47,7 @@ export default function ShoppingCart({ items, onUpdateQuantity, onRemoveItem, on
     return (
       <Card>
         <CardContent className="text-center py-8">
-          <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <ShoppingCartIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600">Tu carrito está vacío</p>
           <p className="text-sm text-gray-500 mt-2">
             Agrega medicamentos para continuar
@@ -61,7 +61,7 @@ export default function ShoppingCart({ items, onUpdateQuantity, onRemoveItem, on
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5" />
+          <ShoppingCartIcon className="w-5 h-5" />
           Carrito de Compras ({items.length} {items.length === 1 ? 'artículo' : 'artículos'})
         </CardTitle>
       </CardHeader>

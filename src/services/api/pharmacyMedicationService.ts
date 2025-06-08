@@ -132,6 +132,7 @@ export class PharmacyMedicationService {
         totalAmount: 91.00,
         status: 'delivered',
         orderDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        prescriptionRequired: false,
         pharmacyId: 'pharmacy-1'
       }
     ];

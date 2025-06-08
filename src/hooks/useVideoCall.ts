@@ -9,6 +9,7 @@ interface VideoCallState {
   isScreenSharing: boolean;
   isRecording: boolean;
   participants: Array<{ id: string; name: string; isVideoEnabled: boolean; isAudioEnabled: boolean }>;
+  messages: Array<{ id: string; sender: string; message: string; timestamp: string }>;
 }
 
 export const useVideoCall = (appointmentId: string) => {
@@ -19,6 +20,7 @@ export const useVideoCall = (appointmentId: string) => {
     isScreenSharing: false,
     isRecording: false,
     participants: [],
+    messages: [],
   });
 
   const toggleVideo = () => {
@@ -51,6 +53,23 @@ export const useVideoCall = (appointmentId: string) => {
     toast.success('Conectado a la llamada');
   };
 
+  const startCall = () => {
+    joinCall();
+  };
+
+  const sendMessage = (message: string) => {
+    const newMessage = {
+      id: crypto.randomUUID(),
+      sender: 'Usuario',
+      message,
+      timestamp: new Date().toISOString(),
+    };
+    setCallState(prev => ({
+      ...prev,
+      messages: [...prev.messages, newMessage],
+    }));
+  };
+
   return {
     callState,
     toggleVideo,
@@ -59,5 +78,7 @@ export const useVideoCall = (appointmentId: string) => {
     toggleRecording,
     endCall,
     joinCall,
+    startCall,
+    sendMessage,
   };
 };
