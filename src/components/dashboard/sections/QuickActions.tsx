@@ -1,26 +1,26 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Video, Calendar, FileText, Pill } from "lucide-react";
+import { Video, Calendar, FileText, Phone } from "lucide-react";
 
 export default function QuickActions() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
+      <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2 hover:bg-blue-50">
         <Video className="h-6 w-6 text-blue-600" />
-        <span className="text-sm">Consulta Virtual</span>
+        <span className="text-sm font-medium">Consulta Virtual</span>
       </Button>
-      <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
+      <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2 hover:bg-green-50">
         <Calendar className="h-6 w-6 text-green-600" />
-        <span className="text-sm">Agendar Cita</span>
+        <span className="text-sm font-medium">Agendar Cita</span>
       </Button>
-      <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
+      <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2 hover:bg-purple-50">
         <FileText className="h-6 w-6 text-purple-600" />
-        <span className="text-sm">Ver Historial</span>
+        <span className="text-sm font-medium">Ver Historial</span>
       </Button>
-      <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2">
-        <Pill className="h-6 w-6 text-red-600" />
-        <span className="text-sm">Medicamentos</span>
+      <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2 hover:bg-red-50">
+        <Phone className="h-6 w-6 text-red-600" />
+        <span className="text-sm font-medium">Emergencia</span>
       </Button>
     </div>
   );

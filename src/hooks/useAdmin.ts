@@ -1,25 +1,25 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { AdminService } from '@/services/api/adminService';
+import { AdminService } from '@/services/api';
 
 export const useAdminAnalytics = () => {
   return useQuery({
     queryKey: ['admin-analytics'],
-    queryFn: AdminService.getAnalytics,
+    queryFn: () => AdminService.getAnalytics(),
   });
 };
 
 export const useSystemHealth = () => {
   return useQuery({
     queryKey: ['system-health'],
-    queryFn: AdminService.getSystemHealth,
-    refetchInterval: 30000, // Refresh every 30 seconds
+    queryFn: () => AdminService.getSystemHealth(),
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 };
 
-export const useUserManagement = () => {
+export const useAllUsers = () => {
   return useQuery({
-    queryKey: ['user-management'],
-    queryFn: AdminService.getAllUsers,
+    queryKey: ['all-users'],
+    queryFn: () => AdminService.getAllUsers(),
   });
 };

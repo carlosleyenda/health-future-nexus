@@ -52,7 +52,9 @@ export class DeliveryService {
         serviceType: 'home_consultation',
         status: 'scheduled',
         scheduledDate: '2024-06-10',
-        doctor: 'Dr. María García'
+        doctor: 'Dr. María García',
+        deliveryAddress: 'Calle Principal 123, Ciudad',
+        estimatedArrival: '10:00 AM'
       },
       {
         id: '2',
@@ -60,7 +62,9 @@ export class DeliveryService {
         serviceType: 'lab_collection',
         status: 'pending',
         scheduledDate: '2024-06-08',
-        service: 'Análisis de sangre'
+        service: 'Análisis de sangre',
+        deliveryAddress: 'Calle Principal 123, Ciudad',
+        estimatedArrival: '2:00 PM'
       }
     ];
   }
@@ -75,7 +79,9 @@ export class DeliveryService {
       status: 'requested',
       scheduledDate: request.scheduledDate,
       address: request.address,
-      notes: request.notes
+      notes: request.notes,
+      deliveryAddress: request.address,
+      estimatedArrival: '30 minutos'
     };
   }
 
@@ -90,7 +96,9 @@ export class DeliveryService {
       driver: {
         name: 'Carlos Rodríguez',
         phone: '+52 555 123 4567'
-      }
+      },
+      driverName: 'Carlos Rodríguez',
+      driverPhone: '+52 555 123 4567'
     };
   }
 }

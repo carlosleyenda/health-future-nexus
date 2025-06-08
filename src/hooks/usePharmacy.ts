@@ -1,19 +1,20 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PharmacyService } from '@/services/api/pharmacyService';
+import { PharmacyService } from '@/services/api';
+import { toast } from 'sonner';
 
-export const usePharmacyNetwork = () => {
+export const useNearbyPharmacies = () => {
   return useQuery({
-    queryKey: ['pharmacy-network'],
-    queryFn: PharmacyService.getNearbyPharmacies,
+    queryKey: ['nearby-pharmacies'],
+    queryFn: () => PharmacyService.getNearbyPharmacies(),
   });
 };
 
-export const usePharmacySearch = (searchTerm: string) => {
+export const useSearchPharmacies = (searchTerm: string) => {
   return useQuery({
-    queryKey: ['pharmacy-search', searchTerm],
+    queryKey: ['search-pharmacies', searchTerm],
     queryFn: () => PharmacyService.searchPharmacies(searchTerm),
-    enabled: !!searchTerm && searchTerm.length > 2,
+    enabled: searchTerm.length > 0,
   });
 };
 
@@ -24,7 +25,11 @@ export const useSendPrescription = () => {
     mutationFn: ({ prescriptionId, pharmacyId }: { prescriptionId: string; pharmacyId: string }) =>
       PharmacyService.sendPrescriptionToPharmacy(prescriptionId, pharmacyId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['prescriptions'] });
+      queryClient.invalidateQueries({ queryKey: ['nearby-pharmacies'] });
+      toast.success('Receta enviada exitosamente');
+    },
+    onError: () => {
+      toast.error('Error al enviar la receta');
     },
   });
 };
