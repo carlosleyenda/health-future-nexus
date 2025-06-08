@@ -1,12 +1,12 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { DeliveryService } from '@/services/api';
+import { DeliveryService, type DeliveryRequest } from '@/services/api/deliveryService';
 import { toast } from 'sonner';
 
 export const useDeliveryServices = (patientId: string) => {
   return useQuery({
     queryKey: ['delivery-services', patientId],
-    queryFn: () => DeliveryService.getPatientDeliveries(patientId),
+    queryFn: () => DeliveryService.getDeliveryServices(patientId),
     enabled: !!patientId,
   });
 };
@@ -15,29 +15,13 @@ export const useRequestDelivery = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: DeliveryService.requestService,
-    onSuccess: (newService) => {
-      queryClient.invalidateQueries({ queryKey: ['delivery-services', newService.patientId] });
+    mutationFn: (request: DeliveryRequest) => DeliveryService.requestDelivery(request),
+    onSuccess: (newDelivery) => {
+      queryClient.invalidateQueries({ queryKey: ['delivery-services', newDelivery.patientId] });
       toast.success('Servicio solicitado correctamente');
     },
     onError: () => {
       toast.error('Error al solicitar el servicio');
-    },
-  });
-};
-
-export const useUpdateDeliveryStatus = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: ({ deliveryId, status, location }: { 
-      deliveryId: string; 
-      status: string; 
-      location?: { lat: number; lng: number } 
-    }) => DeliveryService.updateStatus(deliveryId, status, location),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['delivery-services'] });
-      toast.success('Estado actualizado');
     },
   });
 };
@@ -47,6 +31,6 @@ export const useDeliveryTracking = (deliveryId: string) => {
     queryKey: ['delivery-tracking', deliveryId],
     queryFn: () => DeliveryService.getDeliveryTracking(deliveryId),
     enabled: !!deliveryId,
-    refetchInterval: 30000, // Actualizar cada 30 segundos
+    refetchInterval: 30000,
   });
 };

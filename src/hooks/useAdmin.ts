@@ -1,56 +1,41 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AdminService } from '@/services/api';
+import { AdminService } from '@/services/api/adminService';
 import { toast } from 'sonner';
 
-export const useAdminAnalytics = (timeRange: string) => {
+export const useAdminStats = () => {
   return useQuery({
-    queryKey: ['admin-analytics', timeRange],
-    queryFn: () => AdminService.getAnalytics(timeRange),
+    queryKey: ['admin-stats'],
+    queryFn: () => AdminService.getDashboardStats(),
   });
 };
 
-export const useSystemHealth = () => {
+export const useRevenueAnalytics = (period: string) => {
   return useQuery({
-    queryKey: ['system-health'],
-    queryFn: () => AdminService.getSystemHealth(),
-    refetchInterval: 30000, // Actualizar cada 30 segundos
+    queryKey: ['revenue-analytics', period],
+    queryFn: () => AdminService.getRevenueAnalytics(period),
   });
 };
 
 export const useUserManagement = () => {
-  const queryClient = useQueryClient();
-
-  const activateUser = useMutation({
-    mutationFn: ({ userId, isActive }: { userId: string; isActive: boolean }) =>
-      AdminService.setUserStatus(userId, isActive),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast.success('Estado del usuario actualizado');
-    },
+  return useQuery({
+    queryKey: ['user-management'],
+    queryFn: () => AdminService.getUserManagement(),
   });
-
-  const deleteUser = useMutation({
-    mutationFn: (userId: string) => AdminService.deleteUser(userId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast.success('Usuario eliminado');
-    },
-  });
-
-  return { activateUser, deleteUser };
 };
 
-export const useAdminReports = () => {
+export const useUpdateUserStatus = () => {
+  const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: ({ reportType, startDate, endDate, format }: {
-      reportType: string;
-      startDate: string;
-      endDate: string;
-      format: 'json' | 'csv' | 'pdf';
-    }) => AdminService.generateReport(reportType, startDate, endDate, format),
+    mutationFn: ({ userId, status }: { userId: string; status: 'active' | 'suspended' }) =>
+      AdminService.updateUserStatus(userId, status),
     onSuccess: () => {
-      toast.success('Reporte generado correctamente');
+      queryClient.invalidateQueries({ queryKey: ['user-management'] });
+      toast.success('Estado de usuario actualizado');
+    },
+    onError: () => {
+      toast.error('Error al actualizar el estado');
     },
   });
 };

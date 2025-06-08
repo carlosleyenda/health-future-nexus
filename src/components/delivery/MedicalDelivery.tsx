@@ -53,9 +53,9 @@ export default function MedicalDelivery({ patientId }: MedicalDeliveryProps) {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Servicios a Domicilio</h2>
-          <p className="text-gray-600">Consultas, medicamentos y servicios médicos</p>
+          <p className="text-muted-foreground">Consultas, medicamentos y servicios médicos</p>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700">
+        <Button>
           <Plus className="h-4 w-4 mr-2" />
           Solicitar Servicio
         </Button>
@@ -71,7 +71,7 @@ export default function MedicalDelivery({ patientId }: MedicalDeliveryProps) {
               </div>
               <div>
                 <h3 className="font-semibold">Medicamentos</h3>
-                <p className="text-sm text-gray-600">Entrega a domicilio</p>
+                <p className="text-sm text-muted-foreground">Entrega a domicilio</p>
               </div>
             </div>
             <Button 
@@ -141,7 +141,7 @@ export default function MedicalDelivery({ patientId }: MedicalDeliveryProps) {
               {deliveries.map((delivery) => (
                 <div 
                   key={delivery.id} 
-                  className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                  className="border rounded-lg p-4 hover:bg-muted/50 cursor-pointer"
                   onClick={() => setSelectedDelivery(delivery.id)}
                 >
                   <div className="flex justify-between items-start mb-3">
@@ -149,14 +149,14 @@ export default function MedicalDelivery({ patientId }: MedicalDeliveryProps) {
                       <h4 className="font-semibold capitalize">
                         {delivery.serviceType.replace('_', ' ')}
                       </h4>
-                      <p className="text-sm text-gray-600">{delivery.deliveryAddress}</p>
+                      <p className="text-sm text-muted-foreground">{delivery.deliveryAddress}</p>
                     </div>
                     <Badge variant={getStatusColor(delivery.status)}>
                       {getStatusText(delivery.status)}
                     </Badge>
                   </div>
                   
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center text-sm text-muted-foreground">
                     <Clock className="h-4 w-4 mr-1" />
                     Llegada estimada: {new Date(delivery.estimatedArrival).toLocaleTimeString('es-MX', {
                       hour: '2-digit',
@@ -177,9 +177,9 @@ export default function MedicalDelivery({ patientId }: MedicalDeliveryProps) {
             </div>
           ) : (
             <div className="text-center py-8">
-              <Truck className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Sin servicios activos</h3>
-              <p className="text-gray-500">Solicita un servicio a domicilio cuando lo necesites</p>
+              <Truck className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Sin servicios activos</h3>
+              <p className="text-muted-foreground">Solicita un servicio a domicilio cuando lo necesites</p>
             </div>
           )}
         </CardContent>
