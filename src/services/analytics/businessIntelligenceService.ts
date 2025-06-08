@@ -11,7 +11,7 @@ import type {
 export class BusinessIntelligenceService {
   private apiKey: string;
 
-  constructor(apiKey: string = process.env.BI_API_KEY || '') {
+  constructor(apiKey: string = '') {
     this.apiKey = apiKey;
   }
 
@@ -19,20 +19,77 @@ export class BusinessIntelligenceService {
     organizationId: string, 
     period: string
   ): Promise<ExecutiveDashboard> {
-    const response = await fetch('/api/analytics/executive-dashboard', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`
+    // Mock data for development - replace with actual API call when backend is ready
+    const mockDashboard: ExecutiveDashboard = {
+      id: 'exec-dashboard-1',
+      organizationId,
+      period: period as any,
+      metrics: {
+        revenue: {
+          total: 125000,
+          growth: 15.2,
+          currency: 'USD',
+          breakdown: [
+            { category: 'consultations', amount: 75000, percentage: 60, growth: 12 },
+            { category: 'pharmacy', amount: 30000, percentage: 24, growth: 18 },
+            { category: 'delivery', amount: 15000, percentage: 12, growth: 25 },
+            { category: 'subscriptions', amount: 5000, percentage: 4, growth: 5 }
+          ]
+        },
+        patients: {
+          total: 1250,
+          newPatients: 85,
+          retention: 92,
+          satisfaction: 4.6
+        },
+        operations: {
+          consultations: 450,
+          appointments: 380,
+          cancellationRate: 8.5,
+          averageWaitTime: 12
+        },
+        financial: {
+          profitMargin: 35.5,
+          costPerAcquisition: 45,
+          lifetimeValue: 850,
+          cashFlow: 95000
+        }
       },
-      body: JSON.stringify({ organizationId, period })
-    });
+      trends: [
+        {
+          metric: 'Ingresos Mensuales',
+          current: 125000,
+          previous: 108500,
+          trend: 'up',
+          forecast: [130000, 135000, 140000],
+          confidence: 0.85
+        },
+        {
+          metric: 'Nuevos Pacientes',
+          current: 85,
+          previous: 72,
+          trend: 'up',
+          forecast: [90, 95, 100],
+          confidence: 0.78
+        }
+      ],
+      alerts: [
+        {
+          id: 'alert-1',
+          type: 'operational',
+          severity: 'medium',
+          message: 'Tiempo de espera promedio aumentó 15%',
+          recommendation: 'Considerar agregar más personal médico en horarios pico',
+          createdAt: new Date().toISOString(),
+          resolved: false
+        }
+      ],
+      generatedAt: new Date().toISOString()
+    };
 
-    if (!response.ok) {
-      throw new Error(`BI API error: ${response.status}`);
-    }
-
-    return response.json();
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return mockDashboard;
   }
 
   async generateRegulatoryReport(
