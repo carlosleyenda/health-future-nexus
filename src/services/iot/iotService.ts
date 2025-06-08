@@ -1,16 +1,13 @@
-
+import { delay } from '@/lib/delay';
 import type { 
-  IoTMedicalDevice, 
-  HealthAnalytics, 
-  ClinicalIntegration,
-  DeviceMetric,
-  DeviceAlert
+  IoTDevice,
+  DeviceReading,
+  DeviceAlert,
+  DeviceMetric
 } from '@/types/iot';
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 export class IoTService {
-  static async getConnectedDevices(patientId: string): Promise<IoTMedicalDevice[]> {
+  static async getConnectedDevices(patientId: string): Promise<IoTDevice[]> {
     await delay(400);
     
     return [
@@ -367,6 +364,36 @@ export class IoTService {
       actionRequired: prediction.action,
       escalationLevel: 2
     };
+  }
+
+  static async createAlert(deviceId: string, type: string, message: string, severity: 'low' | 'medium' | 'high' | 'critical'): Promise<DeviceAlert> {
+    await delay(200);
+    
+    return {
+      id: `alert-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      type,
+      severity,
+      message,
+      deviceId,
+      isResolved: false
+    };
+  }
+
+  static async getEmergencyAlerts(): Promise<DeviceAlert[]> {
+    await delay(300);
+    
+    return [
+      {
+        id: 'emergency-1',
+        timestamp: new Date(Date.now() - 300000).toISOString(),
+        type: 'cardiac_emergency',
+        severity: 'critical' as const,
+        message: 'Arritmia detectada - Paciente ID: P-12345',
+        deviceId: 'ecg-monitor-001',
+        isResolved: false
+      }
+    ];
   }
 }
 

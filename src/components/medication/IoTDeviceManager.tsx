@@ -23,7 +23,12 @@ import {
   Heart,
   TrendingUp,
   Calendar,
-  Clock
+  Clock,
+  Signal,
+  MapPin,
+  Volume2,
+  Eye,
+  Lock
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -34,7 +39,14 @@ import {
   CartesianGrid,
   Tooltip
 } from 'recharts';
-import type { IoTDevice, DeviceReading, DeviceAlert } from '@/types/iot';
+import type { IoTDevice as IoTDeviceType, DeviceReading, DeviceAlert } from '@/types/iot';
+
+// Define local interface to avoid conflicts
+interface LocalIoTDevice extends IoTDeviceType {
+  isConnected: boolean;
+  version: string;
+  isResolved?: boolean;
+}
 
 interface IoTDeviceManagerProps {
   patientId: string;
@@ -76,7 +88,7 @@ interface IoTDevice {
 }
 
 export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
-  const [devices, setDevices] = useState<IoTDevice[]>([
+  const [devices, setDevices] = useState<LocalIoTDevice[]>([
     {
       id: '1',
       name: 'Smart Pill Dispenser Pro',
@@ -162,8 +174,8 @@ export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
     { time: '16:00', heartRate: 74, bp: 121 }
   ]);
 
-  const [connectedDevices, setConnectedDevices] = useState<IoTDevice[]>(devices);
-  const [alerts, setAlerts] = useState<IoTDevice[]>(devices);
+  const [connectedDevices, setConnectedDevices] = useState<LocalIoTDevice[]>(devices);
+  const [alerts, setAlerts] = useState<LocalIoTDevice[]>(devices);
 
   useEffect(() => {
     setConnectedDevices(devices.filter(d => d.isOnline));
