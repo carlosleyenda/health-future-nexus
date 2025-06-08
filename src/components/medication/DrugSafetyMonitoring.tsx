@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +17,10 @@ import {
   Calculator,
   TestTube,
   Clock,
-  TrendingUp
+  TrendingUp,
+  Camera,
+  Pill,
+  Check
 } from 'lucide-react';
 
 interface DrugSafetyMonitoringProps {
@@ -292,7 +294,7 @@ export default function DrugSafetyMonitoring({ patientId }: DrugSafetyMonitoring
 
                     <div className="flex gap-2 mt-3">
                       <Button variant="outline" size="sm">
-                        <FileText className="h-4 w-4 mr-1" />
+                        <FileText className="h-4 w-4 mr-2" />
                         Reportar FDA
                       </Button>
                       <Button variant="outline" size="sm">
@@ -301,6 +303,10 @@ export default function DrugSafetyMonitoring({ patientId }: DrugSafetyMonitoring
                       <Button variant="outline" size="sm">
                         <Users className="h-4 w-4 mr-1" />
                         Notificar Médico
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Check className="h-4 w-4 mr-1" />
+                        Marcar como Revisado
                       </Button>
                     </div>
                   </div>

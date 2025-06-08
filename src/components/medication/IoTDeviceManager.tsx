@@ -11,31 +11,57 @@ import {
   Smartphone,
   Wifi,
   WifiOff,
-  Battery,
-  Settings,
-  Plus,
-  AlertTriangle,
-  CheckCircle,
   Activity,
   Heart,
   Pill,
   Camera,
-  Volume2,
-  VolumeX,
-  Eye,
-  EyeOff,
-  Lock,
-  Unlock,
   Clock,
-  MapPin
+  AlertTriangle,
+  Settings,
+  Plus
 } from 'lucide-react';
 
 interface IoTDeviceManagerProps {
   patientId: string;
 }
 
+interface IoTDevice {
+  id: string;
+  name: string;
+  type: string;
+  model: string;
+  manufacturer: string;
+  serialNumber: string;
+  firmwareVersion: string;
+  batteryLevel: number;
+  signalStrength: number;
+  isOnline: boolean;
+  lastHeartbeat: string;
+  location: string;
+  settings?: Record<string, boolean>;
+  compartments?: Array<{
+    id: number;
+    medication: string;
+    pillCount: number;
+    capacity: number;
+    nextDispense: string | null;
+  }>;
+  alerts?: Array<{
+    type: string;
+    severity: string;
+    message: string;
+    timestamp: string;
+  }>;
+  metrics?: Array<{
+    timestamp: string;
+    heartRate?: number;
+    bloodPressure?: { systolic: number; diastolic: number };
+    oxygenSaturation?: number;
+  }>;
+}
+
 export default function IoTDeviceManager({ patientId }: IoTDeviceManagerProps) {
-  const [devices, setDevices] = useState([
+  const [devices, setDevices] = useState<IoTDevice[]>([
     {
       id: '1',
       name: 'Smart Pill Dispenser Pro',
