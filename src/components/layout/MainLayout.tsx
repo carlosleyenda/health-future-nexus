@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Bell, Menu, User, Search, Plus } from 'lucide-react';
+import { Bell, Menu, User, Search, Plus, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -9,11 +9,18 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useRealtime } from '@/services/realtime';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
 import { Outlet, useNavigate } from 'react-router-dom';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 
 export default function MainLayout() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const { data: notifications } = useNotifications(user?.id || '');
   const navigate = useNavigate();
   
@@ -23,7 +30,7 @@ export default function MainLayout() {
   const unreadCount = notifications?.filter(n => !n.isRead).length || 0;
 
   const navigationItems = [
-    { label: 'Dashboard', path: '/dashboard', roles: ['patient', 'doctor', 'admin'] },
+    { label: 'Dashboard', path: `/${user?.role}/dashboard`, roles: ['patient', 'doctor', 'admin'] },
     { label: 'Citas', path: '/appointments', roles: ['patient', 'doctor'] },
     { label: 'Consultas', path: '/consultations', roles: ['patient', 'doctor'] },
     { label: 'Salud', path: '/health', roles: ['patient'] },
@@ -47,6 +54,10 @@ export default function MainLayout() {
   const filteredQuickActions = quickActions.filter(action => 
     action.roles.includes(user?.role || '')
   );
+
+  const handleLogout = () => {
+    logout();
+  };
 
   if (!user) {
     return null;
@@ -128,16 +139,34 @@ export default function MainLayout() {
                 )}
               </Button>
 
-              {/* Perfil de usuario */}
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-white" />
-                </div>
-                <div className="hidden md:block">
-                  <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
-                  <p className="text-xs text-gray-500 capitalize">{user.role}</p>
-                </div>
-              </div>
+              {/* Perfil de usuario con dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="hidden md:block text-left">
+                      <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
+                      <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Mi Perfil</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/settings')}>
+                    <span>Configuración</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Cerrar Sesión</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
@@ -158,6 +187,12 @@ export default function MainLayout() {
                   {item.label}
                 </button>
               ))}
+              <button
+                onClick={handleLogout}
+                className="block w-full text-left px-3 py-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-md"
+              >
+                Cerrar Sesión
+              </button>
             </div>
           </div>
         )}

@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, Lock, Mail, Heart } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const loginSchema = z.object({
@@ -28,6 +29,7 @@ interface LoginFormProps {
 export const LoginForm = ({ onToggleMode }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const { setUser, setLoading } = useAuthStore();
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -96,6 +98,9 @@ export const LoginForm = ({ onToggleMode }: LoginFormProps) => {
         toast.success(`¡Bienvenido ${user.firstName} ${user.lastName}!`, {
           description: `Has iniciado sesión como ${user.role === 'patient' ? 'Paciente' : user.role === 'doctor' ? 'Doctor' : 'Administrador'}`
         });
+        
+        // Redirigir al dashboard apropiado basado en el rol
+        navigate(`/${user.role}/dashboard`);
       } else {
         throw new Error("Credenciales inválidas");
       }

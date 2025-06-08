@@ -24,10 +24,14 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: !!user 
         }),
         setLoading: (isLoading) => set({ isLoading }),
-        logout: () => set({ 
-          user: null, 
-          isAuthenticated: false 
-        }),
+        logout: () => {
+          set({ 
+            user: null, 
+            isAuthenticated: false 
+          });
+          // Redirigir a la página de inicio después del logout
+          window.location.href = '/';
+        },
       }),
       {
         name: 'auth-store',

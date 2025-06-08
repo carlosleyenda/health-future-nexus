@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { AuthPage } from "./pages/auth/AuthPage";
 import MainLayout from "@/components/layout/MainLayout";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useAuthStore } from "@/store/auth";
 import { PatientDashboard } from "@/components/dashboard/PatientDashboard";
 import { DoctorDashboard } from "@/components/dashboard/DoctorDashboard";
@@ -17,41 +18,12 @@ import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
 
 const queryClient = new QueryClient();
 
-// Protected Route component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuthStore();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
-  }
-  
-  return <>{children}</>;
-};
-
-// Dashboard Router based on user role
-const DashboardRouter = () => {
-  const { user } = useAuthStore();
-  
-  if (!user) return <Navigate to="/auth" replace />;
-  
-  switch (user.role) {
-    case 'patient':
-      return <PatientDashboard />;
-    case 'doctor':
-      return <DoctorDashboard />;
-    case 'admin':
-      return <AdminDashboard />;
-    default:
-      return <Navigate to="/auth" replace />;
-  }
-};
-
-// Public Route wrapper - redirects to dashboard if authenticated
+// Public Route wrapper - redirects to appropriate dashboard if authenticated
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+  if (isAuthenticated && user) {
+    return <Navigate to={`/${user.role}/dashboard`} replace />;
   }
   
   return <>{children}</>;
@@ -83,18 +55,34 @@ const App = () => (
             </PublicRoute>
           } />
           
-          {/* Protected routes with main layout */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
+          {/* Protected dashboard routes */}
+          <Route path="/patient/dashboard" element={
+            <ProtectedRoute allowedRoles={['patient']}>
               <MainLayout />
             </ProtectedRoute>
           }>
-            <Route index element={<DashboardRouter />} />
+            <Route index element={<PatientDashboard />} />
           </Route>
           
-          {/* Additional protected routes can be added here */}
+          <Route path="/doctor/dashboard" element={
+            <ProtectedRoute allowedRoles={['doctor']}>
+              <MainLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<DoctorDashboard />} />
+          </Route>
+          
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <MainLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<AdminDashboard />} />
+          </Route>
+          
+          {/* Additional protected routes */}
           <Route path="/appointments" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['patient', 'doctor']}>
               <MainLayout />
             </ProtectedRoute>
           }>
@@ -102,7 +90,7 @@ const App = () => (
           </Route>
           
           <Route path="/consultations" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['patient', 'doctor']}>
               <MainLayout />
             </ProtectedRoute>
           }>
@@ -110,7 +98,7 @@ const App = () => (
           </Route>
           
           <Route path="/health" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['patient']}>
               <MainLayout />
             </ProtectedRoute>
           }>
@@ -118,7 +106,7 @@ const App = () => (
           </Route>
           
           <Route path="/medical-history" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['patient']}>
               <MainLayout />
             </ProtectedRoute>
           }>
@@ -126,12 +114,43 @@ const App = () => (
           </Route>
           
           <Route path="/payments" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['patient']}>
               <MainLayout />
             </ProtectedRoute>
           }>
             <Route index element={<div>Payments</div>} />
           </Route>
+          
+          <Route path="/patients" element={
+            <ProtectedRoute allowedRoles={['doctor']}>
+              <MainLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<div>Patients Management</div>} />
+          </Route>
+          
+          <Route path="/schedule" element={
+            <ProtectedRoute allowedRoles={['doctor']}>
+              <MainLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<div>Doctor Schedule</div>} />
+          </Route>
+          
+          <Route path="/admin" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <MainLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<div>Admin Panel</div>} />
+          </Route>
+          
+          {/* Compatibility redirects for old dashboard route */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Navigate to={`/${useAuthStore.getState().user?.role}/dashboard`} replace />
+            </ProtectedRoute>
+          } />
           
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />

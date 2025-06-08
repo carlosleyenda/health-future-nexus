@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, Lock, Mail, User, Phone, Heart } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const registerSchema = z.object({
@@ -35,6 +36,7 @@ export const RegisterForm = ({ onToggleMode }: RegisterFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { setUser, setLoading } = useAuthStore();
+  const navigate = useNavigate();
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -75,6 +77,9 @@ export const RegisterForm = ({ onToggleMode }: RegisterFormProps) => {
       toast.success("¡Cuenta creada exitosamente!", {
         description: `Bienvenido ${newUser.firstName} ${newUser.lastName}. Tu cuenta ha sido registrada.`
       });
+      
+      // Redirigir al dashboard del paciente (rol por defecto)
+      navigate(`/${newUser.role}/dashboard`);
     } catch (error) {
       toast.error("Error al crear la cuenta", {
         description: "Intenta nuevamente o contacta soporte."
