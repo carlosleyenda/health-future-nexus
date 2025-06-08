@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PatientService } from '@/services/api';
+import { PatientService, AppointmentService } from '@/services/api';
 import { toast } from 'sonner';
 import type { Patient, MedicalRecord, Allergy, HealthMetric } from '@/lib/database';
 
@@ -87,7 +87,7 @@ export const useAddHealthMetric = () => {
 export const usePatientAppointments = (patientId: string) => {
   return useQuery({
     queryKey: ['patient-appointments', patientId],
-    queryFn: () => PatientService.getAppointments(patientId),
+    queryFn: () => AppointmentService.getPatientAppointments(patientId),
     enabled: !!patientId,
   });
 };

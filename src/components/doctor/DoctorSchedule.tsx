@@ -30,7 +30,7 @@ export default function DoctorSchedule({ doctorId }: DoctorScheduleProps) {
   const handleStartConsultation = async (appointmentId: string) => {
     try {
       await updateAppointment.mutateAsync({
-        appointmentId,
+        id: appointmentId,
         updates: { status: 'in_progress' }
       });
       toast.success('Consulta iniciada');
@@ -42,7 +42,7 @@ export default function DoctorSchedule({ doctorId }: DoctorScheduleProps) {
   const handleCompleteConsultation = async (appointmentId: string) => {
     try {
       await updateAppointment.mutateAsync({
-        appointmentId,
+        id: appointmentId,
         updates: { status: 'completed' }
       });
       toast.success('Consulta completada');
@@ -95,7 +95,7 @@ export default function DoctorSchedule({ doctorId }: DoctorScheduleProps) {
                       <div>
                         <CardTitle className="text-lg flex items-center gap-2">
                           <User className="h-5 w-5" />
-                          Paciente {appointment.patientId} {/* Aquí necesitaríamos el nombre real */}
+                          Paciente {appointment.patientId}
                         </CardTitle>
                         <p className="text-sm text-gray-500">{appointment.reason}</p>
                       </div>

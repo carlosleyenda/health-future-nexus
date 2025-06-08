@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { DoctorService } from '@/services/api';
+import { DoctorService, AppointmentService } from '@/services/api';
 import { toast } from 'sonner';
 import type { Doctor } from '@/lib/database';
 
@@ -30,7 +30,7 @@ export const useDoctorsBySpecialty = (specialty: string) => {
 export const useDoctorAppointments = (doctorId: string) => {
   return useQuery({
     queryKey: ['doctor-appointments', doctorId],
-    queryFn: () => DoctorService.getAppointments(doctorId),
+    queryFn: () => AppointmentService.getDoctorAppointments(doctorId),
     enabled: !!doctorId,
   });
 };

@@ -44,10 +44,9 @@ export default function AppointmentsList({ patientId }: AppointmentsListProps) {
   const handleJoinVideoCall = async (appointmentId: string) => {
     try {
       await updateAppointment.mutateAsync({
-        appointmentId,
+        id: appointmentId,
         updates: { status: 'in_progress' }
       });
-      // Aquí iría la lógica para unirse a la videollamada
       toast.success('Uniéndose a la consulta virtual...');
     } catch (error) {
       toast.error('Error al unirse a la consulta');
@@ -84,7 +83,7 @@ export default function AppointmentsList({ patientId }: AppointmentsListProps) {
             <div className="flex justify-between items-start">
               <div>
                 <CardTitle className="text-lg">
-                  Dr. {appointment.doctorId} {/* Aquí necesitaríamos el nombre real del doctor */}
+                  Dr. {appointment.doctorId}
                 </CardTitle>
                 <p className="text-sm text-gray-500">{appointment.reason}</p>
               </div>
