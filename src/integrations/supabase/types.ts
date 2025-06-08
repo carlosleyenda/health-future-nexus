@@ -433,6 +433,36 @@ export type Database = {
           },
         ]
       }
+      currency_rates: {
+        Row: {
+          base_currency: string
+          created_at: string
+          id: string
+          provider: string
+          rate: number
+          target_currency: string
+          valid_at: string
+        }
+        Insert: {
+          base_currency: string
+          created_at?: string
+          id?: string
+          provider: string
+          rate: number
+          target_currency: string
+          valid_at?: string
+        }
+        Update: {
+          base_currency?: string
+          created_at?: string
+          id?: string
+          provider?: string
+          rate?: number
+          target_currency?: string
+          valid_at?: string
+        }
+        Relationships: []
+      }
       emergency_escalation_rules: {
         Row: {
           created_at: string
@@ -460,6 +490,645 @@ export type Database = {
           is_active?: boolean
           rule_name?: string
           trigger_conditions?: Json
+        }
+        Relationships: []
+      }
+      financial_audit_log: {
+        Row: {
+          action: string
+          compliance_reason: string | null
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          performed_by: string | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          compliance_reason?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          performed_by?: string | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          compliance_reason?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          performed_by?: string | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      financial_transactions: {
+        Row: {
+          amount: number
+          appointment_id: string | null
+          cashback_amount: number | null
+          completed_at: string | null
+          created_at: string
+          currency: string
+          delivery_service_id: string | null
+          description: string
+          external_transaction_id: string | null
+          health_coins_earned: number | null
+          id: string
+          insurance_covered_amount: number | null
+          metadata: Json | null
+          payment_method: string
+          payment_provider: string | null
+          pharmacy_order_id: string | null
+          status: string
+          tax_amount: number | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          appointment_id?: string | null
+          cashback_amount?: number | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          delivery_service_id?: string | null
+          description: string
+          external_transaction_id?: string | null
+          health_coins_earned?: number | null
+          id?: string
+          insurance_covered_amount?: number | null
+          metadata?: Json | null
+          payment_method: string
+          payment_provider?: string | null
+          pharmacy_order_id?: string | null
+          status?: string
+          tax_amount?: number | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          appointment_id?: string | null
+          cashback_amount?: number | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          delivery_service_id?: string | null
+          description?: string
+          external_transaction_id?: string | null
+          health_coins_earned?: number | null
+          id?: string
+          insurance_covered_amount?: number | null
+          metadata?: Json | null
+          payment_method?: string
+          payment_provider?: string | null
+          pharmacy_order_id?: string | null
+          status?: string
+          tax_amount?: number | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fraud_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          description: string
+          device_info: Json | null
+          id: string
+          ip_address: unknown | null
+          resolution_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          risk_score: number
+          status: string
+          transaction_id: string | null
+          triggered_rules: string[] | null
+          user_id: string | null
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          description: string
+          device_info?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          risk_score: number
+          status?: string
+          transaction_id?: string | null
+          triggered_rules?: string[] | null
+          user_id?: string | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          description?: string
+          device_info?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          risk_score?: number
+          status?: string
+          transaction_id?: string | null
+          triggered_rules?: string[] | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fraud_alerts_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "financial_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_savings_goals: {
+        Row: {
+          auto_contribute_amount: number | null
+          auto_contribute_frequency: string | null
+          category: string | null
+          created_at: string
+          currency: string
+          current_amount: number
+          goal_name: string
+          id: string
+          is_active: boolean | null
+          target_amount: number
+          target_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_contribute_amount?: number | null
+          auto_contribute_frequency?: string | null
+          category?: string | null
+          created_at?: string
+          currency?: string
+          current_amount?: number
+          goal_name: string
+          id?: string
+          is_active?: boolean | null
+          target_amount: number
+          target_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_contribute_amount?: number | null
+          auto_contribute_frequency?: string | null
+          category?: string | null
+          created_at?: string
+          currency?: string
+          current_amount?: number
+          goal_name?: string
+          id?: string
+          is_active?: boolean | null
+          target_amount?: number
+          target_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      health_wallets: {
+        Row: {
+          auto_pay_enabled: boolean | null
+          balance: number
+          cashback_earned: number
+          created_at: string
+          crypto_enabled: boolean | null
+          currency: string
+          health_coins: number
+          hsa_connected: boolean | null
+          id: string
+          loyalty_tier: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_pay_enabled?: boolean | null
+          balance?: number
+          cashback_earned?: number
+          created_at?: string
+          crypto_enabled?: boolean | null
+          currency?: string
+          health_coins?: number
+          hsa_connected?: boolean | null
+          id?: string
+          loyalty_tier?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_pay_enabled?: boolean | null
+          balance?: number
+          cashback_earned?: number
+          created_at?: string
+          crypto_enabled?: boolean | null
+          currency?: string
+          health_coins?: number
+          hsa_connected?: boolean | null
+          id?: string
+          loyalty_tier?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      insurance_claims: {
+        Row: {
+          approved_amount: number | null
+          claim_amount: number
+          claim_number: string
+          created_at: string
+          denial_reason: string | null
+          diagnosis_codes: string[] | null
+          id: string
+          insurance_provider: string
+          invoice_id: string | null
+          metadata: Json | null
+          policy_number: string
+          procedure_codes: string[] | null
+          processed_at: string | null
+          status: string
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_amount?: number | null
+          claim_amount: number
+          claim_number: string
+          created_at?: string
+          denial_reason?: string | null
+          diagnosis_codes?: string[] | null
+          id?: string
+          insurance_provider: string
+          invoice_id?: string | null
+          metadata?: Json | null
+          policy_number: string
+          procedure_codes?: string[] | null
+          processed_at?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_amount?: number | null
+          claim_amount?: number
+          claim_number?: string
+          created_at?: string
+          denial_reason?: string | null
+          diagnosis_codes?: string[] | null
+          id?: string
+          insurance_provider?: string
+          invoice_id?: string | null
+          metadata?: Json | null
+          policy_number?: string
+          procedure_codes?: string[] | null
+          processed_at?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_claims_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          appointment_id: string | null
+          billing_address: Json | null
+          created_at: string
+          currency: string
+          discount_amount: number | null
+          doctor_id: string | null
+          due_date: string | null
+          id: string
+          invoice_number: string
+          line_items: Json
+          metadata: Json | null
+          notes: string | null
+          paid_at: string | null
+          payment_terms: string | null
+          status: string
+          subtotal: number
+          tax_amount: number
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          billing_address?: Json | null
+          created_at?: string
+          currency?: string
+          discount_amount?: number | null
+          doctor_id?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_number: string
+          line_items?: Json
+          metadata?: Json | null
+          notes?: string | null
+          paid_at?: string | null
+          payment_terms?: string | null
+          status?: string
+          subtotal: number
+          tax_amount?: number
+          total_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appointment_id?: string | null
+          billing_address?: Json | null
+          created_at?: string
+          currency?: string
+          discount_amount?: number | null
+          doctor_id?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_number?: string
+          line_items?: Json
+          metadata?: Json | null
+          notes?: string | null
+          paid_at?: string | null
+          payment_terms?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      kyc_verifications: {
+        Row: {
+          address_verified: boolean | null
+          created_at: string
+          document_expiry: string | null
+          document_number: string | null
+          document_type: string | null
+          id: string
+          identity_verified: boolean | null
+          metadata: Json | null
+          phone_verified: boolean | null
+          rejection_reason: string | null
+          risk_score: number | null
+          status: string
+          updated_at: string
+          user_id: string
+          verification_date: string | null
+          verification_level: string
+          verification_provider: string | null
+        }
+        Insert: {
+          address_verified?: boolean | null
+          created_at?: string
+          document_expiry?: string | null
+          document_number?: string | null
+          document_type?: string | null
+          id?: string
+          identity_verified?: boolean | null
+          metadata?: Json | null
+          phone_verified?: boolean | null
+          rejection_reason?: string | null
+          risk_score?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          verification_date?: string | null
+          verification_level?: string
+          verification_provider?: string | null
+        }
+        Update: {
+          address_verified?: boolean | null
+          created_at?: string
+          document_expiry?: string | null
+          document_number?: string | null
+          document_type?: string | null
+          id?: string
+          identity_verified?: boolean | null
+          metadata?: Json | null
+          phone_verified?: boolean | null
+          rejection_reason?: string | null
+          risk_score?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          verification_date?: string | null
+          verification_level?: string
+          verification_provider?: string | null
+        }
+        Relationships: []
+      }
+      payment_methods: {
+        Row: {
+          billing_address: Json | null
+          brand: string | null
+          country: string | null
+          created_at: string
+          currency: string | null
+          expiry_month: number | null
+          expiry_year: number | null
+          external_id: string
+          id: string
+          is_active: boolean | null
+          is_default: boolean | null
+          is_verified: boolean | null
+          last_four: string | null
+          provider: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_address?: Json | null
+          brand?: string | null
+          country?: string | null
+          created_at?: string
+          currency?: string | null
+          expiry_month?: number | null
+          expiry_year?: number | null
+          external_id: string
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          is_verified?: boolean | null
+          last_four?: string | null
+          provider: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_address?: Json | null
+          brand?: string | null
+          country?: string | null
+          created_at?: string
+          currency?: string | null
+          expiry_month?: number | null
+          expiry_year?: number | null
+          external_id?: string
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          is_verified?: boolean | null
+          last_four?: string | null
+          provider?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          amount: number
+          billing_cycle: string
+          cancelled_at: string | null
+          created_at: string
+          currency: string
+          current_period_end: string
+          current_period_start: string
+          external_subscription_id: string
+          id: string
+          metadata: Json | null
+          payment_method_id: string | null
+          plan_name: string
+          provider: string
+          status: string
+          trial_ends_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          billing_cycle: string
+          cancelled_at?: string | null
+          created_at?: string
+          currency?: string
+          current_period_end: string
+          current_period_start: string
+          external_subscription_id: string
+          id?: string
+          metadata?: Json | null
+          payment_method_id?: string | null
+          plan_name: string
+          provider: string
+          status?: string
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          billing_cycle?: string
+          cancelled_at?: string | null
+          created_at?: string
+          currency?: string
+          current_period_end?: string
+          current_period_start?: string
+          external_subscription_id?: string
+          id?: string
+          metadata?: Json | null
+          payment_method_id?: string | null
+          plan_name?: string
+          provider?: string
+          status?: string
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tax_documents: {
+        Row: {
+          created_at: string
+          currency: string
+          document_type: string
+          document_url: string | null
+          id: string
+          jurisdiction: string
+          metadata: Json | null
+          status: string
+          tax_amount: number
+          tax_year: number
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          document_type: string
+          document_url?: string | null
+          id?: string
+          jurisdiction: string
+          metadata?: Json | null
+          status?: string
+          tax_amount: number
+          tax_year: number
+          total_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          document_type?: string
+          document_url?: string | null
+          id?: string
+          jurisdiction?: string
+          metadata?: Json | null
+          status?: string
+          tax_amount?: number
+          tax_year?: number
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

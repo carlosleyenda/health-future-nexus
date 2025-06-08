@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { ChatConversation, ChatMessage, ChatParticipant, MessageTemplate, SmartReply } from '@/types/chat';
 
@@ -452,5 +451,84 @@ export class ChatService {
         filter: `message_id=eq.${messageId}`
       }, callback)
       .subscribe();
+  }
+
+  // Helper methods for mapping database objects to TypeScript interfaces
+  private static mapConversationFromDb(data: any): ChatConversation {
+    return {
+      id: data.id,
+      type: data.type,
+      title: data.title,
+      description: data.description,
+      createdBy: data.created_by,
+      isEncrypted: data.is_encrypted,
+      encryptionKeyId: data.encryption_key_id,
+      retentionPolicyDays: data.retention_policy_days,
+      isActive: data.is_active,
+      metadata: data.metadata,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at
+    };
+  }
+
+  private static mapParticipantFromDb(data: any): ChatParticipant {
+    return {
+      id: data.id,
+      conversationId: data.conversation_id,
+      userId: data.user_id,
+      role: data.role,
+      joinedAt: data.joined_at,
+      leftAt: data.left_at,
+      isActive: data.is_active,
+      notificationPreferences: data.notification_preferences
+    };
+  }
+
+  private static mapMessageFromDb(data: any): ChatMessage {
+    return {
+      id: data.id,
+      conversationId: data.conversation_id,
+      senderId: data.sender_id,
+      messageType: data.message_type,
+      content: data.content,
+      encryptedContent: data.encrypted_content,
+      metadata: data.metadata,
+      replyToMessageId: data.reply_to_message_id,
+      isEdited: data.is_edited,
+      isDeleted: data.is_deleted,
+      priority: data.priority,
+      expiresAt: data.expires_at,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at
+    };
+  }
+
+  private static mapTemplateFromDb(data: any): MessageTemplate {
+    return {
+      id: data.id,
+      createdBy: data.created_by,
+      category: data.category,
+      title: data.title,
+      content: data.content,
+      variables: data.variables,
+      isSystemTemplate: data.is_system_template,
+      usageCount: data.usage_count,
+      isActive: data.is_active,
+      createdAt: data.created_at
+    };
+  }
+
+  private static mapSmartReplyFromDb(data: any): SmartReply {
+    return {
+      id: data.id,
+      conversationId: data.conversation_id,
+      suggestedForUserId: data.suggested_for_user_id,
+      replyText: data.reply_text,
+      confidenceScore: data.confidence_score,
+      contextHash: data.context_hash,
+      isUsed: data.is_used,
+      createdAt: data.created_at,
+      expiresAt: data.expires_at
+    };
   }
 }
