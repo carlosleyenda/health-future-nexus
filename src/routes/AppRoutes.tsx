@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Routes, Route, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth';
@@ -16,6 +15,7 @@ import PaymentPortal from '@/components/payments/PaymentPortal';
 import VideoConsultation from '@/components/consultation/VideoConsultation';
 import ConsultationRoom from '@/components/consultation/ConsultationRoom';
 import MedicalChat from '@/components/chat/MedicalChat';
+import MedicalRecordsSystem from '@/components/medical-records/MedicalRecordsSystem';
 
 // Wrapper components para pasar props de URL
 function VideoConsultationWrapper() {
@@ -130,6 +130,15 @@ export default function AppRoutes() {
       <Route path="/chat/:conversationId" element={
         <ProtectedRoute>
           <MedicalChat />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/medical-records" element={
+        <ProtectedRoute>
+          <MedicalRecordsSystem 
+            patientId={user?.id || ''} 
+            userRole={user?.role === 'doctor' ? 'doctor' : user?.role === 'admin' ? 'admin' : 'patient'} 
+          />
         </ProtectedRoute>
       } />
     </Routes>
