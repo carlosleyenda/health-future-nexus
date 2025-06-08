@@ -25,7 +25,13 @@ export class DeliveryService {
       patientId: request.patientId,
       serviceType: request.serviceType as any,
       scheduledDate: request.scheduledDate,
-      address: request.address,
+      address: {
+        street: request.address,
+        city: 'Ciudad',
+        state: 'Estado',
+        zipCode: '12345',
+        country: 'México'
+      },
       status: 'requested',
       priority: 'normal',
       estimatedCost: 50,

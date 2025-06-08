@@ -17,6 +17,7 @@ import { DoctorDashboard } from "@/components/dashboard/DoctorDashboard";
 import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
 import UserProfile from "@/components/profile/UserProfile";
 import HealthMonitoring from "@/components/health/HealthMonitoring";
+import ConsultationRoom from "@/components/consultation/ConsultationRoom";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 
 const queryClient = new QueryClient({
@@ -114,6 +115,17 @@ const App = () => (
             }>
               <Route index element={<UserProfile />} />
             </Route>
+            
+            {/* Consultation room - full screen */}
+            <Route path="/consultation/:appointmentId" element={
+              <ProtectedRoute allowedRoles={['patient', 'doctor']}>
+                <ConsultationRoom 
+                  appointmentId={window.location.pathname.split('/')[2]} 
+                  userId={useAuthStore.getState().user?.id || ''} 
+                  userRole={useAuthStore.getState().user?.role as 'patient' | 'doctor' || 'patient'} 
+                />
+              </ProtectedRoute>
+            } />
             
             {/* Additional protected routes */}
             <Route path="/appointments" element={
