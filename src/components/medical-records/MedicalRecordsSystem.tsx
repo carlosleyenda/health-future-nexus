@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,7 +23,7 @@ interface MedicalRecordsSystemProps {
 export default function MedicalRecordsSystem({ patientId, userRole }: MedicalRecordsSystemProps) {
   const [selectedDocument, setSelectedDocument] = useState<MedicalDocument | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [activeTab, setActiveTab] = useState('documents');
 
@@ -32,10 +33,10 @@ export default function MedicalRecordsSystem({ patientId, userRole }: MedicalRec
   const { data: searchResults } = useSearchDocuments(
     patientId,
     searchQuery,
-    selectedCategory ? { category: selectedCategory } : undefined
+    selectedCategory !== 'all' ? { category: selectedCategory } : undefined
   );
 
-  const displayDocuments = searchQuery || selectedCategory ? searchResults : documents;
+  const displayDocuments = searchQuery || selectedCategory !== 'all' ? searchResults : documents;
 
   return (
     <div className="space-y-6 p-6">
@@ -70,7 +71,7 @@ export default function MedicalRecordsSystem({ patientId, userRole }: MedicalRec
                 <SelectValue placeholder="Filtrar por categoría" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas las categorías</SelectItem>
+                <SelectItem value="all">Todas las categorías</SelectItem>
                 <SelectItem value="consultation">Consultas</SelectItem>
                 <SelectItem value="lab_results">Análisis</SelectItem>
                 <SelectItem value="imaging">Estudios</SelectItem>
