@@ -8,3 +8,4 @@ export * from './pharmacy';
 export * from './appointments';
 export * from './research';
 export * from './common';
+export * from './admin';

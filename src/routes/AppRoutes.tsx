@@ -163,6 +163,7 @@ export default function AppRoutes() {
         </ProtectedRoute>
       }>
         <Route index element={<div>Appointments Page</div>} />
+        <Route path="new" element={<div>New Appointment</div>} />
       </Route>
       
       <Route path="/consultations" element={
@@ -171,6 +172,7 @@ export default function AppRoutes() {
         </ProtectedRoute>
       }>
         <Route index element={<div>Consultations Page</div>} />
+        <Route path="new" element={<div>New Consultation</div>} />
       </Route>
       
       <Route path="/health" element={
@@ -198,11 +200,12 @@ export default function AppRoutes() {
       </Route>
       
       <Route path="/patients" element={
-        <ProtectedRoute allowedRoles={['doctor']}>
+        <ProtectedRoute allowedRoles={['doctor', 'admin']}>
           <MainLayout />
         </ProtectedRoute>
       }>
         <Route index element={<div>Patients Management</div>} />
+        <Route path="new" element={<div>New Patient Registration</div>} />
       </Route>
       
       <Route path="/schedule" element={
@@ -219,6 +222,14 @@ export default function AppRoutes() {
         </ProtectedRoute>
       }>
         <Route index element={<div>Admin Panel</div>} />
+      </Route>
+
+      <Route path="/settings" element={
+        <ProtectedRoute>
+          <MainLayout />
+        </ProtectedRoute>
+      }>
+        <Route index element={<div>Settings Page</div>} />
       </Route>
       
       {/* Compatibility redirects for old dashboard route */}
