@@ -4,25 +4,37 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Smartphone, 
   Wifi, 
-  Bluetooth, 
-  Activity,
-  Heart,
-  Zap,
-  Settings,
-  AlertTriangle,
+  WifiOff, 
+  Battery, 
+  Activity, 
+  AlertTriangle, 
   CheckCircle,
-  Clock,
-  Signal,
-  Battery,
-  MapPin,
-  Volume2,
-  Eye,
-  Lock
+  Settings,
+  Bluetooth,
+  Smartphone,
+  Pill,
+  Camera,
+  Plus,
+  Zap,
+  Heart,
+  TrendingUp,
+  Calendar,
+  Clock
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip
+} from 'recharts';
+import type { IoTDevice, DeviceReading, DeviceAlert } from '@/types/iot';
 
 interface IoTDeviceManagerProps {
   patientId: string;
