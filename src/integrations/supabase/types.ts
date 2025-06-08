@@ -9,6 +9,460 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      chat_attachments: {
+        Row: {
+          created_at: string
+          encryption_key_id: string | null
+          file_name: string
+          file_size: number
+          file_type: string
+          id: string
+          is_medical_document: boolean
+          message_id: string
+          storage_path: string
+          virus_scan_status: string | null
+        }
+        Insert: {
+          created_at?: string
+          encryption_key_id?: string | null
+          file_name: string
+          file_size: number
+          file_type: string
+          id?: string
+          is_medical_document?: boolean
+          message_id: string
+          storage_path: string
+          virus_scan_status?: string | null
+        }
+        Update: {
+          created_at?: string
+          encryption_key_id?: string | null
+          file_name?: string
+          file_size?: number
+          file_type?: string
+          id?: string
+          is_medical_document?: boolean
+          message_id?: string
+          storage_path?: string
+          virus_scan_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_attachments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      chat_compliance_settings: {
+        Row: {
+          created_at: string
+          id: string
+          is_system_setting: boolean
+          organization_id: string | null
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_system_setting?: boolean
+          organization_id?: string | null
+          setting_key: string
+          setting_value: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_system_setting?: boolean
+          organization_id?: string | null
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      chat_conversations: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          encryption_key_id: string | null
+          id: string
+          is_active: boolean
+          is_encrypted: boolean
+          metadata: Json | null
+          retention_policy_days: number | null
+          title: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          encryption_key_id?: string | null
+          id?: string
+          is_active?: boolean
+          is_encrypted?: boolean
+          metadata?: Json | null
+          retention_policy_days?: number | null
+          title?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          encryption_key_id?: string | null
+          id?: string
+          is_active?: boolean
+          is_encrypted?: boolean
+          metadata?: Json | null
+          retention_policy_days?: number | null
+          title?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chat_message_status: {
+        Row: {
+          id: string
+          message_id: string
+          status: string
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          message_id: string
+          status: string
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          message_id?: string
+          status?: string
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_message_status_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_message_templates: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          is_system_template: boolean
+          title: string
+          usage_count: number | null
+          variables: Json | null
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          is_system_template?: boolean
+          title: string
+          usage_count?: number | null
+          variables?: Json | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          is_system_template?: boolean
+          title?: string
+          usage_count?: number | null
+          variables?: Json | null
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string | null
+          conversation_id: string
+          created_at: string
+          encrypted_content: string | null
+          expires_at: string | null
+          id: string
+          is_deleted: boolean
+          is_edited: boolean
+          message_type: string
+          metadata: Json | null
+          priority: string | null
+          reply_to_message_id: string | null
+          sender_id: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          conversation_id: string
+          created_at?: string
+          encrypted_content?: string | null
+          expires_at?: string | null
+          id?: string
+          is_deleted?: boolean
+          is_edited?: boolean
+          message_type: string
+          metadata?: Json | null
+          priority?: string | null
+          reply_to_message_id?: string | null
+          sender_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          conversation_id?: string
+          created_at?: string
+          encrypted_content?: string | null
+          expires_at?: string | null
+          id?: string
+          is_deleted?: boolean
+          is_edited?: boolean
+          message_type?: string
+          metadata?: Json | null
+          priority?: string | null
+          reply_to_message_id?: string | null
+          sender_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_reply_to_message_id_fkey"
+            columns: ["reply_to_message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_participants: {
+        Row: {
+          conversation_id: string
+          id: string
+          is_active: boolean
+          joined_at: string
+          left_at: string | null
+          notification_preferences: Json | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          left_at?: string | null
+          notification_preferences?: Json | null
+          role: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          left_at?: string | null
+          notification_preferences?: Json | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_smart_replies: {
+        Row: {
+          confidence_score: number | null
+          context_hash: string | null
+          conversation_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          is_used: boolean
+          reply_text: string
+          suggested_for_user_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          context_hash?: string | null
+          conversation_id: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_used?: boolean
+          reply_text: string
+          suggested_for_user_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          context_hash?: string | null
+          conversation_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_used?: boolean
+          reply_text?: string
+          suggested_for_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_smart_replies_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_translations: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          id: string
+          message_id: string
+          source_language: string
+          target_language: string
+          translated_content: string
+          translation_service: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          message_id: string
+          source_language: string
+          target_language: string
+          translated_content: string
+          translation_service: string
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          message_id?: string
+          source_language?: string
+          target_language?: string
+          translated_content?: string
+          translation_service?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_translations_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_escalation_rules: {
+        Row: {
+          created_at: string
+          created_by: string
+          escalation_levels: Json
+          id: string
+          is_active: boolean
+          rule_name: string
+          trigger_conditions: Json
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          escalation_levels: Json
+          id?: string
+          is_active?: boolean
+          rule_name: string
+          trigger_conditions: Json
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          escalation_levels?: Json
+          id?: string
+          is_active?: boolean
+          rule_name?: string
+          trigger_conditions?: Json
+        }
+        Relationships: []
+      }
       video_call_audit_log: {
         Row: {
           action: string

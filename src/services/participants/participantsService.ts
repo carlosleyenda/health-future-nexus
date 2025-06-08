@@ -104,17 +104,18 @@ export class ParticipantsService {
     // This would integrate with the notification system
     console.log('Sending participant notification:', invite);
     
-    // Real implementation would send email/push notification
+    // For now, we'll just log the notification
+    // In a real implementation, this would send email/push notification
     try {
-      await supabase
-        .from('notifications')
-        .insert({
-          user_id: invite.userId,
-          type: 'video_call_invite',
-          title: 'Invitación a consulta médica',
-          message: `Has sido invitado a participar en una consulta médica como ${invite.participantType}`,
-          data: { sessionId: invite.sessionId },
-        });
+      // Note: Since we don't have a notifications table in the current schema,
+      // we'll just log this for now. In a production system, you'd want to
+      // either create a notifications table or integrate with an external service.
+      console.log('Notification would be sent to:', invite.userId);
+      console.log('Invitation details:', {
+        sessionId: invite.sessionId,
+        participantType: invite.participantType,
+        invitedBy: invite.invitedBy
+      });
     } catch (error) {
       console.error('Error sending notification:', error);
     }

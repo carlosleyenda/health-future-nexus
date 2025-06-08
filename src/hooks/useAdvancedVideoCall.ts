@@ -1,6 +1,9 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { WebRTCService } from '@/services/webrtc/webrtcService';
 import { VideoCallService } from '@/services/api/videoCallService';
+import { TranscriptionService } from '@/services/transcription/transcriptionService';
+import { ParticipantsService } from '@/services/participants/participantsService';
 import { VideoCallState, VideoCallMessage, MedicalNote } from '@/types/videocall';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -78,7 +81,7 @@ export function useAdvancedVideoCall(appointmentId: string, userId: string, user
       }));
 
       // Start transcription if user consents
-      if (userRole === 'doctor') {
+      if (userRole === 'doctor' && localStream) {
         await startTranscription(session.id, localStream);
       }
 

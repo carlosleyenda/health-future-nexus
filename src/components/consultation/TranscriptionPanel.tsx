@@ -48,7 +48,18 @@ export default function TranscriptionPanel({ sessionId, isRecording }: Transcrip
   const loadTranscript = async () => {
     try {
       const data = await TranscriptionService.getSessionTranscript(sessionId);
-      setTranscript(data);
+      
+      // Transform data to match our interface
+      const transformedData = data.map(entry => ({
+        id: entry.id,
+        speakerType: entry.speaker_type as TranscriptEntry['speakerType'],
+        content: entry.content,
+        timestampInCall: entry.timestamp_in_call,
+        confidenceScore: entry.confidence_score || 0,
+        createdAt: entry.created_at || new Date().toISOString(),
+      }));
+      
+      setTranscript(transformedData);
     } catch (error) {
       console.error('Error loading transcript:', error);
     }
