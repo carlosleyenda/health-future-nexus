@@ -6,11 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, Upload, Filter, Clock } from 'lucide-react';
-import { DocumentsGrid } from './DocumentsGrid';
-import { DocumentViewer } from './DocumentViewer';
-import { MedicalTimeline } from './MedicalTimeline';
-import { DocumentUpload } from './DocumentUpload';
-import { AccessAuditLog } from './AccessAuditLog';
+import DocumentsGrid from './DocumentsGrid';
+import DocumentViewer from './DocumentViewer';
+import MedicalTimeline from './MedicalTimeline';
+import DocumentUpload from './DocumentUpload';
+import AccessAuditLog from './AccessAuditLog';
 import { usePatientDocuments, usePatientTimeline, useSearchDocuments } from '@/hooks/useMedicalRecords';
 import type { MedicalDocument } from '@/types/medical-records';
 

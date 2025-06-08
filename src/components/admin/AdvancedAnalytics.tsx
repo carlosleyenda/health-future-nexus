@@ -1,188 +1,79 @@
-
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { 
-  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, 
+  AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  AreaChart, Area, ScatterPlot, Scatter
+  ComposedChart, Scatter
 } from 'recharts';
 import { 
-  TrendingUp, TrendingDown, Users, Clock, Star, 
-  MapPin, Calendar, DollarSign, AlertTriangle, Download
+  TrendingUp, TrendingDown, Users, Calendar, MapPin, Clock,
+  Star, DollarSign, Activity, AlertTriangle, Download, FileText
 } from 'lucide-react';
-import { MetricCard } from '@/components/ui/metric-card';
 
-interface AnalyticsData {
-  satisfaction: {
-    average: number;
-    trend: number;
-    responses: number;
-    distribution: { rating: number; count: number }[];
-  };
-  doctorEfficiency: {
-    avgConsultationTime: number;
-    doctorRatings: { name: string; rating: number; consultations: number }[];
-    timeDistribution: { hour: number; consultations: number }[];
-  };
-  specialties: {
-    demand: { specialty: string; appointments: number; growth: number }[];
-    revenue: { specialty: string; revenue: number }[];
-  };
-  predictions: {
-    hourlyDemand: { hour: number; predicted: number; actual: number }[];
-    weeklyTrends: { week: string; predicted: number; confidence: number }[];
-  };
-  marketing: {
-    roi: number;
-    acquisitionCost: number;
-    conversionFunnel: { stage: string; users: number; rate: number }[];
-    retention: { week: number; retained: number }[];
-  };
-  geographic: {
-    distribution: { city: string; users: number; revenue: number }[];
-    growth: { region: string; growth: number }[];
-  };
-}
+const satisfactionData = [
+  { month: 'Ene', satisfaction: 4.2, responses: 145 },
+  { month: 'Feb', satisfaction: 4.3, responses: 178 },
+  { month: 'Mar', satisfaction: 4.1, responses: 156 },
+  { month: 'Abr', satisfaction: 4.5, responses: 189 },
+  { month: 'May', satisfaction: 4.4, responses: 203 },
+  { month: 'Jun', satisfaction: 4.6, responses: 167 }
+];
 
-const mockAnalyticsData: AnalyticsData = {
-  satisfaction: {
-    average: 4.6,
-    trend: 8.5,
-    responses: 1247,
-    distribution: [
-      { rating: 5, count: 620 },
-      { rating: 4, count: 380 },
-      { rating: 3, count: 150 },
-      { rating: 2, count: 67 },
-      { rating: 1, count: 30 }
-    ]
-  },
-  doctorEfficiency: {
-    avgConsultationTime: 28.5,
-    doctorRatings: [
-      { name: 'Dr. García', rating: 4.8, consultations: 145 },
-      { name: 'Dr. López', rating: 4.7, consultations: 128 },
-      { name: 'Dr. Martínez', rating: 4.6, consultations: 112 },
-      { name: 'Dr. Rodríguez', rating: 4.5, consultations: 98 }
-    ],
-    timeDistribution: [
-      { hour: 8, consultations: 15 },
-      { hour: 9, consultations: 28 },
-      { hour: 10, consultations: 42 },
-      { hour: 11, consultations: 38 },
-      { hour: 12, consultations: 25 },
-      { hour: 13, consultations: 18 },
-      { hour: 14, consultations: 35 },
-      { hour: 15, consultations: 45 },
-      { hour: 16, consultations: 40 },
-      { hour: 17, consultations: 32 },
-      { hour: 18, consultations: 22 }
-    ]
-  },
-  specialties: {
-    demand: [
-      { specialty: 'Medicina General', appointments: 340, growth: 15.2 },
-      { specialty: 'Cardiología', appointments: 180, growth: 8.7 },
-      { specialty: 'Dermatología', appointments: 165, growth: 22.1 },
-      { specialty: 'Neurología', appointments: 120, growth: 12.3 },
-      { specialty: 'Psicología', appointments: 95, growth: 35.6 }
-    ],
-    revenue: [
-      { specialty: 'Cardiología', revenue: 145000 },
-      { specialty: 'Neurología', revenue: 98000 },
-      { specialty: 'Dermatología', revenue: 87000 },
-      { specialty: 'Medicina General', revenue: 156000 },
-      { specialty: 'Psicología', revenue: 65000 }
-    ]
-  },
-  predictions: {
-    hourlyDemand: [
-      { hour: 8, predicted: 18, actual: 15 },
-      { hour: 9, predicted: 25, actual: 28 },
-      { hour: 10, predicted: 40, actual: 42 },
-      { hour: 11, predicted: 35, actual: 38 },
-      { hour: 12, predicted: 22, actual: 25 }
-    ],
-    weeklyTrends: [
-      { week: 'Sem 1', predicted: 240, confidence: 85 },
-      { week: 'Sem 2', predicted: 265, confidence: 78 },
-      { week: 'Sem 3', predicted: 280, confidence: 72 },
-      { week: 'Sem 4', predicted: 295, confidence: 68 }
-    ]
-  },
-  marketing: {
-    roi: 285,
-    acquisitionCost: 45,
-    conversionFunnel: [
-      { stage: 'Visitantes', users: 10000, rate: 100 },
-      { stage: 'Registro', users: 1200, rate: 12 },
-      { stage: 'Primera Cita', users: 480, rate: 4.8 },
-      { stage: 'Cliente Recurrente', users: 240, rate: 2.4 }
-    ],
-    retention: [
-      { week: 1, retained: 100 },
-      { week: 2, retained: 78 },
-      { week: 4, retained: 65 },
-      { week: 8, retained: 52 },
-      { week: 12, retained: 45 }
-    ]
-  },
-  geographic: {
-    distribution: [
-      { city: 'Ciudad de México', users: 2400, revenue: 180000 },
-      { city: 'Guadalajara', users: 890, revenue: 67000 },
-      { city: 'Monterrey', users: 650, revenue: 58000 },
-      { city: 'Puebla', users: 420, revenue: 32000 }
-    ],
-    growth: [
-      { region: 'Norte', growth: 18.5 },
-      { region: 'Centro', growth: 12.3 },
-      { region: 'Sur', growth: 25.7 },
-      { region: 'Occidente', growth: 15.2 }
-    ]
-  }
-};
+const doctorEfficiencyData = [
+  { name: 'Dr. García', avgTime: 25, rating: 4.8, consultations: 89 },
+  { name: 'Dra. López', avgTime: 30, rating: 4.6, consultations: 76 },
+  { name: 'Dr. Martínez', avgTime: 22, rating: 4.9, consultations: 94 },
+  { name: 'Dra. Rodríguez', avgTime: 35, rating: 4.4, consultations: 67 },
+  { name: 'Dr. Fernández', avgTime: 28, rating: 4.7, consultations: 82 }
+];
+
+const specialtyDemandData = [
+  { specialty: 'Cardiología', demand: 35, growth: 12 },
+  { specialty: 'Dermatología', demand: 28, growth: 8 },
+  { specialty: 'Pediatría', demand: 22, growth: -2 },
+  { specialty: 'Neurología', demand: 18, growth: 15 },
+  { specialty: 'Ginecología', demand: 25, growth: 5 }
+];
+
+const conversionFunnelData = [
+  { stage: 'Visitantes', count: 10000, percentage: 100 },
+  { stage: 'Registro', count: 2500, percentage: 25 },
+  { stage: 'Primera cita', count: 1200, percentage: 12 },
+  { stage: 'Pacientes activos', count: 800, percentage: 8 }
+];
+
+const retentionData = [
+  { month: 'Mes 1', retention: 100 },
+  { month: 'Mes 2', retention: 78 },
+  { month: 'Mes 3', retention: 65 },
+  { month: 'Mes 6', retention: 52 },
+  { month: 'Mes 12', retention: 43 }
+];
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 export default function AdvancedAnalytics() {
   const [selectedPeriod, setSelectedPeriod] = useState('monthly');
-  const [selectedMetric, setSelectedMetric] = useState('all');
+  const [activeTab, setActiveTab] = useState('overview');
 
-  const { data: analytics, isLoading } = useQuery({
-    queryKey: ['advanced-analytics', selectedPeriod],
-    queryFn: async () => {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      return mockAnalyticsData;
-    },
-  });
-
-  if (isLoading) {
-    return <div className="p-6">Cargando analytics avanzados...</div>;
-  }
-
-  if (!analytics) {
-    return <div className="p-6">Error al cargar los datos.</div>;
-  }
-
-  const exportReport = (format: 'pdf' | 'excel') => {
-    console.log(`Exportando reporte en formato ${format}`);
-    // Simular descarga
+  const generateReport = (type: string) => {
+    console.log(`Generando reporte: ${type}`);
+    // Simular generación de reporte
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Analytics Avanzados</h1>
-          <p className="text-muted-foreground">Análisis profundo del rendimiento</p>
+          <h2 className="text-2xl font-bold">Analytics Avanzados</h2>
+          <p className="text-muted-foreground">Análisis profundo del rendimiento de la clínica</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
             <SelectTrigger className="w-40">
               <SelectValue />
@@ -191,230 +82,195 @@ export default function AdvancedAnalytics() {
               <SelectItem value="weekly">Semanal</SelectItem>
               <SelectItem value="monthly">Mensual</SelectItem>
               <SelectItem value="quarterly">Trimestral</SelectItem>
+              <SelectItem value="yearly">Anual</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={() => exportReport('pdf')} variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Exportar PDF
-          </Button>
-          <Button onClick={() => exportReport('excel')} variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Exportar Excel
+          <Button onClick={() => generateReport('comprehensive')} className="flex items-center gap-2">
+            <Download className="h-4 w-4" />
+            Exportar Reporte
           </Button>
         </div>
       </div>
 
-      {/* KPIs Principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
-          label="Satisfacción Promedio"
-          value={`${analytics.satisfaction.average}/5`}
-          icon={Star}
-          trend={{ value: analytics.satisfaction.trend, isPositive: true }}
-        />
-        <MetricCard
-          label="Tiempo Promedio de Consulta"
-          value={`${analytics.doctorEfficiency.avgConsultationTime} min`}
-          icon={Clock}
-          trend={{ value: -5.2, isPositive: true }}
-        />
-        <MetricCard
-          label="ROI Marketing"
-          value={`${analytics.marketing.roi}%`}
-          icon={DollarSign}
-          trend={{ value: 15.3, isPositive: true }}
-        />
-        <MetricCard
-          label="Costo de Adquisición"
-          value={`$${analytics.marketing.acquisitionCost}`}
-          icon={Users}
-          trend={{ value: -12.1, isPositive: true }}
-        />
-      </div>
-
-      <Tabs defaultValue="satisfaction" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview">Resumen</TabsTrigger>
           <TabsTrigger value="satisfaction">Satisfacción</TabsTrigger>
           <TabsTrigger value="efficiency">Eficiencia</TabsTrigger>
-          <TabsTrigger value="specialties">Especialidades</TabsTrigger>
-          <TabsTrigger value="predictions">Predicciones</TabsTrigger>
-          <TabsTrigger value="marketing">Marketing</TabsTrigger>
-          <TabsTrigger value="geographic">Geográfico</TabsTrigger>
+          <TabsTrigger value="demand">Demanda</TabsTrigger>
+          <TabsTrigger value="conversion">Conversión</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="satisfaction" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="overview" className="space-y-6">
+          {/* KPIs Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
-              <CardHeader>
-                <CardTitle>Distribución de Calificaciones</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={analytics.satisfaction.distribution}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ rating, count }) => `${rating}★ (${count})`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="count"
-                    >
-                      {analytics.satisfaction.distribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Satisfacción Promedio</p>
+                    <p className="text-2xl font-bold">4.4/5</p>
+                    <p className="text-xs text-green-600 flex items-center">
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                      +5% vs mes anterior
+                    </p>
+                  </div>
+                  <Star className="h-8 w-8 text-yellow-500" />
+                </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Métricas de Satisfacción</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span>Promedio General</span>
-                  <Badge variant="secondary">{analytics.satisfaction.average}/5</Badge>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Tiempo Promedio</p>
+                    <p className="text-2xl font-bold">28 min</p>
+                    <p className="text-xs text-green-600 flex items-center">
+                      <TrendingDown className="h-3 w-3 mr-1" />
+                      -2 min vs mes anterior
+                    </p>
+                  </div>
+                  <Clock className="h-8 w-8 text-blue-500" />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span>Total de Respuestas</span>
-                  <Badge variant="outline">{analytics.satisfaction.responses}</Badge>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Tasa de Conversión</p>
+                    <p className="text-2xl font-bold">12%</p>
+                    <p className="text-xs text-green-600 flex items-center">
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                      +1.2% vs mes anterior
+                    </p>
+                  </div>
+                  <Users className="h-8 w-8 text-green-500" />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span>Tendencia</span>
-                  <Badge variant="default" className="text-green-600">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    +{analytics.satisfaction.trend}%
-                  </Badge>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">ROI Marketing</p>
+                    <p className="text-2xl font-bold">285%</p>
+                    <p className="text-xs text-green-600 flex items-center">
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                      +12% vs mes anterior
+                    </p>
+                  </div>
+                  <DollarSign className="h-8 w-8 text-purple-500" />
                 </div>
               </CardContent>
             </Card>
           </div>
+
+          {/* Heatmap de Actividad */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Heatmap de Actividad por Hora</CardTitle>
+              <CardDescription>Distribución de citas por hora del día y día de la semana</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64 w-full bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg flex items-center justify-center">
+                <p className="text-muted-foreground">Heatmap simulado - Mayor actividad 9AM-5PM</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="satisfaction" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Evolución de Satisfacción del Paciente</CardTitle>
+              <CardDescription>Puntuación promedio y número de respuestas por mes</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <ComposedChart data={satisfactionData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis yAxisId="left" domain={[0, 5]} />
+                  <YAxis yAxisId="right" orientation="right" />
+                  <Tooltip />
+                  <Legend />
+                  <Bar yAxisId="right" dataKey="responses" fill="#8884d8" name="Respuestas" />
+                  <Line yAxisId="left" type="monotone" dataKey="satisfaction" stroke="#82ca9d" name="Satisfacción" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="efficiency" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Ratings de Doctores</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={analytics.doctorEfficiency.doctorRatings}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis domain={[4, 5]} />
-                    <Tooltip />
-                    <Bar dataKey="rating" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Distribución de Consultas por Hora</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={analytics.doctorEfficiency.timeDistribution}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="hour" />
-                    <YAxis />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="consultations" stroke="#8884d8" fill="#8884d8" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Eficiencia por Doctor</CardTitle>
+              <CardDescription>Tiempo promedio por consulta vs rating del doctor</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <ComposedChart data={doctorEfficiencyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis yAxisId="left" />
+                  <YAxis yAxisId="right" orientation="right" domain={[0, 5]} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar yAxisId="left" dataKey="avgTime" fill="#8884d8" name="Tiempo Promedio (min)" />
+                  <Line yAxisId="right" type="monotone" dataKey="rating" stroke="#82ca9d" name="Rating" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        <TabsContent value="specialties" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="demand" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle>Demanda por Especialidad</CardTitle>
+                <CardDescription>Porcentaje de consultas por especialidad</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={analytics.specialties.demand}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="specialty" angle={-45} textAnchor="end" height={80} />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="appointments" fill="#82ca9d" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Ingresos por Especialidad</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
-                      data={analytics.specialties.revenue}
+                      data={specialtyDemandData}
                       cx="50%"
                       cy="50%"
                       outerRadius={80}
                       fill="#8884d8"
-                      dataKey="revenue"
-                      label={({ specialty, revenue }) => `${specialty}: $${(revenue/1000).toFixed(0)}k`}
+                      dataKey="demand"
+                      label
                     >
-                      {analytics.specialties.revenue.map((entry, index) => (
+                      {specialtyDemandData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => `$${(Number(value)/1000).toFixed(0)}k`} />
+                    <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="predictions" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Predicción de Demanda por Hora</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={analytics.predictions.hourlyDemand}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="hour" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="predicted" stroke="#8884d8" name="Predicho" />
-                    <Line type="monotone" dataKey="actual" stroke="#82ca9d" name="Real" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Tendencias Semanales</CardTitle>
+                <CardTitle>Crecimiento por Especialidad</CardTitle>
+                <CardDescription>Porcentaje de crecimiento mensual</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={analytics.predictions.weeklyTrends}>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={specialtyDemandData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="week" />
+                    <XAxis dataKey="specialty" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="predicted" fill="#8884d8" />
-                    <Bar dataKey="confidence" fill="#82ca9d" />
+                    <Bar dataKey="growth" fill="#82ca9d" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -422,85 +278,44 @@ export default function AdvancedAnalytics() {
           </div>
         </TabsContent>
 
-        <TabsContent value="marketing" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="conversion" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle>Funnel de Conversión</CardTitle>
+                <CardDescription>Del visitante al paciente activo</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={analytics.marketing.conversionFunnel}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="stage" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="users" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div className="space-y-4">
+                  {conversionFunnelData.map((stage, index) => (
+                    <div key={stage.stage} className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="font-medium">{stage.stage}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {stage.count.toLocaleString()} ({stage.percentage}%)
+                        </span>
+                      </div>
+                      <Progress value={stage.percentage} className="h-2" />
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
                 <CardTitle>Retención de Usuarios</CardTitle>
+                <CardDescription>Porcentaje de usuarios que regresan</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={analytics.marketing.retention}>
+                <ResponsiveContainer width="100%" height={250}>
+                  <AreaChart data={retentionData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="week" />
+                    <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="retained" stroke="#8884d8" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="geographic" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Distribución Geográfica</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={analytics.geographic.distribution}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="city" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="users" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Crecimiento por Región</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={analytics.geographic.growth}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="growth"
-                      label={({ region, growth }) => `${region}: ${growth}%`}
-                    >
-                      {analytics.geographic.growth.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value) => `${value}%`} />
-                  </PieChart>
+                    <Area type="monotone" dataKey="retention" stroke="#8884d8" fill="#8884d8" />
+                  </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
@@ -508,31 +323,60 @@ export default function AdvancedAnalytics() {
         </TabsContent>
       </Tabs>
 
-      {/* Alertas y Insights */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5" />
-            Insights y Alertas
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
-              <AlertTriangle className="h-4 w-4 text-yellow-600" />
-              <span>La especialidad de Psicología muestra un crecimiento del 35.6% - considerar aumentar capacidad</span>
+      {/* Alertas y Reportes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Alertas de KPIs
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+                <div>
+                  <p className="font-medium">Tiempo de espera alto</p>
+                  <p className="text-sm text-muted-foreground">Promedio: 45 min (Meta: 30 min)</p>
+                </div>
+                <Badge variant="destructive">Crítico</Badge>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                <div>
+                  <p className="font-medium">Nueva tendencia de búsqueda</p>
+                  <p className="text-sm text-muted-foreground">Aumento en consultas de telemedicina</p>
+                </div>
+                <Badge variant="outline">Info</Badge>
+              </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
-              <TrendingUp className="h-4 w-4 text-green-600" />
-              <span>La satisfacción del paciente ha mejorado 8.5% este mes</span>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-500" />
+              Reportes Automáticos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <Button onClick={() => generateReport('weekly')} variant="outline" className="w-full justify-start">
+                <FileText className="h-4 w-4 mr-2" />
+                Reporte Semanal
+              </Button>
+              <Button onClick={() => generateReport('monthly')} variant="outline" className="w-full justify-start">
+                <FileText className="h-4 w-4 mr-2" />
+                Reporte Mensual
+              </Button>
+              <Button onClick={() => generateReport('quarterly')} variant="outline" className="w-full justify-start">
+                <FileText className="h-4 w-4 mr-2" />
+                Reporte Trimestral
+              </Button>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-              <MapPin className="h-4 w-4 text-blue-600" />
-              <span>La región Sur muestra el mayor crecimiento (25.7%) - oportunidad de expansión</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
