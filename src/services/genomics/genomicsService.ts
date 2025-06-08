@@ -1,3 +1,4 @@
+
 import type {
   GenomicProfile,
   PharmacogenomicProfile,
@@ -254,6 +255,58 @@ export class GenomicsService {
     };
   }
 
+  static async getCarrierScreening(patientId: string): Promise<CarrierScreening[]> {
+    await delay(500);
+
+    return [
+      {
+        id: 'screening-001',
+        diseases: [
+          {
+            diseaseName: 'Cystic Fibrosis',
+            gene: 'CFTR',
+            carrierRisk: 0.04,
+            inheritancePattern: 'autosomal recessive',
+            recommendations: ['Partner screening not required']
+          }
+        ],
+        reportSummary: 'Negative for common CFTR mutations',
+        recommendations: ['No immediate action required'],
+        references: ['PMID:56789012']
+      },
+      {
+        id: 'screening-002',
+        diseases: [
+          {
+            diseaseName: 'Sickle Cell Disease',
+            gene: 'HBB',
+            carrierRisk: 0.001,
+            inheritancePattern: 'autosomal recessive',
+            recommendations: ['No action required']
+          }
+        ],
+        reportSummary: 'Negative for sickle cell variants',
+        recommendations: ['No action required'],
+        references: ['PMID:67890123']
+      },
+      {
+        id: 'screening-003',
+        diseases: [
+          {
+            diseaseName: 'Tay-Sachs Disease',
+            gene: 'HEXA',
+            carrierRisk: 0.25,
+            inheritancePattern: 'autosomal recessive',
+            recommendations: ['Partner screening recommended']
+          }
+        ],
+        reportSummary: 'Carrier for Tay-Sachs disease',
+        recommendations: ['Genetic counseling', 'Partner testing'],
+        references: ['PMID:78901234']
+      }
+    ];
+  }
+
   static async getDiseasePredisposition(patientId: string): Promise<DiseasePredisposition[]> {
     await delay(600);
 
@@ -313,58 +366,6 @@ export class GenomicsService {
       neanderthalAdmixture: 2.3,
       references: ['PMID:45678901']
     };
-  }
-
-  static async getCarrierScreening(patientId: string): Promise<CarrierScreening[]> {
-    await delay(500);
-
-    return [
-      {
-        id: 'screening-001',
-        diseases: [
-          {
-            diseaseName: 'Cystic Fibrosis',
-            gene: 'CFTR',
-            carrierRisk: 0.04,
-            inheritancePattern: 'autosomal recessive',
-            recommendations: ['Partner screening not required']
-          }
-        ],
-        reportSummary: 'Negative for common CFTR mutations',
-        recommendations: ['No immediate action required'],
-        references: ['PMID:56789012']
-      },
-      {
-        id: 'screening-002',
-        diseases: [
-          {
-            diseaseName: 'Sickle Cell Disease',
-            gene: 'HBB',
-            carrierRisk: 0.001,
-            inheritancePattern: 'autosomal recessive',
-            recommendations: ['No action required']
-          }
-        ],
-        reportSummary: 'Negative for sickle cell variants',
-        recommendations: ['No action required'],
-        references: ['PMID:67890123']
-      },
-      {
-        id: 'screening-003',
-        diseases: [
-          {
-            diseaseName: 'Tay-Sachs Disease',
-            gene: 'HEXA',
-            carrierRisk: 0.25,
-            inheritancePattern: 'autosomal recessive',
-            recommendations: ['Partner screening recommended']
-          }
-        ],
-        reportSummary: 'Carrier for Tay-Sachs disease',
-        recommendations: ['Genetic counseling', 'Partner testing'],
-        references: ['PMID:78901234']
-      }
-    ];
   }
 
   static async getFamilyHealthPlan(patientId: string): Promise<FamilyHealthPlan> {
