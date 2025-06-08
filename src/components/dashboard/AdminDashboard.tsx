@@ -1,14 +1,16 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, UserPlus, Settings, FileText, Database, TrendingUp, AlertTriangle, Activity } from "lucide-react";
+import { Users, UserPlus, Settings, FileText, Database, TrendingUp, AlertTriangle, Activity, BarChart3 } from "lucide-react";
 import UserManagement from '@/components/admin/UserManagement';
 import SystemConfiguration from '@/components/admin/SystemConfiguration';
 import { ReportsGenerator } from '@/components/admin/ReportsGenerator';
 import { DatabaseManagement } from '@/components/admin/DatabaseManagement';
+import AdvancedAnalytics from '@/components/admin/AdvancedAnalytics';
 
 export default function AdminDashboard() {
-  const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'config' | 'reports' | 'database'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'config' | 'reports' | 'database' | 'analytics'>('dashboard');
 
   const stats = [
     {
@@ -51,6 +53,8 @@ export default function AdminDashboard() {
         return <ReportsGenerator />;
       case 'database':
         return <DatabaseManagement />;
+      case 'analytics':
+        return <AdvancedAnalytics />;
       default:
         return (
           <div className="space-y-6">
@@ -78,7 +82,7 @@ export default function AdminDashboard() {
                 <CardTitle>Acciones Rápidas</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                   <Button 
                     onClick={() => setActiveView('users')} 
                     variant="outline" 
@@ -86,6 +90,14 @@ export default function AdminDashboard() {
                   >
                     <UserPlus className="h-8 w-8 mb-2" />
                     <span>Gestionar Usuarios</span>
+                  </Button>
+                  <Button 
+                    onClick={() => setActiveView('analytics')} 
+                    variant="outline" 
+                    className="h-auto flex-col py-6"
+                  >
+                    <BarChart3 className="h-8 w-8 mb-2" />
+                    <span>Analytics Avanzados</span>
                   </Button>
                   <Button 
                     onClick={() => setActiveView('config')} 
