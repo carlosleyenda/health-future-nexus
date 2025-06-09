@@ -1,128 +1,117 @@
 
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthStore } from '@/store/auth';
+import { Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import MainLayout from '@/components/layout/MainLayout';
+
+// Pages
 import Index from '@/pages/Index';
 import NotFound from '@/pages/NotFound';
+import AuthPage from '@/pages/auth/AuthPage';
 import Settings from '@/pages/Settings';
-import { AuthPage } from '@/pages/auth/AuthPage';
-import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
-import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
+
+// Dashboard pages
+import PatientDashboard from '@/components/dashboard/PatientDashboard';
+import DoctorDashboard from '@/components/dashboard/DoctorDashboard';
 import AdminDashboard from '@/components/dashboard/AdminDashboard';
-import MedicalRecordsSystem from '@/components/medical-records/MedicalRecordsSystem';
-import MedicalAIAssistant from '@/components/ai/MedicalAIAssistant';
-import AIPersonalityDashboard from '@/components/ai/AIPersonalityDashboard';
-import MedicalDelivery from '@/components/delivery/MedicalDelivery';
-import UserProfile from '@/components/profile/UserProfile';
-import AppointmentBooking from '@/components/appointments/AppointmentBooking';
-import ConsultationRoom from '@/components/consultation/ConsultationRoom';
-import HealthDashboard from '@/components/health/HealthDashboard';
-import PharmacyModule from '@/components/pharmacy/PharmacyModule';
-import PaymentPortal from '@/components/payments/PaymentPortal';
-import CompletePatientPortal from '@/components/patient/CompletePatientPortal';
-import DoctorSchedule from '@/components/doctor/DoctorSchedule';
-import type { UserRole } from '@/types/user';
+
+// New pages
+import ChatPage from '@/pages/Chat';
+import NotificationsPage from '@/pages/Notifications';
+import ProfilePage from '@/pages/Profile';
+import AdminPage from '@/pages/AdminPage';
+import UsersManagementPage from '@/pages/UsersManagement';
+import AnalyticsPage from '@/pages/Analytics';
+import AppointmentsPage from '@/pages/Appointments';
+import ConsultationsPage from '@/pages/Consultations';
+import HealthPage from '@/pages/Health';
+import PharmacyPage from '@/pages/Pharmacy';
+import MedicalRecordsPage from '@/pages/MedicalRecords';
+import AIAssistantPage from '@/pages/AIAssistant';
+import DeliveryPage from '@/pages/Delivery';
+import PaymentsPage from '@/pages/Payments';
+
+// Public pages
+import Nosotros from '@/pages/public/Nosotros';
+import Servicios from '@/pages/public/Servicios';
+import Especialidades from '@/pages/public/Especialidades';
+import Contacto from '@/pages/public/Contacto';
 
 export default function AppRoutes() {
-  const { user, isAuthenticated } = useAuthStore();
-
-  const getUserRole = (role: UserRole): 'patient' | 'doctor' => {
-    if (role === 'specialist') return 'doctor';
-    if (role === 'coordinator' || role === 'delivery_staff' || role === 'pharmacist' || role === 'admin') return 'doctor'; // Treating admin roles as doctor for consultation purposes
-    return role as 'patient' | 'doctor';
-  };
-
-  // Función para determinar qué dashboard mostrar
-  const getDashboardComponent = () => {
-    if (!user) return <Navigate to="/auth" replace />;
-    
-    switch (user.role) {
-      case 'patient':
-        return <PatientDashboard />;
-      case 'doctor':
-      case 'specialist':
-        return <DoctorDashboard />;
-      case 'admin':
-      case 'coordinator':
-      case 'delivery_staff':
-      case 'pharmacist':
-        return <AdminDashboard />;
-      default:
-        return <PatientDashboard />;
-    }
-  };
-
   return (
     <Routes>
-      {/* Ruta pública principal */}
-      <Route path="/" element={
-        isAuthenticated ? (
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        ) : (
-          <Index />
-        )
-      }>
-        {/* Rutas protegidas anidadas */}
-        {isAuthenticated && (
-          <>
-            {/* Dashboard principal */}
-            <Route index element={getDashboardComponent()} />
-            
-            {/* Rutas específicas para pacientes */}
-            <Route path="appointments" element={<AppointmentBooking />} />
-            <Route path="consultations" element={
-              <ConsultationRoom 
-                appointmentId={user?.id || ''} 
-                userId={user?.id || ''} 
-                userRole={getUserRole(user?.role || 'patient')} 
-              />
-            } />
-            <Route path="health" element={<HealthDashboard patientId={user?.id || ''} />} />
-            <Route path="pharmacy" element={<PharmacyModule />} />
-            <Route path="payments" element={<PaymentPortal />} />
-            
-            {/* Rutas específicas para doctores */}
-            <Route path="patients" element={<CompletePatientPortal patientId={user?.id || ''} />} />
-            <Route path="schedule" element={<DoctorSchedule doctorId={user?.id || ''} />} />
-            
-            {/* Rutas compartidas */}
-            <Route path="medical-records" element={
-              <MedicalRecordsSystem 
-                patientId={user?.id || ''} 
-                userRole={getUserRole(user?.role || 'patient')}
-              />
-            } />
-            <Route path="ai-assistant" element={<MedicalAIAssistant />} />
-            <Route path="ai-personality" element={<AIPersonalityDashboard />} />
-            <Route path="delivery" element={<MedicalDelivery />} />
-            <Route path="profile" element={<UserProfile />} />
-            <Route path="settings" element={<Settings />} />
-          </>
-        )}
-      </Route>
-
-      {/* Ruta específica para admin que funciona independientemente */}
-      <Route path="/admin/*" element={
-        isAuthenticated ? (
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        ) : (
-          <Navigate to="/auth" replace />
-        )
-      }>
-        <Route index element={<AdminDashboard />} />
-        <Route path="dashboard" element={<AdminDashboard />} />
-      </Route>
-
-      {/* Auth routes */}
+      {/* Public routes */}
+      <Route path="/" element={<Index />} />
       <Route path="/auth" element={<AuthPage />} />
-      
-      {/* 404 route - debe ir al final */}
+      <Route path="/nosotros" element={<Nosotros />} />
+      <Route path="/servicios" element={<Servicios />} />
+      <Route path="/especialidades" element={<Especialidades />} />
+      <Route path="/contacto" element={<Contacto />} />
+
+      {/* Protected routes with layout */}
+      <Route path="/" element={
+        <ProtectedRoute>
+          <MainLayout />
+        </ProtectedRoute>
+      }>
+        {/* Dashboard routes */}
+        <Route path="/patient/dashboard" element={<PatientDashboard />} />
+        <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+        {/* Common routes */}
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/appointments" element={<AppointmentsPage />} />
+        <Route path="/consultations" element={<ConsultationsPage />} />
+        <Route path="/medical-records" element={<MedicalRecordsPage />} />
+        <Route path="/ai-assistant" element={<AIAssistantPage />} />
+        <Route path="/delivery" element={<DeliveryPage />} />
+        <Route path="/payments" element={<PaymentsPage />} />
+        <Route path="/pharmacy" element={<PharmacyPage />} />
+
+        {/* Patient-specific routes */}
+        <Route path="/health" element={
+          <ProtectedRoute allowedRoles={['patient']}>
+            <HealthPage />
+          </ProtectedRoute>
+        } />
+
+        {/* Doctor-specific routes */}
+        <Route path="/patients" element={
+          <ProtectedRoute allowedRoles={['doctor', 'specialist']}>
+            <div>Gestión de Pacientes - En desarrollo</div>
+          </ProtectedRoute>
+        } />
+        <Route path="/schedule" element={
+          <ProtectedRoute allowedRoles={['doctor', 'specialist']}>
+            <div>Agenda Médica - En desarrollo</div>
+          </ProtectedRoute>
+        } />
+
+        {/* Admin-specific routes */}
+        <Route path="/admin" element={
+          <ProtectedRoute allowedRoles={['admin', 'coordinator']}>
+            <AdminPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/users" element={
+          <ProtectedRoute allowedRoles={['admin', 'coordinator']}>
+            <UsersManagementPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/analytics" element={
+          <ProtectedRoute allowedRoles={['admin', 'coordinator']}>
+            <AnalyticsPage />
+          </ProtectedRoute>
+        } />
+
+        {/* Settings */}
+        <Route path="/settings" element={<Settings />} />
+      </Route>
+
+      {/* 404 page */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
