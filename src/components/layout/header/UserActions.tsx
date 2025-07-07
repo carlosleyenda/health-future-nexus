@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { User, Calendar, Phone, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,21 +11,33 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import type { User as UserType } from '@/types';
+
+interface UserProfile {
+  id: string;
+  user_id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  role: 'patient' | 'doctor' | 'admin' | 'enterprise' | 'pharmacy';
+}
 
 interface UserActionsProps {
   isAuthenticated: boolean;
-  user: UserType | null;
+  user: SupabaseUser | null;
+  profile: UserProfile | null;
   onLogin: () => void;
   onLogout: () => void;
 }
 
-export default function UserActions({ isAuthenticated, user, onLogin, onLogout }: UserActionsProps) {
+export default function UserActions({ isAuthenticated, user, profile, onLogin, onLogout }: UserActionsProps) {
   const navigate = useNavigate();
 
   const handleDashboard = () => {
-    if (user) {
-      navigate(`/${user.role}/dashboard`);
+    if (profile?.role) {
+      navigate(`/${profile.role}/dashboard`);
     }
   };
 
@@ -49,8 +62,8 @@ export default function UserActions({ isAuthenticated, user, onLogin, onLogout }
                 <User className="h-4 w-4 text-white" />
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
-                <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+                <p className="text-sm font-medium">{profile?.first_name} {profile?.last_name}</p>
+                <p className="text-xs text-gray-500 capitalize">{profile?.role}</p>
               </div>
             </Button>
           </DropdownMenuTrigger>

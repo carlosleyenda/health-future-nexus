@@ -11,11 +11,11 @@ import MobileMenu from "./header/MobileMenu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, user, logout } = useAuthStore();
+  const { isAuthenticated, user, profile, signOut } = useAuthStore();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    signOut();
   };
 
   const handleLogin = () => {
@@ -43,6 +43,7 @@ const Header = () => {
             <UserActions
               isAuthenticated={isAuthenticated}
               user={user}
+              profile={profile}
               onLogin={handleLogin}
               onLogout={handleLogout}
             />

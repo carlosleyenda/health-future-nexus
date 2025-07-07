@@ -9,7 +9,7 @@ import {
   Plus, Activity, Calendar, Pill, FileText, Heart, Stethoscope, 
   Shield, Smartphone, Bell, TrendingUp, Clock, MapPin, Star,
   MessageCircle, Video, Phone, ChevronRight, AlertCircle,
-  CheckCircle, Target, Zap
+  CheckCircle, Target, Zap, User, Users, CreditCard
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from '@/store/auth';
@@ -18,7 +18,7 @@ import AppointmentBookingModal from '@/components/appointments/AppointmentBookin
 export const PatientDashboard = () => {
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [activeHealthTab, setActiveHealthTab] = useState('overview');
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const navigate = useNavigate();
 
   // Datos simulados del estado de salud del paciente
@@ -104,13 +104,27 @@ export const PatientDashboard = () => {
       route: "/devices",
       stats: "2 conectados"
     },
-    {
-      title: "Cartera de Salud",
-      description: "Pagos, seguros y beneficios",
-      icon: Shield,
-      route: "/financial",
-      stats: "$1,250 disponible"
-    }
+            {
+              title: "Mi Cartera Digital",
+              description: "Pagos, seguros y finanzas",
+              icon: CreditCard,
+              route: "/payments",
+              stats: "$1,250 disponible"
+            },
+            {
+              title: "Red de Doctores",
+              description: "Encuentra especialistas",
+              icon: Users,
+              route: "/marketplace", 
+              stats: "45+ doctores"
+            },
+            {
+              title: "Mi Perfil de Salud",
+              description: "Configuración personal",
+              icon: User,
+              route: "/profile",
+              stats: "Completo al 85%"
+            }
   ];
 
   return (
@@ -122,7 +136,7 @@ export const PatientDashboard = () => {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
               <div className="flex-1">
                 <h1 className="text-3xl font-bold">
-                  ¡Hola, {user?.firstName || 'Usuario'}! 👋
+                  ¡Hola, {profile?.first_name || 'Usuario'}! 👋
                 </h1>
                 <p className="text-blue-100 mt-2 text-lg">
                   Tu salud está en buenas manos. Aquí tienes todo lo que necesitas.
@@ -276,23 +290,23 @@ export const PatientDashboard = () => {
                 <Target className="h-6 w-6 mr-2 text-blue-500" />
                 Mis Servicios de Salud
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {services.map((service, index) => (
                   <Card 
                     key={index}
-                    className="cursor-pointer hover:shadow-lg transition-all duration-200 group"
+                    className="cursor-pointer hover:shadow-lg transition-all duration-200 group hover:bg-blue-50"
                     onClick={() => navigate(service.route)}
                   >
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
+                    <CardContent className="p-6">
+                      <div className="flex items-center space-x-4">
                         <service.icon className="h-8 w-8 text-blue-600 group-hover:scale-110 transition-transform" />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{service.title}</h3>
+                          <p className="text-gray-600 text-sm">{service.description}</p>
+                          <Badge variant="secondary" className="mt-2">{service.stats}</Badge>
+                        </div>
                         <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <h3 className="font-semibold text-lg mb-2">{service.title}</h3>
-                      <p className="text-gray-600 text-sm mb-3">{service.description}</p>
-                      <Badge variant="secondary">{service.stats}</Badge>
                     </CardContent>
                   </Card>
                 ))}
