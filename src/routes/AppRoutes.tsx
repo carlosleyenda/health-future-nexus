@@ -30,6 +30,10 @@ import MedicalRecordsPage from '@/pages/MedicalRecords';
 import AIAssistantPage from '@/pages/AIAssistant';
 import DeliveryPage from '@/pages/Delivery';
 import PaymentsPage from '@/pages/Payments';
+import PricingPage from '@/pages/Pricing';
+import MarketplacePage from '@/pages/Marketplace';
+import ExecutiveDashboard from '@/pages/ExecutiveDashboard';
+import ReferralsPage from '@/pages/Referrals';
 
 // Public pages
 import Nosotros from '@/pages/public/Nosotros';
