@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 export function AppSidebar() {
-  const { user, logout } = useAuthStore();
+  const { user, profile, signOut } = useAuthStore();
   const { state } = useSidebar();
   const { data: notifications = [] } = useNotifications(user?.id || '');
   
@@ -41,7 +41,7 @@ export function AppSidebar() {
           {state === 'expanded' && (
             <div>
               <h1 className="font-bold text-lg text-blue-600">Clínica Virtual</h1>
-              <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+              <p className="text-xs text-gray-500 capitalize">{profile?.role || 'usuario'}</p>
             </div>
           )}
         </div>
@@ -52,7 +52,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navegación Principal</SidebarGroupLabel>
           <SidebarGroupContent>
             <RoleBasedNavigation 
-              userRole={user?.role as any} 
+              userRole={profile?.role || null} 
               collapsed={state === 'collapsed'} 
             />
           </SidebarGroupContent>
@@ -108,10 +108,10 @@ export function AppSidebar() {
                 {state === 'expanded' && (
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">
-                      {user.firstName} {user.lastName}
+                      {profile?.first_name} {profile?.last_name}
                     </span>
                     <span className="text-xs text-gray-500 capitalize">
-                      {user.role}
+                      {profile?.role || 'usuario'}
                     </span>
                   </div>
                 )}
@@ -120,7 +120,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={logout}
+              onClick={signOut}
               tooltip={state === 'collapsed' ? 'Cerrar Sesión' : undefined}
             >
               <LogOut className="h-4 w-4" />
