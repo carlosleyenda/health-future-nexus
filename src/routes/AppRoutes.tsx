@@ -77,6 +77,8 @@ export default function AppRoutes() {
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/marketplace" element={<MarketplacePage />} />
         <Route path="/referrals" element={<ReferralsPage />} />
+        <Route path="/enterprise" element={<EnterpriseDashboard />} />
+        <Route path="/pharmacy-dashboard" element={<PharmacyPartnerDashboard />} />
         <Route path="/executive" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <ExecutiveDashboard />
