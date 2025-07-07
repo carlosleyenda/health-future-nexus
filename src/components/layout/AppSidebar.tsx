@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth';
 import {
   Sidebar,
@@ -15,68 +15,19 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNotifications } from '@/hooks/useNotifications';
+import RoleBasedNavigation from './RoleBasedNavigation';
 import {
-  Home, Calendar, Video, Heart, Pill, FileText, 
-  MessageSquare, Truck, CreditCard, Users, Settings,
-  Stethoscope, BarChart3, Brain, User, LogOut, Bell
+  Stethoscope, MessageSquare, User, LogOut, Bell
 } from 'lucide-react';
 
 export function AppSidebar() {
   const { user, logout } = useAuthStore();
-  const location = useLocation();
   const { state } = useSidebar();
   const { data: notifications = [] } = useNotifications(user?.id || '');
   
   const unreadCount = notifications.filter(n => !n.isRead).length;
-
-  const getNavigationItems = () => {
-    if (!user) return [];
-    
-    if (user.role === 'patient') {
-      return [
-        { label: 'Dashboard', path: '/', icon: Home },
-        { label: 'Citas', path: '/appointments', icon: Calendar },
-        { label: 'Consultas', path: '/consultations', icon: Video },
-        { label: 'Salud', path: '/health', icon: Heart },
-        { label: 'Medicamentos', path: '/pharmacy', icon: Pill },
-        { label: 'Historial Médico', path: '/medical-records', icon: FileText },
-        { label: 'Asistente IA', path: '/ai-assistant', icon: Brain },
-        { label: 'Delivery Médico', path: '/delivery', icon: Truck },
-        { label: 'Pagos', path: '/payments', icon: CreditCard },
-      ];
-    }
-    
-    if (user.role === 'doctor' || user.role === 'specialist') {
-      return [
-        { label: 'Dashboard', path: '/', icon: Home },
-        { label: 'Pacientes', path: '/patients', icon: Users },
-        { label: 'Agenda', path: '/schedule', icon: Calendar },
-        { label: 'Consultas', path: '/consultations', icon: Video },
-        { label: 'Historial Médico', path: '/medical-records', icon: FileText },
-        { label: 'Asistente IA', path: '/ai-assistant', icon: Brain },
-        { label: 'Delivery Médico', path: '/delivery', icon: Truck },
-      ];
-    }
-    
-    if (user.role === 'admin' || user.role === 'coordinator') {
-      return [
-        { label: 'Dashboard', path: '/', icon: Home },
-        { label: 'Panel de Admin', path: '/admin', icon: Settings },
-        { label: 'Usuarios', path: '/users', icon: Users },
-        { label: 'Analytics', path: '/analytics', icon: BarChart3 },
-        { label: 'Historial Médico', path: '/medical-records', icon: FileText },
-        { label: 'Asistente IA', path: '/ai-assistant', icon: Brain },
-        { label: 'Delivery Médico', path: '/delivery', icon: Truck },
-      ];
-    }
-    
-    return [{ label: 'Dashboard', path: '/', icon: Home }];
-  };
-
-  const navigationItems = getNavigationItems();
 
   if (!user) return null;
 
@@ -98,24 +49,12 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navegación</SidebarGroupLabel>
+          <SidebarGroupLabel>Navegación Principal</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {navigationItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location.pathname === item.path}
-                    tooltip={state === 'collapsed' ? item.label : undefined}
-                  >
-                    <Link to={item.path}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <RoleBasedNavigation 
+              userRole={user?.role as any} 
+              collapsed={state === 'collapsed'} 
+            />
           </SidebarGroupContent>
         </SidebarGroup>
 
