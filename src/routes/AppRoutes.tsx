@@ -34,6 +34,8 @@ import PricingPage from '@/pages/Pricing';
 import MarketplacePage from '@/pages/Marketplace';
 import ExecutiveDashboard from '@/pages/ExecutiveDashboard';
 import ReferralsPage from '@/pages/Referrals';
+import EnterpriseDashboard from '@/pages/EnterpriseDashboard';
+import PharmacyPartnerDashboard from '@/pages/PharmacyPartnerDashboard';
 
 // Public pages
 import Nosotros from '@/pages/public/Nosotros';
