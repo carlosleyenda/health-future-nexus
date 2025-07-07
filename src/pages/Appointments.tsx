@@ -2,7 +2,7 @@
 import React from 'react';
 import { useAuthStore } from '@/store/auth';
 import AppointmentsList from '@/components/appointments/AppointmentsList';
-import { AdvancedAppointmentManager } from '@/components/patient/AdvancedAppointmentManager';
+import AdvancedAppointmentManager from '@/components/patient/AdvancedAppointmentManager';
 
 export default function AppointmentsPage() {
   const { user } = useAuthStore();
@@ -13,7 +13,7 @@ export default function AppointmentsPage() {
       {user?.role === 'patient' ? (
         <AdvancedAppointmentManager />
       ) : (
-        <AppointmentsList />
+        <AppointmentsList patientId={user?.id || ''} />
       )}
     </div>
   );

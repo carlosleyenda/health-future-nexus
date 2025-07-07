@@ -7,12 +7,12 @@ import MainLayout from '@/components/layout/MainLayout';
 // Pages
 import Index from '@/pages/Index';
 import NotFound from '@/pages/NotFound';
-import AuthPage from '@/pages/auth/AuthPage';
+import { AuthPage } from '@/pages/auth/AuthPage';
 import Settings from '@/pages/Settings';
 
 // Dashboard pages
-import PatientDashboard from '@/components/dashboard/PatientDashboard';
-import DoctorDashboard from '@/components/dashboard/DoctorDashboard';
+import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
+import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
 import AdminDashboard from '@/components/dashboard/AdminDashboard';
 
 // New pages
