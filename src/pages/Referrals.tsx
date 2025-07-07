@@ -261,7 +261,7 @@ Te invito a la plataforma médica más avanzada:
                     variant="outline" 
                     className="flex items-center gap-2 text-green-600 border-green-600"
                   >
-                    <WhatsApp className="h-4 w-4" />
+                    <MessageCircle className="h-4 w-4" />
                     WhatsApp
                   </Button>
                   <Button variant="outline" className="flex items-center gap-2">
