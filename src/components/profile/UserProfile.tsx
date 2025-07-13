@@ -98,7 +98,7 @@ export default function UserProfile() {
         </TabsContent>
 
         <TabsContent value="patient">
-          <PatientSpecificForm />
+          <PatientSpecificForm user={user} />
         </TabsContent>
       </Tabs>
     </div>

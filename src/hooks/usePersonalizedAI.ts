@@ -5,6 +5,7 @@ import { AIPersonalizationService, type AIPersonality, type AIInteraction } from
 import { useAuthStore } from '@/store/auth';
 import { toast } from 'sonner';
 
+
 export const usePersonalizedAI = () => {
   const { user } = useAuthStore();
   const [aiService] = useState(() => AIPersonalizationService.getInstance());
@@ -18,8 +19,19 @@ export const usePersonalizedAI = () => {
       
       let personality = await aiService.getUserAI(user.id);
       if (!personality) {
-        // Crear perfil de IA si no existe
-        personality = await aiService.createUserAI(user);
+        // Crear perfil de IA si no existe - usar datos básicos del usuario
+        const userForAI = {
+          id: user.id,
+          email: user.email || '',
+          role: 'patient' as const,
+          firstName: user.user_metadata?.firstName || '',
+          lastName: user.user_metadata?.lastName || '',
+          isActive: true,
+          onboardingCompleted: false,
+          createdAt: user.created_at,
+          updatedAt: user.updated_at || user.created_at
+        };
+        personality = await aiService.createUserAI(userForAI);
       }
       return personality;
     },

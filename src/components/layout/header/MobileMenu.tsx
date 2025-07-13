@@ -3,12 +3,12 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { User, Calendar, Phone } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
-import type { User as UserType } from '@/types';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface MobileMenuProps {
   isMenuOpen: boolean;
   isAuthenticated: boolean;
-  user: UserType | null;
+  user: SupabaseUser | null;
   onLogin: () => void;
   onLogout: () => void;
   onMenuClose: () => void;
@@ -34,7 +34,7 @@ export default function MobileMenu({
 
   const handleDashboard = () => {
     if (user) {
-      navigate(`/${user.role}/dashboard`);
+      navigate('/patient/dashboard'); // Default to patient dashboard for now
     }
   };
 
@@ -49,8 +49,8 @@ export default function MobileMenu({
           // Menú móvil para usuarios autenticados
           <>
             <div className="px-3 py-2 border-b border-gray-200 mb-2">
-              <p className="text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</p>
-              <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+              <p className="text-sm font-medium text-gray-900">{user.email}</p>
+              <p className="text-xs text-gray-500">Usuario</p>
             </div>
             <button
               onClick={() => {

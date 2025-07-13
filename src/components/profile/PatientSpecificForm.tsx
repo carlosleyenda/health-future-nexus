@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import type { User } from '@/types';
+import type { User } from '@supabase/supabase-js';
 
 const patientSchema = z.object({
   emergencyContactName: z.string().min(1, 'Nombre del contacto de emergencia requerido'),
