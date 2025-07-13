@@ -20,15 +20,24 @@ export const AuthPage = () => {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('login');
   
-  const { signIn, signUp, isAuthenticated, isLoading } = useAuthStore();
+  const { signIn, signUp, isAuthenticated, isLoading, profile } = useAuthStore();
   const navigate = useNavigate();
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/patient/dashboard');
+    if (isAuthenticated && profile) {
+      const dashboardPaths = {
+        patient: '/patient/dashboard',
+        doctor: '/doctor/dashboard',
+        admin: '/admin/dashboard',
+        enterprise: '/enterprise',
+        pharmacy: '/pharmacy-dashboard'
+      };
+      
+      const targetPath = dashboardPaths[profile.role] || '/patient/dashboard';
+      navigate(targetPath);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, profile, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +50,7 @@ export const AuthPage = () => {
       toast.error('Error al iniciar sesión: ' + error.message);
     } else {
       toast.success('¡Bienvenido de vuelta!');
-      navigate('/patient/dashboard');
+      // Redirect will happen via useEffect when authentication state changes
     }
   };
 
@@ -140,6 +149,18 @@ export const AuthPage = () => {
                   </Alert>
                 )}
                 
+                <div className="bg-blue-50 p-3 rounded-md text-sm text-blue-800 mb-4">
+                  <p className="font-medium mb-2">Credenciales Demo:</p>
+                  <div className="space-y-1 text-xs">
+                    <p>• ana.garcia@paciente.demo (Paciente)</p>
+                    <p>• carlos.rodriguez@doctor.demo (Doctor)</p>
+                    <p>• admin@sistema.demo (Admin)</p>
+                    <p>• empresa@salud.demo (Empresa)</p>
+                    <p>• farmacia@central.demo (Farmacia)</p>
+                    <p className="mt-2 font-mono">Contraseña: demo123</p>
+                  </div>
+                </div>
+
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
                     <>

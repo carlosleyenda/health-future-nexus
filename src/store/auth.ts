@@ -53,6 +53,50 @@ export const useAuthStore = create<AuthState>()(
         
         signIn: async (email: string, password: string) => {
           set({ isLoading: true });
+          
+          // Check for demo credentials
+          const demoUsers = [
+            { email: 'ana.garcia@paciente.demo', password: 'demo123', role: 'patient', name: 'Ana García' },
+            { email: 'carlos.rodriguez@doctor.demo', password: 'demo123', role: 'doctor', name: 'Dr. Carlos Rodríguez' },
+            { email: 'admin@sistema.demo', password: 'demo123', role: 'admin', name: 'Admin Sistema' },
+            { email: 'empresa@salud.demo', password: 'demo123', role: 'enterprise', name: 'Empresa Salud' },
+            { email: 'farmacia@central.demo', password: 'demo123', role: 'pharmacy', name: 'Farmacia Central' }
+          ];
+          
+          const demoUser = demoUsers.find(u => u.email === email && u.password === password);
+          
+          if (demoUser) {
+            // Simulate demo login
+            const mockUser = {
+              id: `demo-${demoUser.role}`,
+              email: demoUser.email,
+              user_metadata: { name: demoUser.name }
+            } as any;
+            
+            const mockProfile = {
+              id: `demo-${demoUser.role}`,
+              user_id: `demo-${demoUser.role}`,
+              email: demoUser.email,
+              first_name: demoUser.name.split(' ')[0],
+              last_name: demoUser.name.split(' ').slice(1).join(' '),
+              phone: null,
+              avatar_url: null,
+              bio: null,
+              role: demoUser.role as any
+            };
+            
+            set({ 
+              user: mockUser, 
+              session: null,
+              profile: mockProfile,
+              isAuthenticated: true,
+              isLoading: false 
+            });
+            
+            return { error: null };
+          }
+          
+          // Regular Supabase authentication
           const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
