@@ -20,8 +20,8 @@ export default function UserProfile() {
   const { user, profile } = useAuthStore();
   const [isUploading, setIsUploading] = useState(false);
 
-  if (!user) {
-    return <div>Usuario no encontrado</div>;
+  if (!user || !profile) {
+    return <div>Cargando...</div>;
   }
 
   const handleAvatarUpload = async () => {
@@ -83,39 +83,23 @@ export default function UserProfile() {
             <Shield className="h-4 w-4" />
             Seguridad
           </TabsTrigger>
-          {user.role === 'patient' && (
-            <TabsTrigger value="patient" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Paciente
-            </TabsTrigger>
-          )}
-          {user.role === 'doctor' && (
-            <TabsTrigger value="doctor" className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
-              Doctor
-            </TabsTrigger>
-          )}
+          <TabsTrigger value="patient" className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            Paciente
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="basic">
-          <BasicInfoForm user={user} />
+          <BasicInfoForm />
         </TabsContent>
 
         <TabsContent value="security">
           <SecurityForm />
         </TabsContent>
 
-        {user.role === 'patient' && (
-          <TabsContent value="patient">
-            <PatientSpecificForm user={user} />
-          </TabsContent>
-        )}
-
-        {user.role === 'doctor' && (
-          <TabsContent value="doctor">
-            <DoctorSpecificForm user={user} />
-          </TabsContent>
-        )}
+        <TabsContent value="patient">
+          <PatientSpecificForm />
+        </TabsContent>
       </Tabs>
     </div>
   );

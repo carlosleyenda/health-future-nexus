@@ -35,7 +35,7 @@ interface RegisterFormProps {
 export const RegisterForm = ({ onToggleMode }: RegisterFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { setUser, setLoading } = useAuthStore();
+  const { signUp } = useAuthStore();
   const navigate = useNavigate();
 
   const form = useForm<RegisterFormData>({
@@ -52,40 +52,19 @@ export const RegisterForm = ({ onToggleMode }: RegisterFormProps) => {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    setLoading(true);
-    
     try {
-      // Simulamos registro (aquí iría la integración con Supabase)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const { error } = await signUp(data.email, data.password, data.firstName, data.lastName);
       
-      const currentTime = new Date().toISOString();
-      const newUser = {
-        id: Date.now().toString(),
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: "patient" as const,
-        phone: data.phone,
-        avatarUrl: null,
-        isActive: true,
-        onboardingCompleted: false,
-        createdAt: currentTime,
-        updatedAt: currentTime
-      };
-
-      setUser(newUser);
-      toast.success("¡Cuenta creada exitosamente!", {
-        description: `Bienvenido ${newUser.firstName} ${newUser.lastName}. Tu cuenta ha sido registrada.`
-      });
+      if (error) {
+        throw new Error(error.message || "Error al crear la cuenta");
+      }
       
-      // Redirigir al dashboard del paciente (rol por defecto)
-      navigate(`/${newUser.role}/dashboard`);
+      toast.success("¡Cuenta creada exitosamente! Revisa tu email para verificar tu cuenta.");
+      onToggleMode();
     } catch (error) {
       toast.error("Error al crear la cuenta", {
         description: "Intenta nuevamente o contacta soporte."
       });
-    } finally {
-      setLoading(false);
     }
   };
 

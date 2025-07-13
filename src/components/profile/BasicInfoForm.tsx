@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,11 +5,9 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuthStore } from '@/store/auth';
 import { toast } from 'sonner';
-import type { User } from '@/types';
 
 const basicInfoSchema = z.object({
   firstName: z.string().min(1, 'El nombre es requerido'),
@@ -19,32 +16,25 @@ const basicInfoSchema = z.object({
   phone: z.string().optional(),
 });
 
-interface BasicInfoFormProps {
-  user: User;
-}
+export function BasicInfoForm() {
+  const { user, profile } = useAuthStore();
 
-export default function BasicInfoForm({ user }: BasicInfoFormProps) {
-  const { setUser } = useAuthStore();
+  const defaultValues = {
+    firstName: profile?.first_name || '',
+    lastName: profile?.last_name || '',
+    email: user?.email || '',
+    phone: profile?.phone || '',
+  };
 
   const form = useForm({
     resolver: zodResolver(basicInfoSchema),
-    defaultValues: {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone || '',
-    },
+    defaultValues,
   });
 
   const onSubmit = async (data: z.infer<typeof basicInfoSchema>) => {
     try {
-      // Simular actualización
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const updatedUser = { ...user, ...data };
-      setUser(updatedUser);
-      
-      toast.success('Información actualizada correctamente');
+      // Aquí iría la lógica para actualizar el perfil en Supabase
+      toast.success("Información actualizada correctamente");
     } catch (error) {
       toast.error('Error al actualizar la información');
     }
@@ -128,3 +118,5 @@ export default function BasicInfoForm({ user }: BasicInfoFormProps) {
     </Card>
   );
 }
+
+export default BasicInfoForm;
