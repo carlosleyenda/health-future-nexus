@@ -5,9 +5,9 @@ import { Navigate } from 'react-router-dom';
 import ModernHealthOverview from '@/components/patient/ModernHealthOverview';
 
 export default function HealthPage() {
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
 
-  if (!user || user.role !== 'patient') {
+  if (!user || !profile || profile.role !== 'patient') {
     return <Navigate to="/" replace />;
   }
 
