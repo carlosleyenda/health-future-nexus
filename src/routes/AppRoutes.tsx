@@ -8,6 +8,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import Index from '@/pages/Index';
 import NotFound from '@/pages/NotFound';
 import { AuthPage } from '@/pages/auth/AuthPage';
+import DemoAccessPage from '@/pages/demo/DemoAccess';
 import Settings from '@/pages/Settings';
 
 // Dashboard pages
@@ -49,6 +50,7 @@ export default function AppRoutes() {
       {/* Public routes */}
       <Route path="/" element={<Index />} />
       <Route path="/auth" element={<AuthPage />} />
+      <Route path="/demo" element={<DemoAccessPage />} />
       <Route path="/nosotros" element={<Nosotros />} />
       <Route path="/servicios" element={<Servicios />} />
       <Route path="/especialidades" element={<Especialidades />} />
