@@ -32,7 +32,7 @@ export default function MainHeader({
   navigationItems,
   quickActions
 }: MainHeaderProps) {
-  const { user, logout } = useAuthStore();
+  const { user, profile, signOut } = useAuthStore();
   const { data: notifications = [] } = useNotifications(user?.id || '');
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,8 +51,9 @@ export default function MainHeader({
     action.roles.includes(user?.role || '')
   );
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
   };
 
   if (!user) {
@@ -152,7 +153,7 @@ export default function MainHeader({
                     <User className="h-4 w-4 text-white" />
                   </div>
                   <div className="hidden md:block text-left">
-                    <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
+                    <p className="text-sm font-medium">{profile?.first_name} {profile?.last_name}</p>
                     <p className="text-xs text-gray-500 capitalize">{user.role}</p>
                   </div>
                 </Button>

@@ -14,15 +14,15 @@ export default function MobileNavigation({
   setShowMobileMenu,
   navigationItems
 }: MobileNavigationProps) {
-  const { user, logout } = useAuthStore();
+  const { user, signOut } = useAuthStore();
   const location = useLocation();
 
   const filteredNavItems = navigationItems.filter(item => 
     item.roles.includes(user?.role || '')
   );
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
   };
 
   if (!showMobileMenu) {

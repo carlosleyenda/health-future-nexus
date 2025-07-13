@@ -17,7 +17,7 @@ import DoctorSpecificForm from './DoctorSpecificForm';
 import { toast } from 'sonner';
 
 export default function UserProfile() {
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const [isUploading, setIsUploading] = useState(false);
 
   if (!user) {
@@ -40,9 +40,9 @@ export default function UserProfile() {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             <div className="relative">
               <Avatar className="w-24 h-24">
-                <AvatarImage src={user.avatarUrl} />
+                <AvatarImage src={profile.avatar_url} />
                 <AvatarFallback className="text-2xl">
-                  {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                  {profile.first_name?.charAt(0)}{profile.last_name?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <Button
@@ -57,17 +57,15 @@ export default function UserProfile() {
             </div>
             
             <div className="text-center md:text-left space-y-2">
-              <h1 className="text-2xl font-bold">{user.firstName} {user.lastName}</h1>
+              <h1 className="text-2xl font-bold">{profile.first_name} {profile.last_name}</h1>
               <p className="text-muted-foreground">{user.email}</p>
               <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                 <Badge variant="outline" className="capitalize">
-                  {user.role}
+                  Paciente
                 </Badge>
-                {user.isActive && (
-                  <Badge variant="default" className="bg-green-600">
-                    Activo
-                  </Badge>
-                )}
+                <Badge variant="default" className="bg-green-600">
+                  Activo
+                </Badge>
               </div>
             </div>
           </div>

@@ -12,7 +12,7 @@ import RecentReviews from './sections/RecentReviews';
 import DoctorActions from '@/components/doctor/DoctorActions';
 
 export const DoctorDashboard = () => {
-  const { user } = useAuthStore();
+  const { profile } = useAuthStore();
   const navigate = useNavigate();
 
   const quickAccessItems = [
@@ -45,7 +45,7 @@ export const DoctorDashboard = () => {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">
-            Dr. {user?.lastName || 'Doctor'}
+            Dr. {profile?.last_name || 'Doctor'}
           </h1>
           <p className="text-muted-foreground">
             Gestiona tus pacientes y consultas médicas
@@ -77,7 +77,7 @@ export const DoctorDashboard = () => {
       </div>
       
       {/* Doctor Actions - Componente completo de acciones */}
-      <DoctorActions doctorId={user?.id || ''} />
+      <DoctorActions doctorId={profile?.user_id || ''} />
       
       {/* Main Grid responsive */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">

@@ -36,7 +36,7 @@ export default function DocumentUpload({ patientId, onClose, onSuccess }: Docume
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const { user } = useAuthStore();
+  const { profile } = useAuthStore();
   const uploadDocument = useUploadDocument();
 
   const categories = [
@@ -93,7 +93,7 @@ export default function DocumentUpload({ patientId, onClose, onSuccess }: Docume
   };
 
   const handleUpload = async () => {
-    if (!title.trim() || files.length === 0 || !user) return;
+    if (!title.trim() || files.length === 0 || !profile) return;
 
     setUploading(true);
     setUploadProgress(0);
@@ -103,13 +103,13 @@ export default function DocumentUpload({ patientId, onClose, onSuccess }: Docume
         const file = files[i];
         
         const metadata = {
-          doctorId: user.id,
+          doctorId: profile.user_id,
           category,
           type: getDocumentType(file),
           title: files.length === 1 ? title : `${title} (${i + 1})`,
           description,
           tags,
-          uploadedBy: `${user.firstName} ${user.lastName}`
+          uploadedBy: `${profile.first_name} ${profile.last_name}`
         };
 
         await uploadDocument.mutateAsync({

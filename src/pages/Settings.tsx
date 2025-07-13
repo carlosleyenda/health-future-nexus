@@ -9,7 +9,7 @@ import { useAuthStore } from '@/store/auth';
 import { Settings, Bell, Shield, User, Palette } from 'lucide-react';
 
 const SettingsPage = () => {
-  const { user } = useAuthStore();
+  const { profile } = useAuthStore();
 
   return (
     <div className="space-y-6">
@@ -153,16 +153,16 @@ const SettingsPage = () => {
               <div>
                 <Label className="text-sm font-medium">Nombre completo</Label>
                 <p className="text-sm text-muted-foreground">
-                  {user?.firstName} {user?.lastName}
+                  {profile?.first_name} {profile?.last_name}
                 </p>
               </div>
               <div>
                 <Label className="text-sm font-medium">Email</Label>
-                <p className="text-sm text-muted-foreground">{user?.email}</p>
+                <p className="text-sm text-muted-foreground">{profile?.email}</p>
               </div>
               <div>
                 <Label className="text-sm font-medium">Rol</Label>
-                <p className="text-sm text-muted-foreground capitalize">{user?.role}</p>
+                <p className="text-sm text-muted-foreground capitalize">Paciente</p>
               </div>
               <div>
                 <Label className="text-sm font-medium">Fecha de registro</Label>

@@ -30,7 +30,7 @@ export default function AIChat({
 }: AIChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const { user } = useAuthStore();
+  const { profile } = useAuthStore();
   const { generateResponse, provideFeedback, isGenerating } = usePersonalizedAI();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -236,9 +236,9 @@ export default function AIChat({
             </Button>
           </div>
           
-          {user && (
+          {profile && (
             <p className="text-xs text-gray-500 mt-2">
-              Personalizado para: {user.firstName} ({user.role})
+              Personalizado para: {profile.first_name}
             </p>
           )}
         </div>

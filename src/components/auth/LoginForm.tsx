@@ -28,7 +28,7 @@ interface LoginFormProps {
 
 export const LoginForm = ({ onToggleMode }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
-  const { setUser, setLoading } = useAuthStore();
+  const { signIn } = useAuthStore();
   const navigate = useNavigate();
 
   const form = useForm<LoginFormData>({
@@ -41,75 +41,19 @@ export const LoginForm = ({ onToggleMode }: LoginFormProps) => {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setLoading(true);
-    
     try {
-      // Simulamos autenticación (aquí iría la integración con Supabase)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const { error } = await signIn(data.email, data.password);
       
-      // Simulamos diferentes tipos de usuarios para demostración
-      const currentTime = new Date().toISOString();
-      const mockUsers = {
-        "paciente@test.com": { 
-          id: "1", 
-          email: "paciente@test.com", 
-          firstName: "Juan",
-          lastName: "Pérez",
-          role: "patient" as const,
-          phone: "+52 555 0123",
-          avatarUrl: null,
-          isActive: true,
-          onboardingCompleted: true,
-          createdAt: currentTime,
-          updatedAt: currentTime
-        },
-        "doctor@test.com": { 
-          id: "2", 
-          email: "doctor@test.com", 
-          firstName: "María",
-          lastName: "García",
-          role: "doctor" as const,
-          phone: "+52 555 0456",
-          avatarUrl: null,
-          isActive: true,
-          onboardingCompleted: true,
-          createdAt: currentTime,
-          updatedAt: currentTime
-        },
-        "admin@test.com": { 
-          id: "3", 
-          email: "admin@test.com", 
-          firstName: "Carlos",
-          lastName: "Admin",
-          role: "admin" as const,
-          phone: "+52 555 0789",
-          avatarUrl: null,
-          isActive: true,
-          onboardingCompleted: true,
-          createdAt: currentTime,
-          updatedAt: currentTime
-        }
-      };
-
-      const user = mockUsers[data.email as keyof typeof mockUsers];
-      
-      if (user && data.password === "123456") {
-        setUser(user);
-        toast.success(`¡Bienvenido ${user.firstName} ${user.lastName}!`, {
-          description: `Has iniciado sesión como ${user.role === 'patient' ? 'Paciente' : user.role === 'doctor' ? 'Doctor' : 'Administrador'}`
-        });
-        
-        // Redirigir al dashboard apropiado basado en el rol
-        navigate(`/${user.role}/dashboard`);
-      } else {
-        throw new Error("Credenciales inválidas");
+      if (error) {
+        throw new Error(error.message || "Credenciales inválidas");
       }
+      
+      toast.success("¡Inicio de sesión exitoso!");
+      navigate("/");
     } catch (error) {
       toast.error("Error al iniciar sesión", {
-        description: "Verifica tus credenciales. Usa: paciente@test.com, doctor@test.com o admin@test.com con contraseña: 123456"
+        description: "Verifica tus credenciales"
       });
-    } finally {
-      setLoading(false);
     }
   };
 
