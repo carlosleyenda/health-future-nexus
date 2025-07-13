@@ -14,6 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from '@/store/auth';
 import AppointmentBookingModal from '@/components/appointments/AppointmentBookingModal';
+import PatientProgressOverview from '@/components/patient/PatientProgressOverview';
 
 export const PatientDashboard = () => {
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
@@ -368,31 +369,8 @@ export const PatientDashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Rating y Feedback */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Star className="h-5 w-5 mr-2 text-yellow-500" />
-                    Tu Experiencia
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600 mb-4">
-                    ¿Cómo ha sido tu experiencia con nuestros servicios?
-                  </p>
-                  <div className="flex justify-center space-x-2 mb-4">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star 
-                        key={star} 
-                        className="h-6 w-6 text-yellow-400 fill-current cursor-pointer hover:scale-110 transition-transform" 
-                      />
-                    ))}
-                  </div>
-                  <Button variant="outline" className="w-full">
-                    Dejar Comentario
-                  </Button>
-                </CardContent>
-              </Card>
+              {/* Patient Progress Overview */}
+              <PatientProgressOverview />
             </div>
           </div>
         </div>

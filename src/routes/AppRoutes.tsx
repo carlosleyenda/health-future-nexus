@@ -35,6 +35,9 @@ import PricingPage from '@/pages/Pricing';
 import MarketplacePage from '@/pages/Marketplace';
 import ExecutiveDashboard from '@/pages/ExecutiveDashboard';
 import ReferralsPage from '@/pages/Referrals';
+import MedicationsPage from '@/pages/Medications';
+import DevicesPage from '@/pages/Devices';
+import EmergencyPage from '@/pages/Emergency';
 import EnterpriseDashboard from '@/pages/EnterpriseDashboard';
 import PharmacyPartnerDashboard from '@/pages/PharmacyPartnerDashboard';
 
@@ -81,6 +84,9 @@ export default function AppRoutes() {
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/marketplace" element={<MarketplacePage />} />
         <Route path="/referrals" element={<ReferralsPage />} />
+        <Route path="/medications" element={<MedicationsPage />} />
+        <Route path="/devices" element={<DevicesPage />} />
+        <Route path="/emergency" element={<EmergencyPage />} />
         <Route path="/enterprise" element={<EnterpriseDashboard />} />
         <Route path="/pharmacy-dashboard" element={<PharmacyPartnerDashboard />} />
         <Route path="/executive" element={
