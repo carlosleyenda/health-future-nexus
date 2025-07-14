@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { useAuthStore } from '@/store/auth';
 import { 
   User, 
   Stethoscope, 
@@ -73,34 +74,31 @@ const demoUsers = [
 export default function DemoLogin() {
   const [loading, setLoading] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { signIn } = useAuthStore();
 
   const handleDemoLogin = async (user: typeof demoUsers[0]) => {
     setLoading(user.role);
     
-    // Simulate demo login - in a real app, you'd create actual demo accounts
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      // Use the existing signIn function which handles demo users
+      const { error } = await signIn(user.email, user.password);
       
-      // For demo purposes, we'll just store the demo user data and redirect
-      localStorage.setItem('demo_user', JSON.stringify({
-        role: user.role,
-        email: user.email,
-        name: user.name,
-        isDemo: true
-      }));
-      
-      toast.success(`¡Bienvenido como ${user.name}!`);
-      
-      // Redirect based on role
-      const dashboardPaths = {
-        patient: '/patient/dashboard',
-        doctor: '/doctor/dashboard',
-        admin: '/admin/dashboard',
-        enterprise: '/enterprise',
-        pharmacy: '/pharmacy-dashboard'
-      };
-      
-      navigate(dashboardPaths[user.role as keyof typeof dashboardPaths] || '/');
+      if (!error) {
+        toast.success(`¡Bienvenido como ${user.name}!`);
+        
+        // Redirect based on role
+        const dashboardPaths = {
+          patient: '/patient/dashboard',
+          doctor: '/doctor/dashboard', 
+          admin: '/admin/dashboard',
+          enterprise: '/enterprise',
+          pharmacy: '/pharmacy-dashboard'
+        };
+        
+        navigate(dashboardPaths[user.role as keyof typeof dashboardPaths] || '/');
+      } else {
+        toast.error('Error al acceder como usuario demo');
+      }
     } catch (error) {
       toast.error('Error al acceder como usuario demo');
     } finally {

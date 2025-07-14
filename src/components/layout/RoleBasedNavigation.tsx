@@ -27,12 +27,15 @@ const navigationConfig: Record<string, NavigationItem[]> = {
     { name: 'Mis Citas', href: '/appointments', icon: Calendar, description: 'Gestionar citas médicas' },
     { name: 'Consultas', href: '/consultations', icon: Stethoscope, description: 'Video consultas virtuales' },
     { name: 'Mi Salud', href: '/health', icon: Activity, description: 'Monitoreo y métricas' },
-    { name: 'Medicamentos', href: '/pharmacy', icon: Pill, description: 'Seguimiento de medicamentos' },
+    { name: 'Medicamentos', href: '/medications', icon: Pill, description: 'Seguimiento de medicamentos' },
+    { name: 'Dispositivos', href: '/devices', icon: Target, description: 'Dispositivos IoT conectados' },
+    { name: 'Emergencias', href: '/emergency', icon: Shield, description: 'Centro de emergencias' },
     { name: 'Historial Médico', href: '/medical-records', icon: FileText, description: 'Registros médicos completos' },
     { name: 'Delivery Médico', href: '/delivery', icon: Truck, description: 'Servicios a domicilio' },
+    { name: 'Farmacia', href: '/pharmacy', icon: Package, description: 'Farmacia online' },
     { name: 'Mis Pagos', href: '/payments', icon: CreditCard, description: 'Wallet y transacciones' },
     { name: 'Chat Médico', href: '/chat', icon: MessageSquare, badge: '3', description: 'Soporte 24/7' },
-    { name: 'IA Assistant', href: '/ai-assistant', icon: Target, description: 'Asistente médico inteligente' },
+    { name: 'IA Assistant', href: '/ai-assistant', icon: Crown, description: 'Asistente médico inteligente' },
     { name: 'Configuración', href: '/settings', icon: Settings, description: 'Preferencias y cuenta' }
   ],
   
