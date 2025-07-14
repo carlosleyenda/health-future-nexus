@@ -468,6 +468,68 @@ export type Database = {
         }
         Relationships: []
       }
+      doctor_profiles: {
+        Row: {
+          available_hours: Json | null
+          bio: string | null
+          certifications: string[] | null
+          consultation_fee: number | null
+          created_at: string
+          education: string[] | null
+          id: string
+          languages: string[] | null
+          license_number: string
+          rating: number | null
+          specialty: Database["public"]["Enums"]["medical_specialty"]
+          total_reviews: number | null
+          updated_at: string
+          user_id: string
+          years_experience: number
+        }
+        Insert: {
+          available_hours?: Json | null
+          bio?: string | null
+          certifications?: string[] | null
+          consultation_fee?: number | null
+          created_at?: string
+          education?: string[] | null
+          id?: string
+          languages?: string[] | null
+          license_number: string
+          rating?: number | null
+          specialty: Database["public"]["Enums"]["medical_specialty"]
+          total_reviews?: number | null
+          updated_at?: string
+          user_id: string
+          years_experience?: number
+        }
+        Update: {
+          available_hours?: Json | null
+          bio?: string | null
+          certifications?: string[] | null
+          consultation_fee?: number | null
+          created_at?: string
+          education?: string[] | null
+          id?: string
+          languages?: string[] | null
+          license_number?: string
+          rating?: number | null
+          specialty?: Database["public"]["Enums"]["medical_specialty"]
+          total_reviews?: number | null
+          updated_at?: string
+          user_id?: string
+          years_experience?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       emergency_escalation_rules: {
         Row: {
           created_at: string
@@ -961,6 +1023,108 @@ export type Database = {
         }
         Relationships: []
       }
+      medical_records: {
+        Row: {
+          allergies: string[] | null
+          chief_complaint: string
+          created_at: string
+          diagnosis: string
+          doctor_id: string
+          follow_up_date: string | null
+          id: string
+          medications: string[] | null
+          notes: string | null
+          patient_id: string
+          record_type: string
+          symptoms: string[] | null
+          treatment_plan: string | null
+          updated_at: string
+          visit_date: string
+          vital_signs: Json | null
+        }
+        Insert: {
+          allergies?: string[] | null
+          chief_complaint: string
+          created_at?: string
+          diagnosis: string
+          doctor_id: string
+          follow_up_date?: string | null
+          id?: string
+          medications?: string[] | null
+          notes?: string | null
+          patient_id: string
+          record_type?: string
+          symptoms?: string[] | null
+          treatment_plan?: string | null
+          updated_at?: string
+          visit_date: string
+          vital_signs?: Json | null
+        }
+        Update: {
+          allergies?: string[] | null
+          chief_complaint?: string
+          created_at?: string
+          diagnosis?: string
+          doctor_id?: string
+          follow_up_date?: string | null
+          id?: string
+          medications?: string[] | null
+          notes?: string | null
+          patient_id?: string
+          record_type?: string
+          symptoms?: string[] | null
+          treatment_plan?: string | null
+          updated_at?: string
+          visit_date?: string
+          vital_signs?: Json | null
+        }
+        Relationships: []
+      }
+      medical_transcriptions: {
+        Row: {
+          confidence_score: number | null
+          doctor_id: string
+          id: string
+          keywords: string[] | null
+          patient_id: string
+          processed_at: string
+          session_date: string
+          session_id: string | null
+          speaker: string
+          summary: string | null
+          timestamp_seconds: number | null
+          transcript_text: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          doctor_id: string
+          id?: string
+          keywords?: string[] | null
+          patient_id: string
+          processed_at?: string
+          session_date?: string
+          session_id?: string | null
+          speaker: string
+          summary?: string | null
+          timestamp_seconds?: number | null
+          transcript_text: string
+        }
+        Update: {
+          confidence_score?: number | null
+          doctor_id?: string
+          id?: string
+          keywords?: string[] | null
+          patient_id?: string
+          processed_at?: string
+          session_date?: string
+          session_id?: string | null
+          speaker?: string
+          summary?: string | null
+          timestamp_seconds?: number | null
+          transcript_text?: string
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           created_at: string
@@ -1032,6 +1196,74 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      patient_profiles: {
+        Row: {
+          allergies: string[] | null
+          blood_type: string | null
+          chronic_conditions: string[] | null
+          created_at: string
+          current_medications: string[] | null
+          date_of_birth: string
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          gender: string | null
+          height_cm: number | null
+          id: string
+          insurance_policy_number: string | null
+          insurance_provider: string | null
+          preferred_language: string | null
+          updated_at: string
+          user_id: string
+          weight_kg: number | null
+        }
+        Insert: {
+          allergies?: string[] | null
+          blood_type?: string | null
+          chronic_conditions?: string[] | null
+          created_at?: string
+          current_medications?: string[] | null
+          date_of_birth: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          gender?: string | null
+          height_cm?: number | null
+          id?: string
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
+          preferred_language?: string | null
+          updated_at?: string
+          user_id: string
+          weight_kg?: number | null
+        }
+        Update: {
+          allergies?: string[] | null
+          blood_type?: string | null
+          chronic_conditions?: string[] | null
+          created_at?: string
+          current_medications?: string[] | null
+          date_of_birth?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          gender?: string | null
+          height_cm?: number | null
+          id?: string
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
+          preferred_language?: string | null
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       payment_intents: {
         Row: {
@@ -1132,6 +1364,60 @@ export type Database = {
           type?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      prescriptions: {
+        Row: {
+          created_at: string
+          doctor_id: string
+          doctor_name: string
+          dosage: string
+          duration: string
+          frequency: string
+          id: string
+          instructions: string | null
+          issued_date: string
+          medication_name: string
+          patient_id: string
+          qr_code: string | null
+          status: string
+          updated_at: string
+          valid_until: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_id: string
+          doctor_name: string
+          dosage: string
+          duration: string
+          frequency: string
+          id?: string
+          instructions?: string | null
+          issued_date?: string
+          medication_name: string
+          patient_id: string
+          qr_code?: string | null
+          status?: string
+          updated_at?: string
+          valid_until: string
+        }
+        Update: {
+          created_at?: string
+          doctor_id?: string
+          doctor_name?: string
+          dosage?: string
+          duration?: string
+          frequency?: string
+          id?: string
+          instructions?: string | null
+          issued_date?: string
+          medication_name?: string
+          patient_id?: string
+          qr_code?: string | null
+          status?: string
+          updated_at?: string
+          valid_until?: string
         }
         Relationships: []
       }
@@ -1770,6 +2056,22 @@ export type Database = {
     Enums: {
       app_role: "patient" | "doctor" | "admin" | "enterprise" | "pharmacy"
       delivery_method: "app" | "email" | "sms"
+      medical_specialty:
+        | "cardiologia"
+        | "dermatologia"
+        | "endocrinologia"
+        | "gastroenterologia"
+        | "ginecologia"
+        | "neurologia"
+        | "oftalmologia"
+        | "ortopedia"
+        | "pediatria"
+        | "psiquiatria"
+        | "urologia"
+        | "neumologia"
+        | "oncologia"
+        | "traumatologia"
+        | "medicina_general"
       notification_priority: "urgent" | "important" | "normal"
       notification_type:
         | "appointment"
@@ -1914,6 +2216,23 @@ export const Constants = {
     Enums: {
       app_role: ["patient", "doctor", "admin", "enterprise", "pharmacy"],
       delivery_method: ["app", "email", "sms"],
+      medical_specialty: [
+        "cardiologia",
+        "dermatologia",
+        "endocrinologia",
+        "gastroenterologia",
+        "ginecologia",
+        "neurologia",
+        "oftalmologia",
+        "ortopedia",
+        "pediatria",
+        "psiquiatria",
+        "urologia",
+        "neumologia",
+        "oncologia",
+        "traumatologia",
+        "medicina_general",
+      ],
       notification_priority: ["urgent", "important", "normal"],
       notification_type: [
         "appointment",
