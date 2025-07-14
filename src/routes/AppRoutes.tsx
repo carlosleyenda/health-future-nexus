@@ -10,6 +10,9 @@ import NotFound from '@/pages/NotFound';
 import { AuthPage } from '@/pages/auth/AuthPage';
 import DemoAccessPage from '@/pages/demo/DemoAccess';
 import Settings from '@/pages/Settings';
+import DoctorSchedulePage from '@/pages/DoctorSchedule';
+import DoctorPatientsPage from '@/pages/DoctorPatients';
+import DoctorFinancialsPage from '@/pages/DoctorFinancials';
 
 // Dashboard pages
 import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
@@ -105,12 +108,17 @@ export default function AppRoutes() {
         {/* Doctor-specific routes */}
         <Route path="/patients" element={
           <ProtectedRoute allowedRoles={['doctor', 'specialist']}>
-            <div>Gestión de Pacientes - En desarrollo</div>
+            <DoctorPatientsPage />
           </ProtectedRoute>
         } />
         <Route path="/schedule" element={
           <ProtectedRoute allowedRoles={['doctor', 'specialist']}>
-            <div>Agenda Médica - En desarrollo</div>
+            <DoctorSchedulePage />
+          </ProtectedRoute>
+        } />
+        <Route path="/doctor/financials" element={
+          <ProtectedRoute allowedRoles={['doctor', 'specialist']}>
+            <DoctorFinancialsPage />
           </ProtectedRoute>
         } />
 

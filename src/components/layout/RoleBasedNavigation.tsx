@@ -46,7 +46,7 @@ const navigationConfig: Record<string, NavigationItem[]> = {
     { name: 'Consultas', href: '/consultations', icon: Stethoscope, description: 'Consultas virtuales' },
     { name: 'Historial Médico', href: '/medical-records', icon: FileText, description: 'Registros de pacientes' },
     { name: 'Chat Médico', href: '/chat', icon: MessageSquare, badge: '12', description: 'Comunicación con pacientes' },
-    { name: 'Finanzas', href: '/payments', icon: CreditCard, description: 'Ingresos y facturación' },
+    { name: 'Finanzas', href: '/doctor/financials', icon: CreditCard, description: 'Ingresos y facturación' },
     { name: 'IA Diagnóstica', href: '/ai-assistant', icon: Target, description: 'Herramientas de diagnóstico' },
     { name: 'Marketplace', href: '/marketplace', icon: Crown, description: 'Servicios y promoción' },
     { name: 'Analytics', href: '/analytics', icon: BarChart3, description: 'Métricas de práctica' },
