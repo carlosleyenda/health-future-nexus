@@ -4,7 +4,7 @@ import {
   Home, Users, Calendar, MessageSquare, FileText, 
   Pill, Truck, CreditCard, BarChart3, Settings,
   Stethoscope, Activity, Building2, Package,
-  Crown, Target, Share2, TrendingUp, Shield
+  Crown, Target, Share2, TrendingUp, Shield, UserCheck
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -32,6 +32,7 @@ const navigationConfig: Record<string, NavigationItem[]> = {
     { name: 'Emergencias', href: '/emergency', icon: Shield, description: 'Centro de emergencias' },
     { name: 'Historial Médico', href: '/medical-records', icon: FileText, description: 'Registros médicos completos' },
     { name: 'Delivery Médico', href: '/delivery', icon: Truck, description: 'Servicios a domicilio' },
+    { name: 'Médico a Domicilio', href: '/home-doctor', icon: UserCheck, description: 'Médico en tu hogar' },
     { name: 'Farmacia', href: '/pharmacy', icon: Package, description: 'Farmacia online' },
     { name: 'Mis Pagos', href: '/payments', icon: CreditCard, description: 'Wallet y transacciones' },
     { name: 'Chat Médico', href: '/chat', icon: MessageSquare, badge: '3', description: 'Soporte 24/7' },

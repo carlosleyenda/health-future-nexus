@@ -43,6 +43,7 @@ import DevicesPage from '@/pages/Devices';
 import EmergencyPage from '@/pages/Emergency';
 import EnterpriseDashboard from '@/pages/EnterpriseDashboard';
 import PharmacyPartnerDashboard from '@/pages/PharmacyPartnerDashboard';
+import HomeDoctorPage from '@/pages/HomeDoctorPage';
 
 // Public pages
 import Nosotros from '@/pages/public/Nosotros';
@@ -82,6 +83,7 @@ export default function AppRoutes() {
         <Route path="/medical-records" element={<MedicalRecordsPage />} />
         <Route path="/ai-assistant" element={<AIAssistantPage />} />
         <Route path="/delivery" element={<DeliveryPage />} />
+        <Route path="/home-doctor" element={<HomeDoctorPage />} />
         <Route path="/payments" element={<PaymentsPage />} />
         <Route path="/pharmacy" element={<PharmacyPage />} />
         <Route path="/pricing" element={<PricingPage />} />
