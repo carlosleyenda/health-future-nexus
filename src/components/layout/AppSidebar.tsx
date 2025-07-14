@@ -27,7 +27,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const { data: notifications = [] } = useNotifications(user?.id || '');
   
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter(n => !n.is_read).length;
 
   if (!user) return null;
 

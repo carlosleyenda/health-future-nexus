@@ -961,6 +961,78 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          delivery_method: Database["public"]["Enums"]["delivery_method"]
+          enabled: boolean
+          id: string
+          notification_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_method?: Database["public"]["Enums"]["delivery_method"]
+          enabled?: boolean
+          id?: string
+          notification_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_method?: Database["public"]["Enums"]["delivery_method"]
+          enabled?: boolean
+          id?: string
+          notification_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          metadata: Json | null
+          priority: Database["public"]["Enums"]["notification_priority"]
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          metadata?: Json | null
+          priority?: Database["public"]["Enums"]["notification_priority"]
+          title: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          metadata?: Json | null
+          priority?: Database["public"]["Enums"]["notification_priority"]
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payment_intents: {
         Row: {
           amount: number
@@ -1697,6 +1769,22 @@ export type Database = {
     }
     Enums: {
       app_role: "patient" | "doctor" | "admin" | "enterprise" | "pharmacy"
+      delivery_method: "app" | "email" | "sms"
+      notification_priority: "urgent" | "important" | "normal"
+      notification_type:
+        | "appointment"
+        | "prescription"
+        | "reminder"
+        | "emergency"
+        | "system"
+        | "user"
+        | "health"
+        | "delivery"
+        | "patient_message"
+        | "health_alert"
+        | "technical"
+        | "metrics"
+        | "general"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1825,6 +1913,23 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["patient", "doctor", "admin", "enterprise", "pharmacy"],
+      delivery_method: ["app", "email", "sms"],
+      notification_priority: ["urgent", "important", "normal"],
+      notification_type: [
+        "appointment",
+        "prescription",
+        "reminder",
+        "emergency",
+        "system",
+        "user",
+        "health",
+        "delivery",
+        "patient_message",
+        "health_alert",
+        "technical",
+        "metrics",
+        "general",
+      ],
     },
   },
 } as const

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNotifications, useMarkNotificationAsRead } from '@/hooks/useNotifications';
+import { type Notification } from '@/services/api/notificationService';
 import { useAuthStore } from '@/store/auth';
 
 interface NotificationCenterProps {
@@ -61,17 +62,17 @@ export default function NotificationCenter({ userId, isOpen, onClose }: Notifica
   };
 
   const filteredNotifications = filterNotificationsByRole(notifications);
-  const unreadCount = filteredNotifications.filter(n => !n.isRead).length;
-  const urgentCount = filteredNotifications.filter(n => n.priority === 'urgent' && !n.isRead).length;
+  const unreadCount = filteredNotifications.filter(n => !n.is_read).length;
+  const urgentCount = filteredNotifications.filter(n => n.priority === 'urgent' && !n.is_read).length;
 
   const getFilteredNotificationsByTab = (tab: string) => {
     switch (tab) {
       case 'urgent':
         return filteredNotifications.filter(n => n.priority === 'urgent');
       case 'unread':
-        return filteredNotifications.filter(n => !n.isRead);
+        return filteredNotifications.filter(n => !n.is_read);
       case 'read':
-        return filteredNotifications.filter(n => n.isRead);
+        return filteredNotifications.filter(n => n.is_read);
       default:
         return filteredNotifications;
     }
@@ -82,7 +83,7 @@ export default function NotificationCenter({ userId, isOpen, onClose }: Notifica
   };
 
   const handleMarkAllAsRead = () => {
-    const unreadNotifications = filteredNotifications.filter(n => !n.isRead);
+    const unreadNotifications = filteredNotifications.filter(n => !n.is_read);
     unreadNotifications.forEach(notification => {
       markAsRead.mutate(notification.id);
     });
@@ -151,12 +152,12 @@ export default function NotificationCenter({ userId, isOpen, onClose }: Notifica
                       <div
                         key={notification.id}
                         className={`p-4 border-b hover:bg-gray-50 cursor-pointer transition-colors ${
-                          !notification.isRead ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                          !notification.is_read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
                         } ${
                           notification.priority === 'urgent' ? 'border-l-4 border-l-red-500 bg-red-50' : ''
                         }`}
                         onClick={() => {
-                          if (!notification.isRead) {
+                          if (!notification.is_read) {
                             handleMarkAsRead(notification.id);
                           }
                         }}
@@ -173,21 +174,21 @@ export default function NotificationCenter({ userId, isOpen, onClose }: Notifica
                             </p>
                             <div className="flex items-center justify-between mt-2">
                               <p className="text-xs text-gray-400">
-                                {new Date(notification.createdAt).toLocaleDateString('es-MX', {
+                                {new Date(notification.created_at).toLocaleDateString('es-MX', {
                                   month: 'short',
                                   day: 'numeric',
                                   hour: '2-digit',
                                   minute: '2-digit'
                                 })}
                               </p>
-                              {notification.actionUrl && (
+                              {notification.action_url && (
                                 <Button variant="ghost" size="sm" className="text-xs h-6 px-2">
                                   Ver más
                                 </Button>
                               )}
                             </div>
                           </div>
-                          {!notification.isRead && (
+                          {!notification.is_read && (
                             <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1" />
                           )}
                         </div>

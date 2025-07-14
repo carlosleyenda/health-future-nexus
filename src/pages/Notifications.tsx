@@ -4,12 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/auth';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotifications, useMarkAllAsRead } from '@/hooks/useNotifications';
+import { type Notification } from '@/services/api/notificationService';
 import { Bell, Check, X, Clock, AlertCircle, Info, Heart } from 'lucide-react';
 
 export default function NotificationsPage() {
   const { user } = useAuthStore();
   const { data: notifications = [], isLoading } = useNotifications(user?.id || '');
+  const markAllAsRead = useMarkAllAsRead();
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -50,7 +52,12 @@ export default function NotificationsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Notificaciones</h1>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => markAllAsRead.mutate(user?.id || '')}
+            disabled={markAllAsRead.isPending}
+          >
             <Check className="h-4 w-4 mr-2" />
             Marcar todas como leídas
           </Button>
@@ -83,7 +90,7 @@ export default function NotificationsPage() {
                       <p className="text-gray-600 mt-1">{notification.message}</p>
                       <div className="flex items-center space-x-4 mt-2">
                         <span className="text-sm text-gray-500">
-                          {new Date(notification.createdAt).toLocaleDateString()}
+                          {new Date(notification.created_at).toLocaleDateString()}
                         </span>
                         <Badge variant="outline" className="text-xs">
                           {notification.type}
@@ -91,7 +98,7 @@ export default function NotificationsPage() {
                       </div>
                     </div>
                   </div>
-                  {!notification.isRead && (
+                  {!notification.is_read && (
                     <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
                   )}
                 </div>

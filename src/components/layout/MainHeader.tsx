@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/auth';
 import { useNotifications, useRealtimeNotifications } from '@/hooks/useNotifications';
+import { type Notification } from '@/services/api/notificationService';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -40,8 +41,8 @@ export default function MainHeader({
   // Activar notificaciones en tiempo real
   useRealtimeNotifications(user?.id || '');
   
-  const unreadCount = notifications.filter(n => !n.isRead).length;
-  const urgentCount = notifications.filter(n => n.priority === 'urgent' && !n.isRead).length;
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+  const urgentCount = notifications.filter(n => n.priority === 'urgent' && !n.is_read).length;
 
   const filteredNavItems = navigationItems.filter(item => 
     item.roles.includes(user?.role || '')
