@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointment_reminders: {
+        Row: {
+          appointment_id: string
+          created_at: string
+          id: string
+          is_sent: boolean | null
+          remind_at: string
+          reminder_type: string
+        }
+        Insert: {
+          appointment_id: string
+          created_at?: string
+          id?: string
+          is_sent?: boolean | null
+          remind_at: string
+          reminder_type?: string
+        }
+        Update: {
+          appointment_id?: string
+          created_at?: string
+          id?: string
+          is_sent?: boolean | null
+          remind_at?: string
+          reminder_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_reminders_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointments: {
+        Row: {
+          appointment_date: string
+          created_at: string
+          doctor_id: string
+          duration: number
+          id: string
+          is_emergency: boolean | null
+          notes: string | null
+          patient_id: string
+          payment_status: string | null
+          reason: string
+          status: string
+          total_cost: number | null
+          type: string
+          updated_at: string
+          video_call_url: string | null
+        }
+        Insert: {
+          appointment_date: string
+          created_at?: string
+          doctor_id: string
+          duration?: number
+          id?: string
+          is_emergency?: boolean | null
+          notes?: string | null
+          patient_id: string
+          payment_status?: string | null
+          reason: string
+          status?: string
+          total_cost?: number | null
+          type?: string
+          updated_at?: string
+          video_call_url?: string | null
+        }
+        Update: {
+          appointment_date?: string
+          created_at?: string
+          doctor_id?: string
+          duration?: number
+          id?: string
+          is_emergency?: boolean | null
+          notes?: string | null
+          patient_id?: string
+          payment_status?: string | null
+          reason?: string
+          status?: string
+          total_cost?: number | null
+          type?: string
+          updated_at?: string
+          video_call_url?: string | null
+        }
+        Relationships: []
+      }
       chat_attachments: {
         Row: {
           created_at: string
@@ -465,6 +554,39 @@ export type Database = {
           rate?: number
           target_currency?: string
           valid_at?: string
+        }
+        Relationships: []
+      }
+      doctor_availability: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          doctor_id: string
+          end_time: string
+          id: string
+          is_available: boolean | null
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          doctor_id: string
+          end_time: string
+          id?: string
+          is_available?: boolean | null
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          doctor_id?: string
+          end_time?: string
+          id?: string
+          is_available?: boolean | null
+          start_time?: string
+          updated_at?: string
         }
         Relationships: []
       }

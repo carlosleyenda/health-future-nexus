@@ -30,7 +30,7 @@ export const useDoctorsBySpecialty = (specialty: string) => {
 export const useDoctorAppointments = (doctorId: string) => {
   return useQuery({
     queryKey: ['doctor-appointments', doctorId],
-    queryFn: () => AppointmentService.getDoctorAppointments(doctorId),
+    queryFn: () => AppointmentService.getUserAppointments(doctorId, 'doctor'),
     enabled: !!doctorId,
   });
 };

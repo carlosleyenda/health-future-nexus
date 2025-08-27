@@ -1,18 +1,21 @@
 import React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { NotificationService, type Notification } from '@/services/api/notificationService';
+import { notificationService, type Notification } from '@/services/api/notificationService';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth';
 import { supabase } from '@/integrations/supabase/client';
 
-export const useNotifications = (userId: string) => {
+export const useNotifications = (userId?: string) => {
+  const { user } = useAuthStore();
+  const targetUserId = userId || user?.id;
+
   return useQuery({
-    queryKey: ['notifications', userId],
+    queryKey: ['notifications', targetUserId],
     queryFn: async () => {
-      if (!userId) return [];
-      return NotificationService.getNotifications(userId);
+      if (!targetUserId) return [];
+      return notificationService.getUserNotifications(targetUserId);
     },
-    enabled: !!userId,
+    enabled: !!targetUserId,
     refetchInterval: 30000, // Refrescar cada 30 segundos
   });
 };
@@ -22,7 +25,7 @@ export const useMarkNotificationAsRead = () => {
   
   return useMutation({
     mutationFn: async (notificationId: string) => {
-      return NotificationService.markAsRead(notificationId);
+      return notificationService.markAsRead(notificationId);
     },
     onSuccess: (_, notificationId) => {
       // Actualizar cache local
@@ -46,7 +49,7 @@ export const useMarkAllAsRead = () => {
   
   return useMutation({
     mutationFn: async (userId: string) => {
-      return NotificationService.markAllAsRead(userId);
+      return notificationService.markAllAsRead(userId);
     },
     onSuccess: (_, userId) => {
       // Invalidar y refrescar los datos
@@ -64,7 +67,7 @@ export const useSendNotification = () => {
   
   return useMutation({
     mutationFn: async (notification: Omit<Notification, 'id' | 'created_at' | 'updated_at'>) => {
-      return NotificationService.sendNotification(notification);
+      return notificationService.createNotification(notification);
     },
     onSuccess: (_, notification) => {
       // Invalidar y refrescar los datos
@@ -82,7 +85,7 @@ export const useDeleteNotification = () => {
   
   return useMutation({
     mutationFn: async (notificationId: string) => {
-      return NotificationService.deleteNotification(notificationId);
+      return notificationService.deleteNotification(notificationId);
     },
     onSuccess: () => {
       // Invalidar y refrescar los datos
@@ -98,7 +101,7 @@ export const useDeleteNotification = () => {
 export const useAppointmentReminders = () => {
   return useMutation({
     mutationFn: async ({ appointmentId, userId }: { appointmentId: string; userId: string }) => {
-      return NotificationService.sendAppointmentReminder(appointmentId, userId);
+      return notificationService.sendAppointmentReminder(userId, '', '', appointmentId);
     },
     onSuccess: () => {
       toast.success('Recordatorio enviado');
@@ -171,7 +174,7 @@ export const useNotificationStats = (userId: string) => {
     queryFn: async () => {
       if (!userId) return { total: 0, unread: 0, urgent: 0 };
       
-      const notifications = await NotificationService.getNotifications(userId);
+      const notifications = await notificationService.getUserNotifications(userId);
       
       return {
         total: notifications.length,
