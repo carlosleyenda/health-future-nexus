@@ -30,7 +30,10 @@ export default function MedicationSearch({ onAddToCart }: MedicationSearchProps)
 
   const { data: medications, isLoading } = useQuery({
     queryKey: ['medications', debouncedQuery, selectedCategory],
-    queryFn: () => PharmacyMedicationService.searchMedications(debouncedQuery, selectedCategory),
+    queryFn: () => PharmacyMedicationService.searchMedications(
+      debouncedQuery, 
+      selectedCategory === 'all' ? '' : selectedCategory
+    ),
   });
 
   const categories = ['Analgésicos', 'Antibióticos', 'Antihistamínicos', 'Vitaminas', 'Dermatológicos'];
@@ -63,7 +66,7 @@ export default function MedicationSearch({ onAddToCart }: MedicationSearchProps)
             <SelectValue placeholder="Categoría" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todas las categorías</SelectItem>
+            <SelectItem value="all">Todas las categorías</SelectItem>
             {categories.map((category) => (
               <SelectItem key={category} value={category}>
                 {category}

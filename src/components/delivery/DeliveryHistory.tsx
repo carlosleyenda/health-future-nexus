@@ -31,7 +31,7 @@ export default function DeliveryHistory() {
       getServiceName(delivery.serviceType).toLowerCase().includes(filter.toLowerCase()) ||
       delivery.address.street.toLowerCase().includes(filter.toLowerCase());
     
-    const matchesStatus = statusFilter === '' || delivery.status === statusFilter;
+    const matchesStatus = statusFilter === '' || statusFilter === 'all' || delivery.status === statusFilter;
     
     return matchesFilter && matchesStatus;
   });
@@ -100,7 +100,7 @@ export default function DeliveryHistory() {
                 <SelectValue placeholder="Filtrar por estado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos los estados</SelectItem>
+                <SelectItem value="all">Todos los estados</SelectItem>
                 <SelectItem value="completed">Completados</SelectItem>
                 <SelectItem value="cancelled">Cancelados</SelectItem>
               </SelectContent>
