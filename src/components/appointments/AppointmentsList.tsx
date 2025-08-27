@@ -83,7 +83,7 @@ export default function AppointmentsList({ patientId }: AppointmentsListProps) {
             <div className="flex justify-between items-start">
               <div>
                 <CardTitle className="text-lg">
-                  Dr. {appointment.doctorId}
+                  Dr. {appointment.doctor_id}
                 </CardTitle>
                 <p className="text-sm text-gray-500">{appointment.reason}</p>
               </div>
@@ -97,11 +97,11 @@ export default function AppointmentsList({ patientId }: AppointmentsListProps) {
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4 text-gray-400" />
-                  {new Date(appointment.appointmentDate).toLocaleDateString('es-MX')}
+                  {new Date(appointment.appointment_date).toLocaleDateString('es-MX')}
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4 text-gray-400" />
-                  {new Date(appointment.appointmentDate).toLocaleTimeString('es-MX', {
+                  {new Date(appointment.appointment_date).toLocaleTimeString('es-MX', {
                     hour: '2-digit',
                     minute: '2-digit'
                   })}
@@ -148,7 +148,7 @@ export default function AppointmentsList({ patientId }: AppointmentsListProps) {
               </div>
 
               <div className="text-right">
-                <span className="text-lg font-semibold">${appointment.totalCost} MXN</span>
+                <span className="text-lg font-semibold">${appointment.total_cost} MXN</span>
               </div>
             </div>
           </CardContent>

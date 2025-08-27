@@ -20,11 +20,11 @@ export default function DoctorSchedule({ doctorId }: DoctorScheduleProps) {
   const updateAppointment = useUpdateAppointment();
 
   const todayAppointments = appointments?.filter(apt => 
-    new Date(apt.appointmentDate).toDateString() === new Date(selectedDate).toDateString()
+    new Date(apt.appointment_date).toDateString() === new Date(selectedDate).toDateString()
   ) || [];
 
   const upcomingAppointments = appointments?.filter(apt => 
-    new Date(apt.appointmentDate) > new Date() && apt.status !== 'cancelled'
+    new Date(apt.appointment_date) > new Date() && apt.status !== 'cancelled'
   ) || [];
 
   const handleStartConsultation = async (appointmentId: string) => {
@@ -87,7 +87,7 @@ export default function DoctorSchedule({ doctorId }: DoctorScheduleProps) {
           {todayAppointments.length ? (
             <div className="space-y-4">
               {todayAppointments
-                .sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime())
+                .sort((a, b) => new Date(a.appointment_date).getTime() - new Date(b.appointment_date).getTime())
                 .map((appointment) => (
                 <Card key={appointment.id}>
                   <CardHeader className="pb-2">
@@ -95,7 +95,7 @@ export default function DoctorSchedule({ doctorId }: DoctorScheduleProps) {
                       <div>
                         <CardTitle className="text-lg flex items-center gap-2">
                           <User className="h-5 w-5" />
-                          Paciente {appointment.patientId}
+                          Paciente {appointment.patient_id}
                         </CardTitle>
                         <p className="text-sm text-gray-500">{appointment.reason}</p>
                       </div>
@@ -109,7 +109,7 @@ export default function DoctorSchedule({ doctorId }: DoctorScheduleProps) {
                       <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-1">
                           <Clock className="h-4 w-4 text-gray-400" />
-                          {new Date(appointment.appointmentDate).toLocaleTimeString('es-MX', {
+                          {new Date(appointment.appointment_date).toLocaleTimeString('es-MX', {
                             hour: '2-digit',
                             minute: '2-digit'
                           })}
@@ -122,7 +122,7 @@ export default function DoctorSchedule({ doctorId }: DoctorScheduleProps) {
                           )}
                           {appointment.type === 'virtual' ? 'Virtual' : 'Presencial'}
                         </div>
-                        <span className="font-medium">${appointment.totalCost} MXN</span>
+                        <span className="font-medium">${appointment.total_cost} MXN</span>
                       </div>
 
                       <div className="flex gap-2">
@@ -175,11 +175,11 @@ export default function DoctorSchedule({ doctorId }: DoctorScheduleProps) {
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-medium">Paciente {appointment.patientId}</h3>
+                      <h3 className="font-medium">Paciente {appointment.patient_id}</h3>
                       <p className="text-sm text-gray-500">{appointment.reason}</p>
                       <div className="flex items-center gap-4 mt-2 text-sm">
-                        <span>{new Date(appointment.appointmentDate).toLocaleDateString('es-MX')}</span>
-                        <span>{new Date(appointment.appointmentDate).toLocaleTimeString('es-MX', {
+                        <span>{new Date(appointment.appointment_date).toLocaleDateString('es-MX')}</span>
+                        <span>{new Date(appointment.appointment_date).toLocaleTimeString('es-MX', {
                           hour: '2-digit',
                           minute: '2-digit'
                         })}</span>

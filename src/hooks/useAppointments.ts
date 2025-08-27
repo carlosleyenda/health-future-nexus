@@ -69,7 +69,7 @@ export const useCancelAppointment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (appointmentId: string) =>
+    mutationFn: ({ appointmentId, reason }: { appointmentId: string; reason: string }) =>
       AppointmentService.cancelAppointment(appointmentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
