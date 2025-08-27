@@ -7,7 +7,7 @@ import SimpleMedicalHistory from '@/components/medical/SimpleMedicalHistory';
 import SimpleAIDiagnostic from '@/components/ai/SimpleAIDiagnostic';
 
 export default function PatientDashboard() {
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const patientId = user?.id || 'demo-patient';
 
   return (
@@ -15,7 +15,7 @@ export default function PatientDashboard() {
       {/* Header de bienvenida */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          ¡Hola, {user?.firstName || 'Usuario'}! 👋
+          ¡Hola, {profile?.first_name || 'Usuario'}! 👋
         </h1>
         <p className="text-gray-600">
           Aquí tienes un resumen de tu salud y próximas actividades

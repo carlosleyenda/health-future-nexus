@@ -15,7 +15,7 @@ import DoctorPatientsPage from '@/pages/DoctorPatients';
 import DoctorFinancialsPage from '@/pages/DoctorFinancials';
 
 // Dashboard pages
-import { PatientDashboard } from '@/components/dashboard/PatientDashboard';
+import PatientDashboard from '@/components/dashboard/PatientDashboard';
 import { DoctorDashboard } from '@/components/dashboard/DoctorDashboard';
 import AdminDashboard from '@/components/dashboard/AdminDashboard';
 
