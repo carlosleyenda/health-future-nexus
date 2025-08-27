@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Truck, Map, Clock } from 'lucide-react';
+import { Truck, Map, Eye } from 'lucide-react';
 import { useDeliveryServices, useDeliveryTracking } from '@/hooks/useDelivery';
 import { useAuthStore } from '@/store/auth';
+import RealTimeDeliveryTracking from './RealTimeDeliveryTracking';
 
 interface DeliveryTrackingProps {
   selectedDeliveryId?: string | null;
@@ -15,40 +15,16 @@ interface DeliveryTrackingProps {
 
 export default function DeliveryTracking({ selectedDeliveryId }: DeliveryTrackingProps) {
   const [trackingId, setTrackingId] = useState(selectedDeliveryId || '');
+  const [showRealTimeTracking, setShowRealTimeTracking] = useState(false);
   const { user } = useAuthStore();
 
   const { data: deliveries } = useDeliveryServices(user?.id || '');
-  const { data: tracking } = useDeliveryTracking(trackingId);
 
   const activeDeliveries = deliveries?.filter(d => 
     ['requested', 'assigned', 'in_transit', 'arrived', 'in_progress'].includes(d.status)
   ) || [];
 
   const selectedDelivery = deliveries?.find(d => d.id === trackingId);
-
-  const getStatusProgress = (status: string) => {
-    const statusMap = {
-      requested: 20,
-      assigned: 40,
-      in_transit: 60,
-      arrived: 80,
-      in_progress: 90,
-      completed: 100
-    };
-    return statusMap[status as keyof typeof statusMap] || 0;
-  };
-
-  const getStatusColor = (status: string) => {
-    const colors = {
-      requested: 'bg-yellow-100 text-yellow-800',
-      assigned: 'bg-blue-100 text-blue-800',
-      in_transit: 'bg-purple-100 text-purple-800',
-      arrived: 'bg-green-100 text-green-800',
-      in_progress: 'bg-orange-100 text-orange-800',
-      completed: 'bg-gray-100 text-gray-800'
-    };
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
-  };
 
   const getServiceName = (serviceType: string) => {
     const names = {
@@ -63,6 +39,37 @@ export default function DeliveryTracking({ selectedDeliveryId }: DeliveryTrackin
     return names[serviceType as keyof typeof names] || serviceType;
   };
 
+  const getStatusColor = (status: string) => {
+    const colors = {
+      requested: 'bg-yellow-100 text-yellow-800',
+      assigned: 'bg-blue-100 text-blue-800',
+      preparing: 'bg-purple-100 text-purple-800',
+      pickup: 'bg-orange-100 text-orange-800',
+      in_transit: 'bg-green-100 text-green-800',
+      arrived: 'bg-indigo-100 text-indigo-800',
+      in_progress: 'bg-orange-100 text-orange-800',
+      completed: 'bg-gray-100 text-gray-800'
+    };
+    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+  };
+
+  // Si hay un tracking ID seleccionado y se quiere ver el tracking en tiempo real
+  if (trackingId && showRealTimeTracking) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowRealTimeTracking(false)}
+          >
+            ← Volver al listado
+          </Button>
+        </div>
+        <RealTimeDeliveryTracking deliveryId={trackingId} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Delivery Selection */}
@@ -70,7 +77,7 @@ export default function DeliveryTracking({ selectedDeliveryId }: DeliveryTrackin
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Map className="h-5 w-5 text-blue-600" />
-            Seguimiento de Servicio
+            Seguimiento de Servicios
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -89,7 +96,10 @@ export default function DeliveryTracking({ selectedDeliveryId }: DeliveryTrackin
                       <div className="flex items-center justify-between w-full">
                         <span>{getServiceName(delivery.serviceType)}</span>
                         <Badge className={`ml-2 ${getStatusColor(delivery.status)}`}>
-                          {delivery.status}
+                          {delivery.status === 'in_transit' ? 'En camino' : 
+                           delivery.status === 'assigned' ? 'Asignado' :
+                           delivery.status === 'arrived' ? 'Llegó' :
+                           delivery.status}
                         </Badge>
                       </div>
                     </SelectItem>
@@ -101,129 +111,100 @@ export default function DeliveryTracking({ selectedDeliveryId }: DeliveryTrackin
         </CardContent>
       </Card>
 
-      {/* Tracking Information */}
-      {selectedDelivery && (
-        <>
-          {/* Service Overview */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">
-                    {getServiceName(selectedDelivery.serviceType)}
-                  </h3>
-                  <p className="text-gray-600 mb-4">{selectedDelivery.address.street}</p>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-500">Estado:</span>
-                      <Badge className={getStatusColor(selectedDelivery.status)}>
-                        {selectedDelivery.status}
-                      </Badge>
+      {/* Active Deliveries Grid */}
+      {activeDeliveries.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {activeDeliveries.map((delivery) => (
+            <Card key={delivery.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-4">
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-medium text-sm">
+                        {getServiceName(delivery.serviceType)}
+                      </h3>
+                      <p className="text-xs text-gray-600 mt-1">
+                        {delivery.address.street}
+                      </p>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-500">Costo:</span>
-                      <span className="font-semibold">${selectedDelivery.estimatedCost}</span>
-                    </div>
-                    {selectedDelivery.estimatedArrival && (
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-500">Llegada estimada:</span>
-                        <span className="font-semibold">
-                          {new Date(selectedDelivery.estimatedArrival).toLocaleTimeString()}
-                        </span>
-                      </div>
-                    )}
+                    <Badge className={`${getStatusColor(delivery.status)} text-xs`}>
+                      {delivery.status === 'in_transit' ? 'En camino' : 
+                       delivery.status === 'assigned' ? 'Asignado' :
+                       delivery.status === 'arrived' ? 'Llegó' :
+                       delivery.status}
+                    </Badge>
                   </div>
-                </div>
 
-                <div>
-                  <h4 className="font-medium mb-3">Progreso del servicio</h4>
-                  <Progress value={getStatusProgress(selectedDelivery.status)} className="mb-2" />
-                  <p className="text-sm text-gray-600">
-                    {getStatusProgress(selectedDelivery.status)}% completado
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Live Tracking */}
-          {selectedDelivery.status === 'in_transit' && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Truck className="h-5 w-5 text-green-600" />
-                  Ubicación en Tiempo Real
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-100 rounded-lg h-64 flex items-center justify-center mb-4">
-                  <div className="text-center">
-                    <Map className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                    <p className="text-gray-500">Mapa de seguimiento</p>
-                    <p className="text-sm text-gray-400">
-                      {selectedDelivery.currentLocation || 'Ubicación en tiempo real'}
-                    </p>
-                  </div>
-                </div>
-
-                {selectedDelivery.estimatedArrival && (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Clock className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm">Tiempo estimado de llegada</span>
+                  {delivery.estimatedArrival && (
+                    <div className="text-xs text-gray-500">
+                      Llegada estimada: {new Date(delivery.estimatedArrival).toLocaleTimeString('es-ES', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </div>
-                    <span className="font-semibold text-green-600">
-                      {Math.round((new Date(selectedDelivery.estimatedArrival).getTime() - Date.now()) / (1000 * 60))} min
-                    </span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                  )}
 
-          {/* Tracking Events */}
-          {tracking && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Historial de Eventos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {tracking.events.map((event, index) => (
-                    <div key={event.id} className="flex items-start space-x-4">
-                      <div className="flex-shrink-0 w-3 h-3 bg-blue-600 rounded-full mt-2" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium">{event.description}</p>
-                          <span className="text-xs text-gray-500">
-                            {new Date(event.timestamp).toLocaleTimeString()}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-600">{event.location}</p>
-                      </div>
-                    </div>
-                  ))}
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1 text-xs"
+                      onClick={() => {
+                        setTrackingId(delivery.id);
+                        setShowRealTimeTracking(true);
+                      }}
+                    >
+                      <Eye className="h-3 w-3 mr-1" />
+                      Ver en vivo
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          )}
+          ))}
+        </div>
+      )}
 
-          {/* Contact and Actions */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button variant="outline" className="w-full">
-                  <Truck className="h-4 w-4 mr-2" />
-                  Contactar Repartidor
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Cancelar Servicio
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </>
+      {/* Quick Access for In Transit */}
+      {activeDeliveries.filter(d => ['in_transit', 'assigned'].includes(d.status)).length > 0 && (
+        <Card className="bg-gradient-to-r from-green-50 to-blue-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-green-800">
+              <Truck className="h-5 w-5" />
+              Servicios en camino
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {activeDeliveries
+                .filter(d => ['in_transit', 'assigned'].includes(d.status))
+                .map((delivery) => (
+                  <div key={delivery.id} className="flex items-center justify-between bg-white rounded-lg p-3">
+                    <div>
+                      <h4 className="font-medium text-sm">
+                        {getServiceName(delivery.serviceType)}
+                      </h4>
+                      <p className="text-xs text-gray-600">
+                        {delivery.estimatedArrival && (
+                          <>Llega en {Math.round((new Date(delivery.estimatedArrival).getTime() - Date.now()) / (1000 * 60))} min</>
+                        )}
+                      </p>
+                    </div>
+                    <Button 
+                      size="sm"
+                      onClick={() => {
+                        setTrackingId(delivery.id);
+                        setShowRealTimeTracking(true);
+                      }}
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      Rastrear
+                    </Button>
+                  </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {activeDeliveries.length === 0 && (
@@ -234,6 +215,9 @@ export default function DeliveryTracking({ selectedDeliveryId }: DeliveryTrackin
             <p className="text-sm text-gray-400 mt-2">
               Solicita un servicio para ver el seguimiento en tiempo real
             </p>
+            <Button className="mt-4" variant="outline">
+              Solicitar servicio
+            </Button>
           </CardContent>
         </Card>
       )}
