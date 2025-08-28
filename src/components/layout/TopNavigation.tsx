@@ -7,6 +7,8 @@ import { useAuthStore } from "@/store/auth";
 const TopNavigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isServiciosOpen, setIsServiciosOpen] = useState(false);
+  const [isCorporativoOpen, setIsCorporativoOpen] = useState(false);
+  const [isPromocionesOpen, setIsPromocionesOpen] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
 
@@ -27,16 +29,35 @@ const TopNavigation = () => {
       hasDropdown: true,
       submenu: [
         { name: "Consultas Médicas", href: "/servicios/consultas" },
-        { name: "Telemedicina", href: "/servicios/telemedicina" },
-        { name: "Laboratorio", href: "/servicios/laboratorio" },
-        { name: "Farmacia", href: "/servicios/farmacia" },
-        { name: "Emergencias", href: "/servicios/emergencias" }
+        { name: "Telemedicina", href: "/consultas" },
+        { name: "Laboratorio", href: "/health" },
+        { name: "Farmacia", href: "/pharmacy" },
+        { name: "Emergencias", href: "/emergency" }
       ]
     },
     { name: "Nosotros", href: "/nosotros" },
-    { name: "Corporativo", href: "/nosotros" },
-    { name: "Promociones", href: "/servicios" },
-    { name: "Validar", href: "/servicios" }
+    { 
+      name: "Corporativo", 
+      href: "/corporativo",
+      hasDropdown: true,
+      submenu: [
+        { name: "Para Empresas", href: "/EnterpriseDashboard" },
+        { name: "Marketplace", href: "/marketplace" },
+        { name: "Analytics", href: "/analytics" },
+        { name: "Soluciones B2B", href: "/ExecutiveDashboard" }
+      ]
+    },
+    { 
+      name: "Promociones", 
+      href: "/promociones",
+      hasDropdown: true,
+      submenu: [
+        { name: "Planes y Precios", href: "/pricing" },
+        { name: "Descuentos", href: "/servicios" },
+        { name: "Membresías", href: "/payments" },
+        { name: "Referidos", href: "/referrals" }
+      ]
+    }
   ];
 
   const handleNavigation = (href: string) => {
@@ -73,8 +94,20 @@ const TopNavigation = () => {
               <div 
                 key={item.name} 
                 className="relative"
-                onMouseEnter={() => item.hasDropdown && setIsServiciosOpen(true)}
-                onMouseLeave={() => item.hasDropdown && setIsServiciosOpen(false)}
+                onMouseEnter={() => {
+                  if (item.hasDropdown) {
+                    if (item.name === 'Servicios') setIsServiciosOpen(true);
+                    if (item.name === 'Corporativo') setIsCorporativoOpen(true);
+                    if (item.name === 'Promociones') setIsPromocionesOpen(true);
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (item.hasDropdown) {
+                    if (item.name === 'Servicios') setIsServiciosOpen(false);
+                    if (item.name === 'Corporativo') setIsCorporativoOpen(false);
+                    if (item.name === 'Promociones') setIsPromocionesOpen(false);
+                  }
+                }}
               >
                 <button
                   onClick={() => handleNavigation(item.href)}
@@ -83,13 +116,19 @@ const TopNavigation = () => {
                   {item.name}
                   {item.hasDropdown && (
                     <ChevronDown className={`ml-1 h-4 w-4 transition-transform duration-200 ${
-                      isServiciosOpen ? 'rotate-180' : ''
+                      (item.name === 'Servicios' && isServiciosOpen) || 
+                      (item.name === 'Corporativo' && isCorporativoOpen) || 
+                      (item.name === 'Promociones' && isPromocionesOpen) ? 'rotate-180' : ''
                     }`} />
                   )}
                 </button>
 
                 {/* Dropdown Menu */}
-                {item.hasDropdown && isServiciosOpen && (
+                {item.hasDropdown && (
+                  (item.name === 'Servicios' && isServiciosOpen) ||
+                  (item.name === 'Corporativo' && isCorporativoOpen) ||
+                  (item.name === 'Promociones' && isPromocionesOpen)
+                ) && (
                   <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                     {item.submenu?.map((subItem) => (
                       <button
