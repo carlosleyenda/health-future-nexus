@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, User, Clock, Share2, BookOpen } from "lucide-react";
 import TopNavigation from '@/components/layout/TopNavigation';
 
 const NoticiasMedicas = () => {
+  const navigate = useNavigate();
   const articles = [
     {
       id: 1,
@@ -101,7 +103,11 @@ const NoticiasMedicas = () => {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {articles.map((article) => (
-              <Card key={article.id} className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full">
+              <Card key={article.id} className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full" onClick={() => {
+                if (article.id === 1) navigate('/blog/inteligencia-artificial-diagnostico');
+                if (article.id === 2) navigate('/blog/terapia-genica');
+                // Add more article links as needed
+              }}>
                 <CardHeader>
                   <div className="flex items-center justify-between text-sm text-slate-500 mb-2">
                     <Badge variant="secondary">{article.category}</Badge>

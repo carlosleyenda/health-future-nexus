@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, User, Clock, Microscope, Beaker, Dna, Brain } from "lucide-react";
 import TopNavigation from '@/components/layout/TopNavigation';
 
 const InvestigacionMedica = () => {
+  const navigate = useNavigate();
   const researchArticles = [
     {
       id: 1,
@@ -159,7 +161,10 @@ const InvestigacionMedica = () => {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {researchArticles.map((article) => (
-              <Card key={article.id} className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full">
+              <Card key={article.id} className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full" onClick={() => {
+                if (article.id === 1) navigate('/blog/terapias-car-t');
+                // Add more research article links as needed
+              }}>
                 <CardHeader>
                   <div className="flex items-center justify-between text-sm text-slate-500 mb-2">
                     <Badge variant="secondary" className="flex items-center">

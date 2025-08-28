@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, User, Clock, Trophy, Heart, Star } from "lucide-react";
 import TopNavigation from '@/components/layout/TopNavigation';
 
 const CasosExito = () => {
+  const navigate = useNavigate();
   const successStories = [
     {
       id: 1,
@@ -160,7 +162,10 @@ const CasosExito = () => {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {successStories.map((story) => (
-              <Card key={story.id} className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full">
+              <Card key={story.id} className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full" onClick={() => {
+                if (story.id === 2) navigate('/blog/recuperacion-infarto');
+                // Add more story links as needed
+              }}>
                 <CardHeader>
                   <div className="flex items-center justify-between text-sm text-slate-500 mb-2">
                     <Badge variant="secondary">{story.category}</Badge>

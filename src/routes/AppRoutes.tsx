@@ -63,6 +63,8 @@ import InteligenciaArtificialDiagnostico from '@/pages/blog/articles/Inteligenci
 import SuperalimentosDieta from '@/pages/blog/articles/SuperalimentosDieta';
 import RecuperacionInfarto from '@/pages/blog/articles/RecuperacionInfarto';
 import TerapiasCarT from '@/pages/blog/articles/TerapiasCarT';
+import RutinaEjercicios from '@/pages/blog/articles/RutinaEjercicios';
+import TerapiaGenica from '@/pages/blog/articles/TerapiaGenica';
 
 export default function AppRoutes() {
   return (
@@ -85,7 +87,9 @@ export default function AppRoutes() {
       
       {/* Individual Articles */}
       <Route path="/blog/inteligencia-artificial-diagnostico" element={<InteligenciaArtificialDiagnostico />} />
+      <Route path="/blog/terapia-genica" element={<TerapiaGenica />} />
       <Route path="/blog/superalimentos-dieta" element={<SuperalimentosDieta />} />
+      <Route path="/blog/rutina-ejercicios" element={<RutinaEjercicios />} />
       <Route path="/blog/recuperacion-infarto" element={<RecuperacionInfarto />} />
       <Route path="/blog/terapias-car-t" element={<TerapiasCarT />} />
 
