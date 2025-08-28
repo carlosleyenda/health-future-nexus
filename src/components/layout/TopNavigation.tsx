@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/auth";
 
 const TopNavigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isEscuelasOpen, setIsEscuelasOpen] = useState(false);
+  const [isServiciosOpen, setIsServiciosOpen] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
 
@@ -22,14 +22,15 @@ const TopNavigation = () => {
   const navigationItems = [
     { name: "Inicio", href: "/" },
     { 
-      name: "Escuelas", 
-      href: "/especialidades",
+      name: "Servicios", 
+      href: "/servicios",
       hasDropdown: true,
       submenu: [
-        { name: "Medicina", href: "/especialidades" },
-        { name: "Enfermería", href: "/especialidades" },
-        { name: "Odontología", href: "/especialidades" },
-        { name: "Psicología", href: "/especialidades" }
+        { name: "Consultas Médicas", href: "/servicios/consultas" },
+        { name: "Telemedicina", href: "/servicios/telemedicina" },
+        { name: "Laboratorio", href: "/servicios/laboratorio" },
+        { name: "Farmacia", href: "/servicios/farmacia" },
+        { name: "Emergencias", href: "/servicios/emergencias" }
       ]
     },
     { name: "Nosotros", href: "/nosotros" },
@@ -72,8 +73,8 @@ const TopNavigation = () => {
               <div 
                 key={item.name} 
                 className="relative"
-                onMouseEnter={() => item.hasDropdown && setIsEscuelasOpen(true)}
-                onMouseLeave={() => item.hasDropdown && setIsEscuelasOpen(false)}
+                onMouseEnter={() => item.hasDropdown && setIsServiciosOpen(true)}
+                onMouseLeave={() => item.hasDropdown && setIsServiciosOpen(false)}
               >
                 <button
                   onClick={() => handleNavigation(item.href)}
@@ -82,13 +83,13 @@ const TopNavigation = () => {
                   {item.name}
                   {item.hasDropdown && (
                     <ChevronDown className={`ml-1 h-4 w-4 transition-transform duration-200 ${
-                      isEscuelasOpen ? 'rotate-180' : ''
+                      isServiciosOpen ? 'rotate-180' : ''
                     }`} />
                   )}
                 </button>
 
                 {/* Dropdown Menu */}
-                {item.hasDropdown && isEscuelasOpen && (
+                {item.hasDropdown && isServiciosOpen && (
                   <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                     {item.submenu?.map((subItem) => (
                       <button
@@ -108,21 +109,13 @@ const TopNavigation = () => {
           {/* Right Side Buttons */}
           <div className="flex items-center space-x-4">
             {!isAuthenticated ? (
-              <>
-                <Button
-                  variant="ghost"
-                  onClick={handleLogin}
-                  className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
-                >
-                  Iniciar Sesión
-                </Button>
-                <Button
-                  onClick={handleLogin}
-                  className="bg-medical-primary hover:bg-medical-dark text-white border border-medical-primary"
-                >
-                  Aula Virtual
-                </Button>
-              </>
+              <Button
+                variant="ghost"
+                onClick={handleLogin}
+                className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+              >
+                Iniciar Sesión
+              </Button>
             ) : (
               <Button
                 onClick={() => navigate('/dashboard')}
