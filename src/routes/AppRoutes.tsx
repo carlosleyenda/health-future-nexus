@@ -58,6 +58,12 @@ import ConsejosSalud from '@/pages/blog/ConsejosSalud';
 import CasosExito from '@/pages/blog/CasosExito';
 import InvestigacionMedica from '@/pages/blog/InvestigacionMedica';
 
+// Individual Articles
+import InteligenciaArtificialDiagnostico from '@/pages/blog/articles/InteligenciaArtificialDiagnostico';
+import SuperalimentosDieta from '@/pages/blog/articles/SuperalimentosDieta';
+import RecuperacionInfarto from '@/pages/blog/articles/RecuperacionInfarto';
+import TerapiasCarT from '@/pages/blog/articles/TerapiasCarT';
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -76,6 +82,12 @@ export default function AppRoutes() {
       <Route path="/blog/consejos-salud" element={<ConsejosSalud />} />
       <Route path="/blog/casos-exito" element={<CasosExito />} />
       <Route path="/blog/investigacion-medica" element={<InvestigacionMedica />} />
+      
+      {/* Individual Articles */}
+      <Route path="/blog/inteligencia-artificial-diagnostico" element={<InteligenciaArtificialDiagnostico />} />
+      <Route path="/blog/superalimentos-dieta" element={<SuperalimentosDieta />} />
+      <Route path="/blog/recuperacion-infarto" element={<RecuperacionInfarto />} />
+      <Route path="/blog/terapias-car-t" element={<TerapiasCarT />} />
 
       {/* Protected routes with layout */}
       <Route path="/" element={
