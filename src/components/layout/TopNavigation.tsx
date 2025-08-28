@@ -7,6 +7,7 @@ import { useAuthStore } from "@/store/auth";
 const TopNavigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isServiciosOpen, setIsServiciosOpen] = useState(false);
+  const [isBlogOpen, setIsBlogOpen] = useState(false);
   const [isCorporativoOpen, setIsCorporativoOpen] = useState(false);
   const [isPromocionesOpen, setIsPromocionesOpen] = useState(false);
   const navigate = useNavigate();
@@ -33,6 +34,17 @@ const TopNavigation = () => {
         { name: "Laboratorio", href: "/health" },
         { name: "Farmacia", href: "/pharmacy" },
         { name: "Emergencias", href: "/emergency" }
+      ]
+    },
+    { 
+      name: "Blog", 
+      href: "/blog",
+      hasDropdown: true,
+      submenu: [
+        { name: "Noticias Médicas", href: "/blog/noticias-medicas" },
+        { name: "Consejos de Salud", href: "/blog/consejos-salud" },
+        { name: "Casos de Éxito", href: "/blog/casos-exito" },
+        { name: "Investigación Médica", href: "/blog/investigacion-medica" }
       ]
     },
     { name: "Nosotros", href: "/nosotros" },
@@ -97,6 +109,7 @@ const TopNavigation = () => {
                 onMouseEnter={() => {
                   if (item.hasDropdown) {
                     if (item.name === 'Servicios') setIsServiciosOpen(true);
+                    if (item.name === 'Blog') setIsBlogOpen(true);
                     if (item.name === 'Corporativo') setIsCorporativoOpen(true);
                     if (item.name === 'Promociones') setIsPromocionesOpen(true);
                   }
@@ -104,6 +117,7 @@ const TopNavigation = () => {
                 onMouseLeave={() => {
                   if (item.hasDropdown) {
                     if (item.name === 'Servicios') setIsServiciosOpen(false);
+                    if (item.name === 'Blog') setIsBlogOpen(false);
                     if (item.name === 'Corporativo') setIsCorporativoOpen(false);
                     if (item.name === 'Promociones') setIsPromocionesOpen(false);
                   }
@@ -117,6 +131,7 @@ const TopNavigation = () => {
                   {item.hasDropdown && (
                     <ChevronDown className={`ml-1 h-4 w-4 transition-transform duration-200 ${
                       (item.name === 'Servicios' && isServiciosOpen) || 
+                      (item.name === 'Blog' && isBlogOpen) ||
                       (item.name === 'Corporativo' && isCorporativoOpen) || 
                       (item.name === 'Promociones' && isPromocionesOpen) ? 'rotate-180' : ''
                     }`} />
@@ -126,6 +141,7 @@ const TopNavigation = () => {
                 {/* Dropdown Menu */}
                 {item.hasDropdown && (
                   (item.name === 'Servicios' && isServiciosOpen) ||
+                  (item.name === 'Blog' && isBlogOpen) ||
                   (item.name === 'Corporativo' && isCorporativoOpen) ||
                   (item.name === 'Promociones' && isPromocionesOpen)
                 ) && (

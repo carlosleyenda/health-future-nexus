@@ -51,6 +51,13 @@ import Servicios from '@/pages/public/Servicios';
 import Especialidades from '@/pages/public/Especialidades';
 import Contacto from '@/pages/public/Contacto';
 
+// Blog pages
+import BlogIndex from '@/pages/blog/BlogIndex';
+import NoticiasMedicas from '@/pages/blog/NoticiasMedicas';
+import ConsejosSalud from '@/pages/blog/ConsejosSalud';
+import CasosExito from '@/pages/blog/CasosExito';
+import InvestigacionMedica from '@/pages/blog/InvestigacionMedica';
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -62,6 +69,13 @@ export default function AppRoutes() {
       <Route path="/servicios" element={<Servicios />} />
       <Route path="/especialidades" element={<Especialidades />} />
       <Route path="/contacto" element={<Contacto />} />
+      
+      {/* Blog routes */}
+      <Route path="/blog" element={<BlogIndex />} />
+      <Route path="/blog/noticias-medicas" element={<NoticiasMedicas />} />
+      <Route path="/blog/consejos-salud" element={<ConsejosSalud />} />
+      <Route path="/blog/casos-exito" element={<CasosExito />} />
+      <Route path="/blog/investigacion-medica" element={<InvestigacionMedica />} />
 
       {/* Protected routes with layout */}
       <Route path="/" element={
