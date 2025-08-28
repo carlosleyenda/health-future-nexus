@@ -157,6 +157,38 @@ const ModernIndex = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
+      {/* Top Company Navigation */}
+      <section className="py-6 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap justify-center gap-8 text-sm">
+            <Button variant="ghost" className="text-professional hover:text-medical-primary font-medium px-4 py-2">
+              <Building className="mr-2 h-4 w-4" />
+              Nosotros
+            </Button>
+            <Button variant="ghost" className="text-professional hover:text-medical-primary font-medium px-4 py-2">
+              <Users className="mr-2 h-4 w-4" />
+              Nuestro Equipo
+            </Button>
+            <Button variant="ghost" className="text-professional hover:text-medical-primary font-medium px-4 py-2">
+              <Award className="mr-2 h-4 w-4" />
+              Acreditaciones
+            </Button>
+            <Button variant="ghost" className="text-professional hover:text-medical-primary font-medium px-4 py-2">
+              <Shield className="mr-2 h-4 w-4" />
+              Calidad y Seguridad
+            </Button>
+            <Button variant="ghost" className="text-professional hover:text-medical-primary font-medium px-4 py-2">
+              <TrendingUp className="mr-2 h-4 w-4" />
+              Innovación
+            </Button>
+            <Button variant="ghost" className="text-professional hover:text-medical-primary font-medium px-4 py-2">
+              <Globe className="mr-2 h-4 w-4" />
+              Responsabilidad Social
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -377,6 +409,164 @@ const ModernIndex = () => {
                 </Button>
               </CardContent>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Competitive Advantages Section */}
+      <section className="py-16 lg:py-20 bg-medical-lighter">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <Badge className="mb-6 bg-medical-primary text-white px-4 py-2 text-sm font-medium">
+              <Star className="w-4 h-4 mr-2" />
+              VENTAJAS COMPETITIVAS
+            </Badge>
+            <h2 className="font-display text-3xl lg:text-4xl font-bold text-professional mb-6">
+              ¿Por qué elegir nuestra plataforma?
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Somos pioneros en salud digital con tecnología de vanguardia y el respaldo de más de 30 años de experiencia médica
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card className="hover:shadow-medical transition-all duration-300 border-0 shadow-soft bg-white">
+              <CardHeader className="pb-6">
+                <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6">
+                  <Brain className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-professional mb-3">
+                  IA Médica Avanzada
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-muted-foreground leading-relaxed">
+                  Primera plataforma con diagnósticos asistidos por inteligencia artificial certificada por FDA, aumentando la precisión diagnóstica en un 40%
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-medical transition-all duration-300 border-0 shadow-soft bg-white">
+              <CardHeader className="pb-6">
+                <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6">
+                  <Shield className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-professional mb-3">
+                  Seguridad Líder
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-muted-foreground leading-relaxed">
+                  Triple certificación internacional: HIPAA, ISO 27001 y SOC 2. Encriptación end-to-end y cumplimiento de regulaciones globales de privacidad
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-medical transition-all duration-300 border-0 shadow-soft bg-white">
+              <CardHeader className="pb-6">
+                <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6">
+                  <Activity className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-professional mb-3">
+                  Monitoreo IoT 24/7
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-muted-foreground leading-relaxed">
+                  Integración con más de 200 dispositivos médicos IoT para monitoreo continuo y alertas predictivas en tiempo real
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-medical transition-all duration-300 border-0 shadow-soft bg-white">
+              <CardHeader className="pb-6">
+                <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6">
+                  <Globe className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-professional mb-3">
+                  Red Global de Especialistas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-muted-foreground leading-relaxed">
+                  Acceso a más de 1,200 especialistas certificados en 45 países. Consultas multidioma disponibles las 24 horas del día
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-medical transition-all duration-300 border-0 shadow-soft bg-white">
+              <CardHeader className="pb-6">
+                <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6">
+                  <Zap className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-professional mb-3">
+                  Respuesta Instantánea
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-muted-foreground leading-relaxed">
+                  Tiempo promedio de respuesta de 2 minutos. Sistema de triaje automático que conecta pacientes con el especialista correcto al instante
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-medical transition-all duration-300 border-0 shadow-soft bg-white">
+              <CardHeader className="pb-6">
+                <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6">
+                  <CheckCircle className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-professional mb-3">
+                  98% Satisfacción
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-muted-foreground leading-relaxed">
+                  La plataforma médica digital con mayor índice de satisfacción del mercado. Más de 2 millones de consultas exitosas y 50,000+ pacientes activos
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Key Differentiators */}
+          <div className="mt-16 bg-white rounded-3xl p-8 shadow-soft">
+            <h3 className="text-2xl font-bold text-professional text-center mb-8">
+              Nuestros Diferenciales Únicos
+            </h3>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Smartphone className="h-10 w-10 text-white" />
+                </div>
+                <h4 className="text-lg font-semibold text-professional mb-3">
+                  Tecnología Propia
+                </h4>
+                <p className="text-muted-foreground text-sm">
+                  Desarrollamos nuestras propias soluciones tecnológicas sin depender de terceros
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Award className="h-10 w-10 text-white" />
+                </div>
+                <h4 className="text-lg font-semibold text-professional mb-3">
+                  Acreditación JCI
+                </h4>
+                <p className="text-muted-foreground text-sm">
+                  Única plataforma digital con triple acreditación JCI consecutiva
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                  <HeartHandshake className="h-10 w-10 text-white" />
+                </div>
+                <h4 className="text-lg font-semibold text-professional mb-3">
+                  Atención Integral
+                </h4>
+                <p className="text-muted-foreground text-sm">
+                  Seguimiento completo desde prevención hasta rehabilitación
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
