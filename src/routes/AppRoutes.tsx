@@ -65,6 +65,14 @@ import Laboratorio from '@/pages/services/Laboratorio';
 import FarmaciaVirtual from '@/pages/services/FarmaciaVirtual';
 import EmergenciasMedicas from '@/pages/services/EmergenciasMedicas';
 
+// Blog article pages
+import InteligenciaArtificialDiagnostico from '@/pages/blog/articles/InteligenciaArtificialDiagnostico';
+import TerapiaGenica from '@/pages/blog/articles/TerapiaGenica';
+import SuperalimentosDieta from '@/pages/blog/articles/SuperalimentosDieta';
+import RutinaEjercicios from '@/pages/blog/articles/RutinaEjercicios';
+import RecuperacionInfarto from '@/pages/blog/articles/RecuperacionInfarto';
+import TerapiasCarT from '@/pages/blog/articles/TerapiasCarT';
+
 export default function AppRoutes() {
   return (
     <Routes>
