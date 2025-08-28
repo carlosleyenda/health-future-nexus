@@ -85,12 +85,19 @@ export default function AppRoutes() {
       <Route path="/especialidades" element={<Especialidades />} />
       <Route path="/contacto" element={<Contacto />} />
       
+      {/* Blog routes */}
+      <Route path="/blog" element={<BlogIndex />} />
+      <Route path="/blog/noticias-medicas" element={<NoticiasMedicas />} />
+      <Route path="/blog/consejos-salud" element={<ConsejosSalud />} />
+      <Route path="/blog/casos-exito" element={<CasosExito />} />
+      <Route path="/blog/investigacion-medica" element={<InvestigacionMedica />} />
+      
       {/* Service routes */}
       <Route path="/servicios/consultas" element={<ConsultasMedicas />} />
-      <Route path="/consultas" element={<Telemedicina />} />
-      <Route path="/health" element={<Laboratorio />} />
-      <Route path="/pharmacy" element={<FarmaciaVirtual />} />
-      <Route path="/emergency" element={<EmergenciasMedicas />} />
+      <Route path="/servicios/telemedicina" element={<Telemedicina />} />
+      <Route path="/servicios/laboratorio" element={<Laboratorio />} />
+      <Route path="/servicios/farmacia-virtual" element={<FarmaciaVirtual />} />
+      <Route path="/servicios/emergencias" element={<EmergenciasMedicas />} />
       
       {/* Individual Articles */}
       <Route path="/blog/inteligencia-artificial-diagnostico" element={<InteligenciaArtificialDiagnostico />} />
