@@ -27,7 +27,15 @@ import {
   Sparkles,
   Phone,
   Mail,
-  MapPin
+  MapPin,
+  Play,
+  Building,
+  Ambulance,
+  Pill,
+  HeartHandshake,
+  X,
+  Lightbulb,
+  Newspaper
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/auth";
@@ -35,6 +43,10 @@ import medicalTeamHero from "@/assets/medical-team-hero.jpg";
 import doctorPortrait1 from "@/assets/doctor-portrait-1.jpg";
 import doctorPortrait2 from "@/assets/doctor-portrait-2.jpg";
 import medicalSpecialists from "@/assets/medical-specialists.jpg";
+import medicalAnnouncement from "@/assets/medical-announcement.jpg";
+import smartOperatingRoom from "@/assets/smart-operating-room.jpg";
+import telemedicineSuccess from "@/assets/telemedicine-success.jpg";
+import insurancePartners from "@/assets/insurance-partners.jpg";
 
 const ModernIndex = () => {
   const navigate = useNavigate();
@@ -240,6 +252,388 @@ const ModernIndex = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* News Announcement Banner */}
+      <section className="py-4 bg-medical-lighter relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-soft overflow-hidden">
+            <div className="grid lg:grid-cols-3 gap-6 items-center p-6">
+              <div className="lg:col-span-2">
+                <div className="flex items-center gap-3 mb-3">
+                  <Badge className="bg-orange-100 text-orange-800 px-3 py-1 text-sm font-semibold">
+                    ¡BUENAS NOTICIAS!
+                  </Badge>
+                  <Button variant="ghost" size="sm" className="ml-auto lg:hidden">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <h3 className="text-lg lg:text-xl font-bold text-professional mb-2">
+                  Obtuvimos nuestra tercera acreditación consecutiva por la JCI
+                </h3>
+                <p className="text-muted-foreground text-sm lg:text-base">
+                  Nos sentimos orgullosos de este gran logro que reafirma nuestro compromiso con la excelencia médica
+                </p>
+              </div>
+              <div className="relative">
+                <img 
+                  src={medicalAnnouncement} 
+                  alt="Acreditación médica JCI" 
+                  className="w-full h-32 lg:h-24 object-cover rounded-xl"
+                />
+                <div className="absolute top-2 right-2 bg-yellow-400 w-8 h-8 rounded-full flex items-center justify-center">
+                  <Award className="h-4 w-4 text-yellow-800" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How can we help you today Section */}
+      <section className="py-16 lg:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-3xl lg:text-4xl font-bold text-professional mb-6">
+              ¿En qué podemos ayudarte hoy?
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <Card className="text-center hover:shadow-medical transition-all duration-300 border-0 shadow-soft group cursor-pointer" onClick={handleGetStarted}>
+              <CardHeader className="pb-6">
+                <div className="w-20 h-20 bg-medical-lighter rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-medical-primary group-hover:text-white transition-all">
+                  <Stethoscope className="h-10 w-10 text-medical-primary group-hover:text-white" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-professional mb-3">
+                  Staff Médico
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-muted-foreground leading-relaxed mb-4">
+                  Conoce a nuestros especialistas certificados y agenda tu consulta
+                </CardDescription>
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white w-full">
+                  Conoce al Staff
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-medical transition-all duration-300 border-0 shadow-soft group cursor-pointer" onClick={handleBookConsultation}>
+              <CardHeader className="pb-6">
+                <div className="w-20 h-20 bg-medical-lighter rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-medical-primary group-hover:text-white transition-all">
+                  <Calendar className="h-10 w-10 text-medical-primary group-hover:text-white" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-professional mb-3">
+                  Reserva una cita
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-muted-foreground leading-relaxed mb-4">
+                  Agenda tu consulta de forma rápida y sencilla en línea
+                </CardDescription>
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white w-full">
+                  Reservar
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-medical transition-all duration-300 border-0 shadow-soft group cursor-pointer" onClick={handleGetStarted}>
+              <CardHeader className="pb-6">
+                <div className="w-20 h-20 bg-medical-lighter rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-medical-primary group-hover:text-white transition-all">
+                  <Users className="h-10 w-10 text-medical-primary group-hover:text-white" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-professional mb-3">
+                  Pacientes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-muted-foreground leading-relaxed mb-4">
+                  Accede a tu historial médico y resultados de forma segura
+                </CardDescription>
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white w-full">
+                  Ingresar
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-medical transition-all duration-300 border-0 shadow-soft group cursor-pointer" onClick={handleGetStarted}>
+              <CardHeader className="pb-6">
+                <div className="w-20 h-20 bg-medical-lighter rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-medical-primary group-hover:text-white transition-all">
+                  <HeartHandshake className="h-10 w-10 text-medical-primary group-hover:text-white" />
+                </div>
+                <CardTitle className="text-xl font-semibold text-professional mb-3">
+                  Servicios
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-muted-foreground leading-relaxed mb-4">
+                  Explora todos nuestros servicios médicos especializados
+                </CardDescription>
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white w-full">
+                  Ver más
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Always close to you Section */}
+      <section className="py-16 lg:py-24 bg-gradient-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="font-display text-3xl lg:text-4xl font-bold text-professional mb-6">
+                Siempre cerca de ti, cuando más nos necesitas
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                Con más de 30 años de experiencia en el cuidado de la salud de miles de personas, 
+                nos hemos convertido en una plataforma líder reconocida a nivel internacional por 
+                la calidad de nuestros servicios médicos digitales y la innovación constante en 
+                telemedicina.
+              </p>
+              <p className="text-lg text-muted-foreground mb-8">
+                En nuestra búsqueda constante de la excelencia, hemos desarrollado tecnologías 
+                que nos permiten combinar lo mejor de la medicina tradicional con las 
+                innovaciones digitales más avanzadas, garantizando una atención integral 
+                e inteligente para cada paciente.
+              </p>
+              <Button 
+                size="lg"
+                className="bg-medical-primary hover:bg-medical-dark text-white shadow-medical"
+                onClick={handleGetStarted}
+              >
+                <Lightbulb className="mr-2 h-5 w-5" />
+                Conoce más sobre nosotros
+              </Button>
+            </div>
+            
+            <div className="relative">
+              <div className="relative rounded-3xl overflow-hidden shadow-elevated">
+                <img 
+                  src={smartOperatingRoom} 
+                  alt="Sala de operaciones inteligente" 
+                  className="w-full h-[400px] object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-medical-primary/20 to-transparent"></div>
+                
+                {/* Video Play Button */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-6 hover:bg-white transition-all cursor-pointer group">
+                    <Play className="h-12 w-12 text-medical-primary group-hover:scale-110 transition-transform" />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="absolute -bottom-6 -right-6 bg-white rounded-2xl p-4 shadow-medical">
+                <h4 className="font-bold text-professional text-lg mb-2">
+                  Inauguramos Sala de Operaciones Inteligente
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Cirugía robótica con tecnología aumentada de última generación, 
+                  integrando inteligencia artificial de última generación.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Success Cases Section */}
+      <section className="py-16 lg:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-3xl lg:text-4xl font-bold text-professional mb-6">
+              Casos de éxito
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="relative">
+              <img 
+                src={telemedicineSuccess} 
+                alt="Consulta virtual exitosa" 
+                className="w-full h-[300px] object-cover rounded-3xl shadow-elevated"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-3xl"></div>
+              
+              {/* Video Play Button */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-red-600 rounded-full p-4 hover:bg-red-700 transition-all cursor-pointer group">
+                  <Play className="h-8 w-8 text-white group-hover:scale-110 transition-transform fill-white" />
+                </div>
+              </div>
+              
+              <div className="absolute bottom-4 left-4 text-white">
+                <p className="text-sm opacity-90">Conoce la historia de Rosmer Ayala</p>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-2xl font-bold text-professional mb-4">
+                Rosmer Ayala, desafío insuperable
+              </h3>
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                Conoce el extraordinario caso de Rosmer Ayala, cuando parecía ser un 
+                desafío insuperable, el equipo de la Unidad de Medicina de precisión junto 
+                con especialistas en genómica médica, lograron un diagnóstico certero 
+                mediante el uso de inteligencia artificial y secuenciación genómica.
+              </p>
+              <Button 
+                variant="outline" 
+                className="border-medical-primary text-medical-primary hover:bg-medical-lighter"
+              >
+                Conoce más historias
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Insurance Partners Section */}
+      <section className="py-16 lg:py-20 bg-gradient-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-3xl lg:text-4xl font-bold text-professional mb-6">
+              Nuestros Convenios
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Trabajamos con las principales aseguradoras para brindarte la mejor atención médica
+            </p>
+          </div>
+          
+          <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-soft">
+            <div className="relative">
+              <img 
+                src={insurancePartners} 
+                alt="Socios de seguros médicos" 
+                className="w-full h-32 object-cover rounded-2xl opacity-80"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-medical-primary/10 to-medical-light/10 rounded-2xl"></div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-medical-lighter rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Shield className="h-8 w-8 text-medical-primary" />
+                </div>
+                <h4 className="font-semibold text-professional">RIMAC</h4>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-medical-lighter rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Heart className="h-8 w-8 text-medical-primary" />
+                </div>
+                <h4 className="font-semibold text-professional">UniVida</h4>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-medical-lighter rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Building className="h-8 w-8 text-medical-primary" />
+                </div>
+                <h4 className="font-semibold text-professional">FEBEN</h4>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-medical-lighter rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Pill className="h-8 w-8 text-medical-primary" />
+                </div>
+                <h4 className="font-semibold text-professional">SaludVisa</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* News Section */}
+      <section className="py-16 lg:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-3xl lg:text-4xl font-bold text-professional mb-6">
+              Buenas Noticias
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <Card className="overflow-hidden hover:shadow-medical transition-all duration-300 border-0 shadow-soft">
+              <div className="relative">
+                <img 
+                  src={medicalTeamHero} 
+                  alt="Médicos San Pablo reconocidos" 
+                  className="w-full h-48 object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle className="text-lg font-bold text-professional mb-2">
+                  Médicos San Pablo son reconocidos en los America's Best Hospitals por Newsweek
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Nuestros especialistas han sido reconocidos internacionalmente por su excelencia médica digital.
+                </p>
+                <Button variant="outline" size="sm" className="text-orange-600 border-orange-600 hover:bg-orange-50">
+                  Conoce la noticia
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden hover:shadow-medical transition-all duration-300 border-0 shadow-soft">
+              <div className="relative">
+                <img 
+                  src={smartOperatingRoom} 
+                  alt="Nueva sede San Pablo" 
+                  className="w-full h-48 object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle className="text-lg font-bold text-professional mb-2">
+                  Inauguración de nueva plataforma de telemedicina
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Nueva sede digital con tecnología de vanguardia para atención médica remota.
+                </p>
+                <Button variant="outline" size="sm" className="text-orange-600 border-orange-600 hover:bg-orange-50">
+                  Conoce más detalles
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden hover:shadow-medical transition-all duration-300 border-0 shadow-soft">
+              <div className="relative">
+                <img 
+                  src={medicalSpecialists} 
+                  alt="Inauguración Emergencia Inteligente" 
+                  className="w-full h-48 object-cover"
+                />
+              </div>
+              <CardHeader>
+                <CardTitle className="text-lg font-bold text-professional mb-2">
+                  Inauguramos la primera Emergencia Inteligente
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Sistema de emergencia con IA que reduce tiempos de respuesta en un 60%.
+                </p>
+                <Button variant="outline" size="sm" className="text-orange-600 border-orange-600 hover:bg-orange-50">
+                  Conoce la noticia
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="border-medical-primary text-medical-primary hover:bg-medical-lighter"
+            >
+              <Newspaper className="mr-2 h-4 w-4" />
+              Ver todas las noticias
+            </Button>
           </div>
         </div>
       </section>
