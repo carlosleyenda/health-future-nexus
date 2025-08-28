@@ -58,13 +58,12 @@ import ConsejosSalud from '@/pages/blog/ConsejosSalud';
 import CasosExito from '@/pages/blog/CasosExito';
 import InvestigacionMedica from '@/pages/blog/InvestigacionMedica';
 
-// Individual Articles
-import InteligenciaArtificialDiagnostico from '@/pages/blog/articles/InteligenciaArtificialDiagnostico';
-import SuperalimentosDieta from '@/pages/blog/articles/SuperalimentosDieta';
-import RecuperacionInfarto from '@/pages/blog/articles/RecuperacionInfarto';
-import TerapiasCarT from '@/pages/blog/articles/TerapiasCarT';
-import RutinaEjercicios from '@/pages/blog/articles/RutinaEjercicios';
-import TerapiaGenica from '@/pages/blog/articles/TerapiaGenica';
+// Service pages
+import ConsultasMedicas from '@/pages/services/ConsultasMedicas';
+import Telemedicina from '@/pages/services/Telemedicina';
+import Laboratorio from '@/pages/services/Laboratorio';
+import FarmaciaVirtual from '@/pages/services/FarmaciaVirtual';
+import EmergenciasMedicas from '@/pages/services/EmergenciasMedicas';
 
 export default function AppRoutes() {
   return (
@@ -78,12 +77,12 @@ export default function AppRoutes() {
       <Route path="/especialidades" element={<Especialidades />} />
       <Route path="/contacto" element={<Contacto />} />
       
-      {/* Blog routes */}
-      <Route path="/blog" element={<BlogIndex />} />
-      <Route path="/blog/noticias-medicas" element={<NoticiasMedicas />} />
-      <Route path="/blog/consejos-salud" element={<ConsejosSalud />} />
-      <Route path="/blog/casos-exito" element={<CasosExito />} />
-      <Route path="/blog/investigacion-medica" element={<InvestigacionMedica />} />
+      {/* Service routes */}
+      <Route path="/servicios/consultas" element={<ConsultasMedicas />} />
+      <Route path="/consultas" element={<Telemedicina />} />
+      <Route path="/health" element={<Laboratorio />} />
+      <Route path="/pharmacy" element={<FarmaciaVirtual />} />
+      <Route path="/emergency" element={<EmergenciasMedicas />} />
       
       {/* Individual Articles */}
       <Route path="/blog/inteligencia-artificial-diagnostico" element={<InteligenciaArtificialDiagnostico />} />
