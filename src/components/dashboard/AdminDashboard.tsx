@@ -20,8 +20,10 @@ import AutomationDashboard from '@/components/automation/AutomationDashboard';
 import QualityAssuranceDashboard from '@/components/testing/QualityAssuranceDashboard';
 import ComplianceDashboard from '@/components/compliance/ComplianceDashboard';
 import IoTDashboard from '@/components/iot/IoTDashboard';
+import EcosystemManagement from '@/components/admin/EcosystemManagement';
+import EcosystemSynergyDashboard from '@/components/admin/EcosystemSynergyDashboard';
 
-type AdminView = 'dashboard' | 'users' | 'doctors' | 'patients' | 'appointments' | 'inventory' | 'alerts' | 'config' | 'reports' | 'database' | 'analytics' | 'monitoring' | 'executive' | 'global' | 'automation' | 'qa' | 'compliance' | 'iot';
+type AdminView = 'dashboard' | 'users' | 'doctors' | 'patients' | 'appointments' | 'inventory' | 'alerts' | 'config' | 'reports' | 'database' | 'analytics' | 'monitoring' | 'executive' | 'global' | 'automation' | 'qa' | 'compliance' | 'iot' | 'ecosystem' | 'synergy';
 
 export default function AdminDashboard() {
   const [activeView, setActiveView] = useState<AdminView>('dashboard');
@@ -97,6 +99,10 @@ export default function AdminDashboard() {
         return <ComplianceDashboard organizationId="org-1" />;
       case 'iot':
         return <IoTDashboard patientId="patient-1" />;
+      case 'ecosystem':
+        return <EcosystemManagement />;
+      case 'synergy':
+        return <EcosystemSynergyDashboard />;
       default:
         return (
           <div className="space-y-6">
@@ -125,7 +131,7 @@ export default function AdminDashboard() {
             {/* Gestión Principal */}
             <Card>
               <CardHeader>
-                <CardTitle>Gestión Principal</CardTitle>
+                <CardTitle>Gestión Principal del Ecosistema</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -160,6 +166,35 @@ export default function AdminDashboard() {
                   >
                     <Calendar className="h-8 w-8 mb-2 text-orange-600" />
                     <span className="text-sm font-medium">Gestionar Citas</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Gestión del Ecosistema Completo */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Ecosistema Completo - Sinergia Total</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button 
+                    onClick={() => setActiveView('ecosystem')} 
+                    variant="outline" 
+                    className="h-auto flex-col py-6 hover:bg-emerald-50 border-emerald-200"
+                  >
+                    <Globe className="h-8 w-8 mb-2 text-emerald-600" />
+                    <span className="text-sm font-medium">Gestión Completa del Ecosistema</span>
+                    <span className="text-xs text-muted-foreground mt-1">Empresas • Farmacias • Hospitales • Delivery • Ambulancias</span>
+                  </Button>
+                  <Button 
+                    onClick={() => setActiveView('synergy')} 
+                    variant="outline" 
+                    className="h-auto flex-col py-6 hover:bg-teal-50 border-teal-200"
+                  >
+                    <Activity className="h-8 w-8 mb-2 text-teal-600" />
+                    <span className="text-sm font-medium">Coordinación y Sinergia</span>
+                    <span className="text-xs text-muted-foreground mt-1">Flujos • Métricas • Optimización en Tiempo Real</span>
                   </Button>
                 </div>
               </CardContent>
