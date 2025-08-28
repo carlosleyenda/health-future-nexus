@@ -1,12 +1,11 @@
 
 import React from 'react';
-import MedicalAIAssistant from '@/components/ai/MedicalAIAssistant';
+import RoleBasedAIAssistant from '@/components/ai/RoleBasedAIAssistant';
 
 export default function AIAssistantPage() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Asistente de IA Médica</h1>
-      <MedicalAIAssistant />
+    <div className="container mx-auto py-6">
+      <RoleBasedAIAssistant />
     </div>
   );
 }
