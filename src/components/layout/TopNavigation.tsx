@@ -48,10 +48,10 @@ const TopNavigation = () => {
 
   return (
     <nav 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled 
-          ? 'bg-slate-800/90 backdrop-blur-md border-b border-white/10' 
-          : 'bg-slate-800/80 backdrop-blur-sm'
+          ? 'bg-slate-900/20 backdrop-blur-md border-b border-white/5' 
+          : 'bg-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
