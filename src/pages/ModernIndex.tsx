@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/auth";
+import TopNavigation from "@/components/layout/TopNavigation";
 import medicalTeamHero from "@/assets/medical-team-hero.jpg";
 import doctorPortrait1 from "@/assets/doctor-portrait-1.jpg";
 import doctorPortrait2 from "@/assets/doctor-portrait-2.jpg";
@@ -157,8 +158,11 @@ const ModernIndex = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
+      {/* Top Navigation */}
+      <TopNavigation />
+      
       {/* Hero Section */}
-      <section className="relative py-20 lg:py-32 overflow-hidden">
+      <section className="relative py-20 lg:py-32 overflow-hidden pt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Content */}
