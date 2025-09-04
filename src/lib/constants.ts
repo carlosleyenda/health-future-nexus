@@ -2,16 +2,34 @@
 export const APP_CONFIG = {
   name: 'Clínica Virtual',
   version: '1.0.0',
-  description: 'Plataforma integral de telemedicina',
+  description: 'Plataforma integral de telemedicina para América Latina',
+  regions: ['perú', 'chile', 'colombia', 'venezuela'],
   support: {
     email: 'soporte@clinicavirtual.com',
-    phone: '+52 (55) 1234-5678'
+    phone: {
+      peru: '+51 (1) 234-5678',
+      chile: '+56 (2) 234-5678', 
+      colombia: '+57 (1) 234-5678',
+      venezuela: '+58 (212) 234-5678'
+    }
   },
   social: {
     website: 'https://clinicavirtual.com',
     facebook: 'https://facebook.com/clinicavirtual',
     twitter: 'https://twitter.com/clinicavirtual',
     instagram: 'https://instagram.com/clinicavirtual'
+  },
+  currencies: {
+    peru: 'PEN',
+    chile: 'CLP',
+    colombia: 'COP', 
+    venezuela: 'VES'
+  },
+  emergency_numbers: {
+    peru: '116',
+    chile: '131',
+    colombia: '123',
+    venezuela: '911'
   }
 };
 
@@ -121,11 +139,15 @@ export const PAYMENT_METHODS = {
   credit_card: 'Tarjeta de Crédito',
   debit_card: 'Tarjeta de Débito',
   bank_transfer: 'Transferencia Bancaria',
+  pse: 'PSE (Colombia)',
+  mercado_pago: 'Mercado Pago',
+  webpay: 'Webpay (Chile)',
+  yape: 'Yape (Perú)',
+  plin: 'Plin (Perú)',
+  nequi: 'Nequi (Colombia)',
   digital_wallet: 'Cartera Digital',
-  cryptocurrency: 'Criptomonedas',
   health_coins: 'Health Coins',
   insurance: 'Seguro Médico',
-  hsa_fsa: 'HSA/FSA',
   medical_financing: 'Financiamiento Médico',
   cash: 'Efectivo'
 } as const;

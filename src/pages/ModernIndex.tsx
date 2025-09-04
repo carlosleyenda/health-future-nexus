@@ -40,6 +40,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/auth";
 import TopNavigation from "@/components/layout/TopNavigation";
+import CountrySelector from "@/components/regional/CountrySelector";
+import { useRegionalSettings } from "@/hooks/useRegionalSettings";
+import { DemoDataService } from "@/services/demo/demoDataService";
 import medicalTeamHero from "@/assets/medical-team-hero.jpg";
 import doctorPortrait1 from "@/assets/doctor-portrait-1.jpg";
 import doctorPortrait2 from "@/assets/doctor-portrait-2.jpg";
@@ -52,6 +55,10 @@ import insurancePartners from "@/assets/insurance-partners.jpg";
 const ModernIndex = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
+  const { selectedCountry, setCountry, getLocalizedPrice, emergencyNumber } = useRegionalSettings();
+  
+  const countryDoctors = DemoDataService.getDoctorsByCountry(selectedCountry);
+  const emergencyContacts = DemoDataService.getEmergencyContacts(selectedCountry);
 
   const featuredDoctors = [
     {
@@ -160,7 +167,63 @@ const ModernIndex = () => {
     <div className="min-h-screen bg-gradient-hero">
       {/* Top Navigation */}
       <TopNavigation />
-      
+
+      {/* Regional Selection Section */}
+      <section className="py-8 bg-gradient-subtle border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-soft p-6">
+            <div className="grid lg:grid-cols-3 gap-6 items-center">
+              <div className="lg:col-span-2">
+                <div className="flex items-center gap-3 mb-4">
+                  <Globe className="h-6 w-6 text-medical-primary" />
+                  <h3 className="text-xl font-bold text-professional">
+                    Atención Médica en América Latina
+                  </h3>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Conectamos a médicos certificados de Perú, Chile, Colombia y Venezuela con pacientes que necesitan atención médica de calidad.
+                </p>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span>Médicos locales certificados</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span>Precios en moneda local</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span>Atención en tu idioma</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span>Soporte 24/7</span>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <CountrySelector
+                  selectedCountry={selectedCountry}
+                  onCountryChange={setCountry}
+                  showEmergencyInfo={true}
+                />
+                {countryDoctors.length > 0 && (
+                  <div className="bg-medical-lighter p-4 rounded-lg">
+                    <div className="text-sm font-medium text-medical-primary mb-2">
+                      🩺 Médicos disponibles: {countryDoctors.length}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Consultas desde {getLocalizedPrice(50).symbol} {getLocalizedPrice(50).amount}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden pt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

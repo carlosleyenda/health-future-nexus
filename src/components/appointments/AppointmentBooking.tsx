@@ -17,6 +17,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import type { Specialty } from '@/types';
+import CountrySelector from '@/components/regional/CountrySelector';
+import { APP_CONFIG } from '@/lib/constants';
 
 const appointmentSchema = z.object({
   specialty: z.string().min(1, 'Selecciona una especialidad'),
@@ -29,6 +31,7 @@ const appointmentSchema = z.object({
   patientName: z.string().min(2, 'Nombre requerido'),
   patientPhone: z.string().min(10, 'Teléfono válido requerido'),
   patientEmail: z.string().email('Email válido requerido'),
+  country: z.string().min(1, 'Selecciona tu país'),
 });
 
 type AppointmentFormData = z.infer<typeof appointmentSchema>;
@@ -91,6 +94,11 @@ export default function AppointmentBooking({ onClose }: AppointmentBookingProps)
   const [step, setStep] = useState<'form' | 'confirmation'>('form');
   const [confirmedAppointment, setConfirmedAppointment] = useState<any>(null);
 
+  const getCurrencyByCountry = (country?: string) => {
+    const selectedCountry = country || form.watch('country');
+    return APP_CONFIG.currencies[selectedCountry as keyof typeof APP_CONFIG.currencies] || 'USD';
+  };
+
   const form = useForm<AppointmentFormData>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
@@ -100,6 +108,7 @@ export default function AppointmentBooking({ onClose }: AppointmentBookingProps)
       patientName: '',
       patientPhone: '',
       patientEmail: '',
+      country: '',
     },
   });
 
@@ -150,7 +159,7 @@ export default function AppointmentBooking({ onClose }: AppointmentBookingProps)
             <p><strong>Doctor:</strong> {confirmedAppointment?.doctor?.name}</p>
             <p><strong>Fecha:</strong> {confirmedAppointment?.date && format(confirmedAppointment.date, 'dd/MM/yyyy', { locale: es })}</p>
             <p><strong>Hora:</strong> {confirmedAppointment?.time}</p>
-            <p><strong>Costo:</strong> ${confirmedAppointment?.doctor?.consultationFee} MXN</p>
+            <p><strong>Costo:</strong> {getCurrencyByCountry()} {confirmedAppointment?.doctor?.consultationFee}</p>
           </div>
           <div className="pt-4 space-y-2">
             <Button onClick={() => {
@@ -187,6 +196,24 @@ export default function AppointmentBooking({ onClose }: AppointmentBookingProps)
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Información del Paciente</h3>
                 
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>País</FormLabel>
+                      <FormControl>
+                        <CountrySelector
+                          selectedCountry={field.value}
+                          onCountryChange={field.onChange}
+                          showEmergencyInfo={true}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="patientName"
@@ -275,10 +302,10 @@ export default function AppointmentBooking({ onClose }: AppointmentBookingProps)
                           <SelectContent>
                             {availableDoctors.map((doctor) => (
                               <SelectItem key={doctor.id} value={doctor.id}>
-                                <div className="flex items-center gap-2">
-                                  <User className="h-4 w-4" />
-                                  {doctor.name} - ${doctor.consultationFee}
-                                </div>
+                                 <div className="flex items-center gap-2">
+                                   <User className="h-4 w-4" />
+                                   {doctor.name} - {getCurrencyByCountry()} {doctor.consultationFee}
+                                 </div>
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -394,7 +421,7 @@ export default function AppointmentBooking({ onClose }: AppointmentBookingProps)
                 disabled={!form.formState.isValid}
               >
                 Confirmar Cita
-                {selectedDoctor && ` - $${selectedDoctor.consultationFee} MXN`}
+                {selectedDoctor && ` - ${getCurrencyByCountry()} ${selectedDoctor.consultationFee}`}
               </Button>
             </div>
           </form>
