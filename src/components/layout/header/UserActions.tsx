@@ -21,7 +21,7 @@ interface UserProfile {
   phone: string | null;
   avatar_url: string | null;
   bio: string | null;
-  role: 'patient' | 'doctor' | 'admin' | 'enterprise' | 'pharmacy';
+  role: 'patient' | 'doctor' | 'admin' | 'enterprise' | 'pharmacy' | 'delivery_person';
 }
 
 interface UserActionsProps {
@@ -37,7 +37,16 @@ export default function UserActions({ isAuthenticated, user, profile, onLogin, o
 
   const handleDashboard = () => {
     if (profile?.role) {
-      navigate(`/${profile.role}/dashboard`);
+      const dashboardPaths = {
+        patient: '/patient/dashboard',
+        doctor: '/doctor/dashboard',
+        admin: '/admin/dashboard',
+        enterprise: '/enterprise',
+        pharmacy: '/pharmacy-dashboard',
+        delivery_person: '/repartidor'
+      };
+      
+      navigate(dashboardPaths[profile.role] || '/patient/dashboard');
     }
   };
 

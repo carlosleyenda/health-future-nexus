@@ -17,7 +17,7 @@ interface NavigationItem {
 }
 
 interface RoleBasedNavigationProps {
-  userRole: 'patient' | 'doctor' | 'admin' | 'enterprise' | 'pharmacy' | null;
+  userRole: 'patient' | 'doctor' | 'admin' | 'enterprise' | 'pharmacy' | 'delivery_person' | null;
   collapsed?: boolean;
 }
 
@@ -89,6 +89,15 @@ const navigationConfig: Record<string, NavigationItem[]> = {
     { name: 'Analytics', href: '/analytics', icon: BarChart3, description: 'Métricas de ventas' },
     { name: 'Red de Farmacias', href: '/network', icon: Building2, description: 'Partners y red' },
     { name: 'Configuración', href: '/settings', icon: Settings, description: 'Configuración de farmacia' }
+  ],
+
+  delivery_person: [
+    { name: 'Mi Dashboard', href: '/repartidor', icon: Home, description: 'Panel del repartidor' },
+    { name: 'Entregas Pendientes', href: '/delivery/pending', icon: Package, badge: '3', description: 'Entregas asignadas' },
+    { name: 'En Progreso', href: '/delivery/active', icon: Truck, description: 'Entregas en curso' },
+    { name: 'Historial', href: '/delivery/history', icon: FileText, description: 'Entregas completadas' },
+    { name: 'Ganancias', href: '/delivery/earnings', icon: CreditCard, description: 'Ingresos y pagos' },
+    { name: 'Configuración', href: '/settings', icon: Settings, description: 'Perfil y vehículo' }
   ]
 };
 

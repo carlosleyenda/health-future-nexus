@@ -68,6 +68,16 @@ const demoUsers = [
     icon: <Store className="h-6 w-6" />,
     color: 'bg-teal-100 text-teal-800 border-teal-200',
     features: ['Gestión inventario', 'Recetas digitales', 'Entregas', 'Reportes ventas']
+  },
+  {
+    role: 'delivery_person',
+    email: 'carlos.delivery@repartidor.demo',
+    password: 'demo123',
+    name: 'Carlos Mendoza',
+    description: 'Repartidor con motocicleta - Zona Lima',
+    icon: <Pill className="h-6 w-6" />,
+    color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    features: ['Entregas pendientes', 'Rastreo GPS', 'Chat con clientes', 'Gestión de rutas']
   }
 ];
 
@@ -92,7 +102,8 @@ export default function DemoLogin() {
           doctor: '/doctor/dashboard', 
           admin: '/admin/dashboard',
           enterprise: '/enterprise',
-          pharmacy: '/pharmacy-dashboard'
+          pharmacy: '/pharmacy-dashboard',
+          delivery_person: '/repartidor'
         };
         
         navigate(dashboardPaths[user.role as keyof typeof dashboardPaths] || '/');

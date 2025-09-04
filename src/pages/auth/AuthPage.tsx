@@ -31,7 +31,8 @@ export const AuthPage = () => {
         doctor: '/doctor/dashboard',
         admin: '/admin/dashboard',
         enterprise: '/enterprise',
-        pharmacy: '/pharmacy-dashboard'
+        pharmacy: '/pharmacy-dashboard',
+        delivery_person: '/repartidor'
       };
       
       const targetPath = dashboardPaths[profile.role] || '/patient/dashboard';
@@ -157,6 +158,7 @@ export const AuthPage = () => {
                     <p>• admin@sistema.demo (Admin)</p>
                     <p>• empresa@salud.demo (Empresa)</p>
                     <p>• farmacia@central.demo (Farmacia)</p>
+                    <p>• carlos.delivery@repartidor.demo (Repartidor)</p>
                     <p className="mt-2 font-mono">Contraseña: demo123</p>
                   </div>
                 </div>

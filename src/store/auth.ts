@@ -13,7 +13,7 @@ interface UserProfile {
   phone: string | null;
   avatar_url: string | null;
   bio: string | null;
-  role: 'patient' | 'doctor' | 'admin' | 'enterprise' | 'pharmacy';
+  role: 'patient' | 'doctor' | 'admin' | 'enterprise' | 'pharmacy' | 'delivery_person';
 }
 
 interface AuthState {
@@ -60,7 +60,8 @@ export const useAuthStore = create<AuthState>()(
             { email: 'carlos.rodriguez@doctor.demo', password: 'demo123', role: 'doctor', name: 'Dr. Carlos Rodríguez' },
             { email: 'admin@sistema.demo', password: 'demo123', role: 'admin', name: 'Admin Sistema' },
             { email: 'empresa@salud.demo', password: 'demo123', role: 'enterprise', name: 'Empresa Salud' },
-            { email: 'farmacia@central.demo', password: 'demo123', role: 'pharmacy', name: 'Farmacia Central' }
+            { email: 'farmacia@central.demo', password: 'demo123', role: 'pharmacy', name: 'Farmacia Central' },
+            { email: 'carlos.delivery@repartidor.demo', password: 'demo123', role: 'delivery_person', name: 'Carlos Mendoza' }
           ];
           
           const demoUser = demoUsers.find(u => u.email === email && u.password === password);
