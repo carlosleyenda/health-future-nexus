@@ -39,6 +39,7 @@ import {
   PieChart,
   Zap
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useDeliveryPerson } from '@/hooks/useDeliveryPerson';
 import DeliveryEarnings from './DeliveryEarnings';
 import DeliveryRatings from './DeliveryRatings';
@@ -78,10 +79,14 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
 
   const handleAcceptDelivery = (deliveryId: string) => {
     console.log('Accepting delivery:', deliveryId);
+    toast.success('Entrega aceptada exitosamente');
+    // Move to active deliveries (simulation)
+    setActiveTab('active');
   };
 
   const handleCompleteDelivery = (deliveryId: string) => {
     console.log('Completing delivery:', deliveryId);
+    toast.success('Entrega marcada como completada');
   };
 
   if (!profile) return <div>Cargando...</div>;
@@ -249,19 +254,34 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-2 md:gap-4">
-                <Button className="h-16 md:h-20 flex-col gap-1 md:gap-2 text-xs md:text-sm">
+                <Button 
+                  className="h-16 md:h-20 flex-col gap-1 md:gap-2 text-xs md:text-sm"
+                  onClick={() => setActiveTab('routes')}
+                >
                   <Navigation className="h-4 w-4 md:h-6 md:w-6" />
                   <span>Ver Rutas</span>
                 </Button>
-                <Button variant="outline" className="h-16 md:h-20 flex-col gap-1 md:gap-2 text-xs md:text-sm">
+                <Button 
+                  variant="outline" 
+                  className="h-16 md:h-20 flex-col gap-1 md:gap-2 text-xs md:text-sm"
+                  onClick={() => toast.info('No tienes notificaciones pendientes')}
+                >
                   <Bell className="h-4 w-4 md:h-6 md:w-6" />
                   <span>Notificaciones</span>
                 </Button>
-                <Button variant="outline" className="h-16 md:h-20 flex-col gap-1 md:gap-2 text-xs md:text-sm">
+                <Button 
+                  variant="outline" 
+                  className="h-16 md:h-20 flex-col gap-1 md:gap-2 text-xs md:text-sm"
+                  onClick={() => toast.info('Configuración próximamente disponible')}
+                >
                   <Settings className="h-4 w-4 md:h-6 md:w-6" />
                   <span>Configuración</span>
                 </Button>
-                <Button variant="outline" className="h-16 md:h-20 flex-col gap-1 md:gap-2 text-xs md:text-sm">
+                <Button 
+                  variant="outline" 
+                  className="h-16 md:h-20 flex-col gap-1 md:gap-2 text-xs md:text-sm"
+                  onClick={() => window.open('tel:+51987654321')}
+                >
                   <Phone className="h-4 w-4 md:h-6 md:w-6" />
                   <span>Soporte</span>
                 </Button>
@@ -303,7 +323,14 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
                         <CheckCircle className="h-4 w-4 mr-1" />
                         <span className="hidden sm:inline">Aceptar</span>
                       </Button>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          const address = `${delivery.address.street}, ${delivery.address.city}`;
+                          window.open(`https://www.google.com/maps/dir//${encodeURIComponent(address)}`, '_blank');
+                        }}
+                      >
                         <Navigation className="h-4 w-4 mr-1" />
                         <span className="hidden sm:inline">Ruta</span>
                       </Button>
@@ -364,11 +391,19 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
                         <CheckCircle className="h-4 w-4 mr-1" />
                         Completar
                       </Button>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => window.open('tel:+51987654321')}
+                      >
                         <Phone className="h-4 w-4 mr-1" />
                         Llamar
                       </Button>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => toast.info('Iniciando chat con cliente...')}
+                      >
                         <MessageCircle className="h-4 w-4 mr-1" />
                         Chat
                       </Button>

@@ -52,27 +52,27 @@ export default function DeliveryEarnings({ earnings, currency = '$' }: EarningsP
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Mis Ganancias</h2>
         <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant={timeFrame === 'day' ? 'default' : 'outline'}
-            onClick={() => setTimeFrame('day')}
-          >
-            Hoy
-          </Button>
-          <Button
-            size="sm"
-            variant={timeFrame === 'week' ? 'default' : 'outline'}
-            onClick={() => setTimeFrame('week')}
-          >
-            Semana
-          </Button>
-          <Button
-            size="sm"
-            variant={timeFrame === 'month' ? 'default' : 'outline'}
-            onClick={() => setTimeFrame('month')}
-          >
-            Mes
-          </Button>
+            <Button
+              size="sm"
+              variant={timeFrame === 'day' ? 'default' : 'outline'}
+              onClick={() => setTimeFrame('day')}
+            >
+              Hoy
+            </Button>
+            <Button
+              size="sm"
+              variant={timeFrame === 'week' ? 'default' : 'outline'}
+              onClick={() => setTimeFrame('week')}
+            >
+              Semana
+            </Button>
+            <Button
+              size="sm"
+              variant={timeFrame === 'month' ? 'default' : 'outline'}
+              onClick={() => setTimeFrame('month')}
+            >
+              Mes
+            </Button>
         </div>
       </div>
 
