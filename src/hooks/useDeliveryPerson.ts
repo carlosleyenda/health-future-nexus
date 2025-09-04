@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DeliveryStaff, DeliveryService } from '@/types/delivery';
 import { toast } from 'sonner';
 
-// Mock data for delivery person
+// Enhanced mock data for delivery person
 const mockDeliveryPerson: DeliveryStaff = {
   id: 'delivery-001',
   name: 'Carlos Mendoza',
@@ -27,6 +27,84 @@ const mockDeliveryPerson: DeliveryStaff = {
     lat: -12.0464,
     lng: -77.0428
   }
+};
+
+const mockEarnings = {
+  today: 85.50,
+  thisWeek: 420.75,
+  thisMonth: 1685.40,
+  total: 12850.25,
+  deliveriesCompleted: 28,
+  averagePerDelivery: 15.02,
+  bonus: 125.50,
+  tips: 89.25
+};
+
+const mockRatings = {
+  overall: 4.8,
+  totalReviews: 156,
+  breakdown: {
+    5: 98,
+    4: 35,
+    3: 15,
+    2: 5,
+    1: 3
+  },
+  recentReviews: [
+    {
+      id: '1',
+      customerName: 'María González',
+      customerAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+      rating: 5,
+      comment: 'Excelente servicio, muy puntual y amable. Los medicamentos llegaron perfectos.',
+      date: '2024-01-14T10:30:00Z',
+      deliveryType: 'Medicamentos'
+    },
+    {
+      id: '2',
+      customerName: 'José Ramírez',
+      rating: 5,
+      comment: 'Carlos fue muy profesional, llegó exactamente a la hora acordada y con mucho cuidado.',
+      date: '2024-01-13T15:20:00Z',
+      deliveryType: 'Muestras'
+    },
+    {
+      id: '3',
+      customerName: 'Ana Flores',
+      rating: 4,
+      comment: 'Buen servicio, aunque llegó 5 minutos tarde. Pero fue muy educado y cuidadoso.',
+      date: '2024-01-12T09:15:00Z',
+      deliveryType: 'Medicamentos'
+    }
+  ],
+  badges: [
+    'Puntualidad Oro',
+    'Entregador Estrella',
+    'Cliente Satisfecho',
+    'Velocidad Plus'
+  ]
+};
+
+const mockWeeklyStats = {
+  deliveriesThisWeek: 28,
+  deliveriesLastWeek: 24,
+  averageRating: 4.8,
+  onTimeDeliveries: 96,
+  customerSatisfaction: 98
+};
+
+const mockMonthlyGoals = {
+  deliveries: { current: 118, target: 120, progress: 98 },
+  earnings: { current: 1685.40, target: 1800, progress: 94 },
+  rating: { current: 4.8, target: 4.7, progress: 102 }
+};
+
+const mockVehicleStatus = {
+  fuelLevel: 75,
+  batteryLevel: 90,
+  maintenanceNext: '2024-02-15',
+  mileage: 15420,
+  lastService: '2024-01-05'
 };
 
 const mockPendingDeliveries: DeliveryService[] = [
@@ -137,11 +215,47 @@ export const useDeliveryPerson = (deliveryPersonId: string) => {
     enabled: !!deliveryPersonId
   });
 
+  const earnings = useQuery({
+    queryKey: ['earnings', deliveryPersonId],
+    queryFn: () => Promise.resolve(mockEarnings),
+    enabled: !!deliveryPersonId
+  });
+
+  const ratings = useQuery({
+    queryKey: ['ratings', deliveryPersonId],
+    queryFn: () => Promise.resolve(mockRatings),
+    enabled: !!deliveryPersonId
+  });
+
+  const weeklyStats = useQuery({
+    queryKey: ['weekly-stats', deliveryPersonId],
+    queryFn: () => Promise.resolve(mockWeeklyStats),
+    enabled: !!deliveryPersonId
+  });
+
+  const monthlyGoals = useQuery({
+    queryKey: ['monthly-goals', deliveryPersonId],
+    queryFn: () => Promise.resolve(mockMonthlyGoals),
+    enabled: !!deliveryPersonId
+  });
+
+  const vehicleStatus = useQuery({
+    queryKey: ['vehicle-status', deliveryPersonId],
+    queryFn: () => Promise.resolve(mockVehicleStatus),
+    enabled: !!deliveryPersonId
+  });
+
   return {
     data: profile.data,
     pendingDeliveries: pendingDeliveries.data,
     activeDeliveries: activeDeliveries.data,
     completedDeliveries: completedDeliveries.data,
+    earnings: earnings.data,
+    ratings: ratings.data,
+    weeklyStats: weeklyStats.data,
+    monthlyGoals: monthlyGoals.data,
+    vehicleStatus: vehicleStatus.data,
+    recentReviews: mockRatings.recentReviews,
     isLoading: profile.isLoading
   };
 };
