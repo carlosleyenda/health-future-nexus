@@ -1,49 +1,24 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MetricCard } from '@/components/ui/metric-card';
-
-interface AnalyticsData {
-  totalUsers: number;
-  activeUsers: number;
-  averageSessionDuration: number;
-  revenueGenerated: number;
-  conversionRate: number;
-}
-
-const mockAnalytics: AnalyticsData = {
-  totalUsers: 1250,
-  activeUsers: 890,
-  averageSessionDuration: 180,
-  revenueGenerated: 54000,
-  conversionRate: 4.5,
-};
+import { useAdminAnalytics } from '@/hooks/useAdmin';
 
 export default function AdminAnalytics() {
-  const { data: analytics, isLoading } = useQuery({
-    queryKey: ['admin-analytics'],
-    queryFn: async () => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return mockAnalytics;
-    },
-  });
+  const { data: analytics, isLoading, error } = useAdminAnalytics();
 
-  if (isLoading) {
-    return <div>Cargando analíticas...</div>;
-  }
+  if (isLoading) return <div>Cargando analíticas...</div>;
+  if (error || !analytics) return <div>Error al cargar las analíticas.</div>;
 
-  if (!analytics) {
-    return <div>Error al cargar las analíticas.</div>;
-  }
+  const formatCurrency = (n: number) =>
+    new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(n);
 
   return (
     <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <MetricCard label="Usuarios Totales" value={analytics.totalUsers} />
       <MetricCard label="Usuarios Activos" value={analytics.activeUsers} />
-      <MetricCard label="Duración Promedio de Sesión" value={`${analytics.averageSessionDuration} segundos`} />
-      <MetricCard label="Ingresos Generados" value={`$${analytics.revenueGenerated}`} />
-      <MetricCard label="Tasa de Conversión" value={`${analytics.conversionRate}%`} />
+      <MetricCard label="Citas este mes" value={analytics.appointmentsThisMonth} />
+      <MetricCard label="Ingresos" value={formatCurrency(analytics.revenue)} />
+      <MetricCard label="Satisfacción" value={`${analytics.satisfaction}%`} />
+      <MetricCard label="Crecimiento ingresos" value={`${analytics.revenueGrowth}%`} />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+const isUuid = (v: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
+
 export interface Notification {
   id: string;
   user_id: string;
@@ -17,6 +19,10 @@ export interface Notification {
 
 export class NotificationService {
   static async getNotifications(userId: string): Promise<Notification[]> {
+    if (!isUuid(userId)) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from('notifications')
       .select('*')
@@ -46,6 +52,8 @@ export class NotificationService {
   }
 
   static async markAllAsRead(userId: string): Promise<boolean> {
+    if (!isUuid(userId)) return true;
+
     const { error } = await supabase
       .from('notifications')
       .update({ is_read: true, updated_at: new Date().toISOString() })

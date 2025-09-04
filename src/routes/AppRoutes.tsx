@@ -44,6 +44,7 @@ import EmergencyPage from '@/pages/Emergency';
 import EnterpriseDashboard from '@/pages/EnterpriseDashboard';
 import PharmacyPartnerDashboard from '@/pages/PharmacyPartnerDashboard';
 import HomeDoctorPage from '@/pages/HomeDoctorPage';
+import CompliancePage from '@/pages/Compliance';
 
 // Public pages
 import Nosotros from '@/pages/public/Nosotros';
@@ -182,6 +183,11 @@ export default function AppRoutes() {
         <Route path="/analytics" element={
           <ProtectedRoute allowedRoles={['admin', 'coordinator']}>
             <AnalyticsPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/compliance" element={
+          <ProtectedRoute allowedRoles={['admin', 'coordinator']}>
+            <CompliancePage />
           </ProtectedRoute>
         } />
 
