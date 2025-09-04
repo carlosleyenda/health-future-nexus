@@ -135,6 +135,23 @@ export const DELIVERY_SERVICES = {
   pediatric_care: 'Cuidado Pediátrico'
 } as const;
 
+export const VEHICLE_TYPES = {
+  motorcycle: 'Motocicleta',
+  bicycle: 'Bicicleta',
+  car: 'Automóvil',
+  drone: 'Dron'
+} as const;
+
+export const DELIVERY_STATUS = {
+  requested: 'Solicitado',
+  assigned: 'Asignado',
+  in_transit: 'En Tránsito',
+  arrived: 'Llegó',
+  in_progress: 'En Progreso',
+  completed: 'Completado',
+  cancelled: 'Cancelado'
+} as const;
+
 export const PAYMENT_METHODS = {
   credit_card: 'Tarjeta de Crédito',
   debit_card: 'Tarjeta de Débito',
@@ -184,6 +201,7 @@ export const ROUTES = {
   SEARCH_DOCTORS: '/search/doctors',
   PHARMACY: '/pharmacy',
   DELIVERY: '/delivery',
+  DELIVERY_PERSON: '/repartidor',
   HELP: '/help',
   ABOUT: '/about',
   CONTACT: '/contact'

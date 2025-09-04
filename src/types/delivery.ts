@@ -74,12 +74,40 @@ export interface TrackingEvent {
   location: string;
 }
 
+export type VehicleType = 'motorcycle' | 'bicycle' | 'car' | 'drone';
+
 export interface DeliveryStaff {
   id: string;
   name: string;
   phone: string;
+  email: string;
   specialization: string[];
   rating: number;
   isAvailable: boolean;
   currentLocation?: Coordinates;
+  vehicleType: VehicleType;
+  licenseNumber: string;
+  profilePhoto?: string;
+  workingHours: {
+    start: string;
+    end: string;
+  };
+  totalDeliveries: number;
+  completionRate: number;
+  averageDeliveryTime: number; // in minutes
+  isOnline: boolean;
+  lastActive?: string;
+}
+
+export interface DeliveryAssignment {
+  id: string;
+  deliveryId: string;
+  deliveryPersonId: string;
+  assignedAt: string;
+  acceptedAt?: string;
+  startedAt?: string;
+  completedAt?: string;
+  status: 'assigned' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
+  estimatedTime: number; // in minutes
+  actualTime?: number; // in minutes
 }

@@ -62,6 +62,7 @@ import InvestigacionMedica from '@/pages/blog/InvestigacionMedica';
 // Service pages
 import ConsultasMedicas from '@/pages/services/ConsultasMedicas';
 import TelemedicinePage from '@/pages/TelemedicinePage';
+import DeliveryPersonPage from '@/pages/DeliveryPersonPage';
 import Laboratorio from '@/pages/services/Laboratorio';
 import FarmaciaVirtual from '@/pages/services/FarmaciaVirtual';
 import EmergenciasMedicas from '@/pages/services/EmergenciasMedicas';
@@ -96,7 +97,8 @@ export default function AppRoutes() {
       {/* Service routes */}
       <Route path="/servicios/consultas" element={<ConsultasMedicas />} />
       <Route path="/servicios/telemedicina" element={<TelemedicinePage />} />
-      <Route path="/telemedicina" element={<TelemedicinePage />} />
+        <Route path="/telemedicina" element={<TelemedicinePage />} />
+        <Route path="/repartidor" element={<DeliveryPersonPage />} />
       <Route path="/servicios/laboratorio" element={<Laboratorio />} />
       <Route path="/servicios/farmacia-virtual" element={<FarmaciaVirtual />} />
       <Route path="/servicios/emergencias" element={<EmergenciasMedicas />} />
