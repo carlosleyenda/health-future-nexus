@@ -40,8 +40,8 @@ import {
   Zap
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useDeliveryPerson } from '@/hooks/useDeliveryPerson';
-import DeliveryEarnings from './DeliveryEarnings';
+import { useProfessionalDelivery, useAcceptDelivery, useUpdateDeliveryStatus, useUpdateOnlineStatus } from '@/hooks/useProfessionalDelivery';
+import ProfessionalEarnings from './ProfessionalEarnings';
 import DeliveryRatings from './DeliveryRatings';
 import RouteOptimization from './RouteOptimization';
 import OfflineMode from './OfflineMode';
@@ -52,20 +52,23 @@ interface DeliveryPersonDashboardProps {
 }
 
 export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPersonDashboardProps) {
-  const [isOnline, setIsOnline] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
   const { 
-    data: profile, 
+    staffProfile: profile, 
+    isLoading,
     pendingDeliveries, 
     activeDeliveries, 
     completedDeliveries,
     earnings,
     ratings,
-    weeklyStats,
-    monthlyGoals,
-    vehicleStatus,
-    recentReviews
-  } = useDeliveryPerson(deliveryPersonId);
+    stats
+  } = useProfessionalDelivery(deliveryPersonId);
+
+  const [isOnline, setIsOnline] = useState(profile?.is_online || false);
+  
+  const acceptDeliveryMutation = useAcceptDelivery();
+  const updateStatusMutation = useUpdateDeliveryStatus();
+  const updateOnlineStatusMutation = useUpdateOnlineStatus();
 
   const getVehicleIcon = (vehicleType: string) => {
     switch (vehicleType) {
@@ -78,18 +81,38 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
   };
 
   const handleAcceptDelivery = (deliveryId: string) => {
-    console.log('Accepting delivery:', deliveryId);
-    toast.success('Entrega aceptada exitosamente');
-    // Move to active deliveries (simulation)
-    setActiveTab('active');
+    acceptDeliveryMutation.mutate(deliveryId, {
+      onSuccess: () => {
+        setActiveTab('active');
+      }
+    });
   };
 
   const handleCompleteDelivery = (deliveryId: string) => {
-    console.log('Completing delivery:', deliveryId);
-    toast.success('Entrega marcada como completada');
+    updateStatusMutation.mutate({
+      serviceId: deliveryId,
+      status: 'completed'
+    });
   };
 
-  if (!profile) return <div>Cargando...</div>;
+  const handleOnlineStatusChange = (online: boolean) => {
+    setIsOnline(online);
+    if (profile?.id) {
+      updateOnlineStatusMutation.mutate({
+        staffId: profile.id,
+        isOnline: online
+      });
+    }
+  };
+
+  if (isLoading || !profile) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Cargando datos del repartidor...</p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 lg:bg-white">
@@ -98,23 +121,37 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3 md:gap-4">
             <Avatar className="h-12 w-12 md:h-16 md:w-16">
-              <AvatarImage src={profile.profilePhoto} />
-              <AvatarFallback>{profile.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+              <AvatarImage src={profile.profile_photo} />
+              <AvatarFallback>{`${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-xl md:text-2xl font-bold">{profile.name}</h1>
+              <h1 className="text-xl md:text-2xl font-bold">{`${profile.first_name} ${profile.last_name}`}</h1>
               <div className="flex items-center gap-2">
-                {getVehicleIcon(profile.vehicleType)}
-                <span className="text-sm text-muted-foreground capitalize">{profile.vehicleType}</span>
+                {getVehicleIcon(profile.vehicle_type)}
+                <span className="text-sm text-muted-foreground capitalize">{profile.vehicle_type}</span>
                 <Badge variant={isOnline ? 'default' : 'secondary'} className="text-xs">
                   {isOnline ? 'En línea' : 'Desconectado'}
                 </Badge>
+                {profile.documents_verified && (
+                  <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                    Verificado
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-muted-foreground">ID: {profile.staff_id}</span>
+                <span className="text-xs text-muted-foreground">•</span>
+                <span className="text-xs text-muted-foreground">{profile.total_deliveries} entregas</span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <span className="text-sm">Estado:</span>
-            <Switch checked={isOnline} onCheckedChange={setIsOnline} />
+            <Switch 
+              checked={isOnline} 
+              onCheckedChange={handleOnlineStatusChange}
+              disabled={updateOnlineStatusMutation.isPending}
+            />
           </div>
         </div>
 
@@ -142,7 +179,7 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
                   <Package className="h-5 w-5 md:h-6 md:w-6" />
                   <div>
                     <p className="text-blue-100 text-xs md:text-sm">Entregas Hoy</p>
-                    <p className="text-xl md:text-2xl font-bold">{activeDeliveries?.length || 0}</p>
+                    <p className="text-xl md:text-2xl font-bold">{stats.completedToday}</p>
                   </div>
                 </div>
               </CardContent>
@@ -178,7 +215,7 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
                   <TrendingUp className="h-5 w-5 md:h-6 md:w-6" />
                   <div>
                     <p className="text-purple-100 text-xs md:text-sm">Eficiencia</p>
-                    <p className="text-xl md:text-2xl font-bold">{profile.completionRate}%</p>
+                    <p className="text-xl md:text-2xl font-bold">{stats.completionRate.toFixed(1)}%</p>
                   </div>
                 </div>
               </CardContent>
@@ -197,10 +234,10 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Progreso Semanal</span>
-                    <span>{monthlyGoals?.deliveries?.current || 0} / {monthlyGoals?.deliveries?.target || 120}</span>
+                    <span>Progreso Mensual</span>
+                    <span>{stats.totalDeliveries} / 120</span>
                   </div>
-                  <Progress value={monthlyGoals?.deliveries?.progress || 0} className="h-2" />
+                  <Progress value={(stats.totalDeliveries / 120) * 100} className="h-2" />
                 </div>
               </CardContent>
             </Card>
@@ -215,10 +252,10 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>S/{earnings?.thisMonth?.toFixed(2) || '0.00'}</span>
-                    <span>S/{monthlyGoals?.earnings?.target?.toFixed(2) || '1800.00'}</span>
+                    <span>S/{earnings?.month?.toFixed(2) || '0.00'}</span>
+                    <span>S/1800.00</span>
                   </div>
-                  <Progress value={monthlyGoals?.earnings?.progress || 0} className="h-2" />
+                  <Progress value={((earnings?.month || 0) / 1800) * 100} className="h-2" />
                 </div>
               </CardContent>
             </Card>
@@ -233,13 +270,21 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm">Combustible</span>
-                    <Badge variant="default">{vehicleStatus?.fuelLevel || 75}%</Badge>
+                    <span className="text-sm">Estado</span>
+                    <Badge variant={profile.is_active ? "default" : "secondary"}>
+                      {profile.is_active ? "Activo" : "Inactivo"}
+                    </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm">Próximo Mantenimiento</span>
-                    <span className="text-sm text-muted-foreground">
-                      {vehicleStatus?.maintenanceNext || '15 Feb'}
+                    <span className="text-sm">Verificación</span>
+                    <Badge variant={profile.documents_verified ? "default" : "destructive"}>
+                      {profile.documents_verified ? "Verificado" : "Pendiente"}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Vehículo</span>
+                    <span className="text-sm text-muted-foreground capitalize">
+                      {profile.vehicle_brand} {profile.vehicle_model}
                     </span>
                   </div>
                 </div>
@@ -433,15 +478,13 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
         {/* Earnings Tab */}
         <TabsContent value="earnings">
           {earnings && (
-            <DeliveryEarnings earnings={earnings} currency="S/" />
+            <ProfessionalEarnings earnings={earnings} currency="S/" />
           )}
         </TabsContent>
 
         {/* Ratings Tab */}
         <TabsContent value="ratings">
-          {ratings && (
-            <DeliveryRatings ratings={ratings} />
-          )}
+          <DeliveryRatings ratings={ratings} />
         </TabsContent>
 
         {/* Routes Optimization Tab */}

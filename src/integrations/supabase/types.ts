@@ -557,6 +557,507 @@ export type Database = {
         }
         Relationships: []
       }
+      delivery_earnings: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string | null
+          delivery_service_id: string | null
+          delivery_staff_id: string | null
+          description: string | null
+          earning_type: string
+          id: string
+          net_amount: number | null
+          payment_date: string | null
+          payment_method: string | null
+          payment_status: string | null
+          tax_withheld: number | null
+          transaction_reference: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string | null
+          delivery_service_id?: string | null
+          delivery_staff_id?: string | null
+          description?: string | null
+          earning_type: string
+          id?: string
+          net_amount?: number | null
+          payment_date?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          tax_withheld?: number | null
+          transaction_reference?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string | null
+          delivery_service_id?: string | null
+          delivery_staff_id?: string | null
+          description?: string | null
+          earning_type?: string
+          id?: string
+          net_amount?: number | null
+          payment_date?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          tax_withheld?: number | null
+          transaction_reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_earnings_delivery_service_id_fkey"
+            columns: ["delivery_service_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_earnings_delivery_staff_id_fkey"
+            columns: ["delivery_staff_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_performance_metrics: {
+        Row: {
+          acceptance_rate: number | null
+          average_delivery_time: number | null
+          average_rating: number | null
+          cancelled_deliveries: number | null
+          completed_deliveries: number | null
+          completion_rate: number | null
+          created_at: string
+          customer_complaints: number | null
+          date: string
+          delivery_staff_id: string | null
+          id: string
+          online_hours: number | null
+          positive_feedback: number | null
+          total_deliveries: number | null
+          total_distance_km: number | null
+          total_earnings: number | null
+          total_tips: number | null
+        }
+        Insert: {
+          acceptance_rate?: number | null
+          average_delivery_time?: number | null
+          average_rating?: number | null
+          cancelled_deliveries?: number | null
+          completed_deliveries?: number | null
+          completion_rate?: number | null
+          created_at?: string
+          customer_complaints?: number | null
+          date: string
+          delivery_staff_id?: string | null
+          id?: string
+          online_hours?: number | null
+          positive_feedback?: number | null
+          total_deliveries?: number | null
+          total_distance_km?: number | null
+          total_earnings?: number | null
+          total_tips?: number | null
+        }
+        Update: {
+          acceptance_rate?: number | null
+          average_delivery_time?: number | null
+          average_rating?: number | null
+          cancelled_deliveries?: number | null
+          completed_deliveries?: number | null
+          completion_rate?: number | null
+          created_at?: string
+          customer_complaints?: number | null
+          date?: string
+          delivery_staff_id?: string | null
+          id?: string
+          online_hours?: number | null
+          positive_feedback?: number | null
+          total_deliveries?: number | null
+          total_distance_km?: number | null
+          total_earnings?: number | null
+          total_tips?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_performance_metrics_delivery_staff_id_fkey"
+            columns: ["delivery_staff_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_ratings: {
+        Row: {
+          care_quality_rating: number | null
+          communication_rating: number | null
+          created_at: string
+          delivery_service_id: string | null
+          delivery_staff_id: string | null
+          feedback: string | null
+          id: string
+          is_anonymous: boolean | null
+          overall_rating: number
+          patient_id: string | null
+          professionalism_rating: number | null
+          punctuality_rating: number | null
+          tags: string[] | null
+        }
+        Insert: {
+          care_quality_rating?: number | null
+          communication_rating?: number | null
+          created_at?: string
+          delivery_service_id?: string | null
+          delivery_staff_id?: string | null
+          feedback?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          overall_rating: number
+          patient_id?: string | null
+          professionalism_rating?: number | null
+          punctuality_rating?: number | null
+          tags?: string[] | null
+        }
+        Update: {
+          care_quality_rating?: number | null
+          communication_rating?: number | null
+          created_at?: string
+          delivery_service_id?: string | null
+          delivery_staff_id?: string | null
+          feedback?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          overall_rating?: number
+          patient_id?: string | null
+          professionalism_rating?: number | null
+          punctuality_rating?: number | null
+          tags?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_ratings_delivery_service_id_fkey"
+            columns: ["delivery_service_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_ratings_delivery_staff_id_fkey"
+            columns: ["delivery_staff_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_services: {
+        Row: {
+          actual_delivery_time: string | null
+          actual_duration_minutes: number | null
+          actual_pickup_time: string | null
+          base_cost: number
+          created_at: string
+          delivery_address: Json
+          delivery_coordinates: Json | null
+          delivery_fee: number
+          delivery_photo: string | null
+          delivery_staff_id: string | null
+          distance_cost: number | null
+          distance_km: number | null
+          equipment_required: string[] | null
+          estimated_arrival: string | null
+          estimated_duration_minutes: number | null
+          feedback: string | null
+          id: string
+          incident_reports: Json | null
+          medical_conditions: string[] | null
+          metadata: Json | null
+          patient_id: string | null
+          patient_signature: string | null
+          payment_method: string | null
+          payment_status: string | null
+          pickup_address: Json
+          pickup_coordinates: Json | null
+          platform_fee: number | null
+          priority: string
+          proof_of_delivery: Json | null
+          rating: number | null
+          scheduled_time: string | null
+          service_type: string
+          special_instructions: string | null
+          staff_earnings: number | null
+          status: string
+          time_multiplier: number | null
+          tips: number | null
+          total_cost: number
+          transaction_id: string | null
+          updated_at: string
+          urgency_multiplier: number | null
+        }
+        Insert: {
+          actual_delivery_time?: string | null
+          actual_duration_minutes?: number | null
+          actual_pickup_time?: string | null
+          base_cost: number
+          created_at?: string
+          delivery_address: Json
+          delivery_coordinates?: Json | null
+          delivery_fee: number
+          delivery_photo?: string | null
+          delivery_staff_id?: string | null
+          distance_cost?: number | null
+          distance_km?: number | null
+          equipment_required?: string[] | null
+          estimated_arrival?: string | null
+          estimated_duration_minutes?: number | null
+          feedback?: string | null
+          id?: string
+          incident_reports?: Json | null
+          medical_conditions?: string[] | null
+          metadata?: Json | null
+          patient_id?: string | null
+          patient_signature?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          pickup_address: Json
+          pickup_coordinates?: Json | null
+          platform_fee?: number | null
+          priority?: string
+          proof_of_delivery?: Json | null
+          rating?: number | null
+          scheduled_time?: string | null
+          service_type: string
+          special_instructions?: string | null
+          staff_earnings?: number | null
+          status?: string
+          time_multiplier?: number | null
+          tips?: number | null
+          total_cost: number
+          transaction_id?: string | null
+          updated_at?: string
+          urgency_multiplier?: number | null
+        }
+        Update: {
+          actual_delivery_time?: string | null
+          actual_duration_minutes?: number | null
+          actual_pickup_time?: string | null
+          base_cost?: number
+          created_at?: string
+          delivery_address?: Json
+          delivery_coordinates?: Json | null
+          delivery_fee?: number
+          delivery_photo?: string | null
+          delivery_staff_id?: string | null
+          distance_cost?: number | null
+          distance_km?: number | null
+          equipment_required?: string[] | null
+          estimated_arrival?: string | null
+          estimated_duration_minutes?: number | null
+          feedback?: string | null
+          id?: string
+          incident_reports?: Json | null
+          medical_conditions?: string[] | null
+          metadata?: Json | null
+          patient_id?: string | null
+          patient_signature?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          pickup_address?: Json
+          pickup_coordinates?: Json | null
+          platform_fee?: number | null
+          priority?: string
+          proof_of_delivery?: Json | null
+          rating?: number | null
+          scheduled_time?: string | null
+          service_type?: string
+          special_instructions?: string | null
+          staff_earnings?: number | null
+          status?: string
+          time_multiplier?: number | null
+          tips?: number | null
+          total_cost?: number
+          transaction_id?: string | null
+          updated_at?: string
+          urgency_multiplier?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_services_delivery_staff_id_fkey"
+            columns: ["delivery_staff_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_staff: {
+        Row: {
+          average_delivery_time: number | null
+          background_check_status: string | null
+          bank_account_info: Json | null
+          cancelled_deliveries: number | null
+          completed_deliveries: number | null
+          completion_rate: number | null
+          created_at: string
+          current_location: Json | null
+          documents_verified: boolean | null
+          email: string
+          emergency_contact: Json | null
+          first_name: string
+          id: string
+          insurance_policy: string | null
+          is_active: boolean | null
+          is_online: boolean | null
+          last_name: string
+          license_number: string
+          phone: string
+          profile_photo: string | null
+          rating: number | null
+          specializations: string[] | null
+          staff_id: string
+          tax_id: string | null
+          total_deliveries: number | null
+          total_earnings: number | null
+          updated_at: string
+          user_id: string | null
+          vehicle_brand: string | null
+          vehicle_model: string | null
+          vehicle_plate: string | null
+          vehicle_type: string
+        }
+        Insert: {
+          average_delivery_time?: number | null
+          background_check_status?: string | null
+          bank_account_info?: Json | null
+          cancelled_deliveries?: number | null
+          completed_deliveries?: number | null
+          completion_rate?: number | null
+          created_at?: string
+          current_location?: Json | null
+          documents_verified?: boolean | null
+          email: string
+          emergency_contact?: Json | null
+          first_name: string
+          id?: string
+          insurance_policy?: string | null
+          is_active?: boolean | null
+          is_online?: boolean | null
+          last_name: string
+          license_number: string
+          phone: string
+          profile_photo?: string | null
+          rating?: number | null
+          specializations?: string[] | null
+          staff_id: string
+          tax_id?: string | null
+          total_deliveries?: number | null
+          total_earnings?: number | null
+          updated_at?: string
+          user_id?: string | null
+          vehicle_brand?: string | null
+          vehicle_model?: string | null
+          vehicle_plate?: string | null
+          vehicle_type: string
+        }
+        Update: {
+          average_delivery_time?: number | null
+          background_check_status?: string | null
+          bank_account_info?: Json | null
+          cancelled_deliveries?: number | null
+          completed_deliveries?: number | null
+          completion_rate?: number | null
+          created_at?: string
+          current_location?: Json | null
+          documents_verified?: boolean | null
+          email?: string
+          emergency_contact?: Json | null
+          first_name?: string
+          id?: string
+          insurance_policy?: string | null
+          is_active?: boolean | null
+          is_online?: boolean | null
+          last_name?: string
+          license_number?: string
+          phone?: string
+          profile_photo?: string | null
+          rating?: number | null
+          specializations?: string[] | null
+          staff_id?: string
+          tax_id?: string | null
+          total_deliveries?: number | null
+          total_earnings?: number | null
+          updated_at?: string
+          user_id?: string | null
+          vehicle_brand?: string | null
+          vehicle_model?: string | null
+          vehicle_plate?: string | null
+          vehicle_type?: string
+        }
+        Relationships: []
+      }
+      delivery_vehicle_status: {
+        Row: {
+          battery_level: number | null
+          current_issues: string[] | null
+          delivery_staff_id: string | null
+          fuel_level: number | null
+          id: string
+          insurance_expiry: string | null
+          is_operational: boolean | null
+          last_inspection_date: string | null
+          last_maintenance_date: string | null
+          maintenance_due_date: string | null
+          mileage_km: number | null
+          registration_expiry: string | null
+          updated_at: string
+          vehicle_condition: string | null
+        }
+        Insert: {
+          battery_level?: number | null
+          current_issues?: string[] | null
+          delivery_staff_id?: string | null
+          fuel_level?: number | null
+          id?: string
+          insurance_expiry?: string | null
+          is_operational?: boolean | null
+          last_inspection_date?: string | null
+          last_maintenance_date?: string | null
+          maintenance_due_date?: string | null
+          mileage_km?: number | null
+          registration_expiry?: string | null
+          updated_at?: string
+          vehicle_condition?: string | null
+        }
+        Update: {
+          battery_level?: number | null
+          current_issues?: string[] | null
+          delivery_staff_id?: string | null
+          fuel_level?: number | null
+          id?: string
+          insurance_expiry?: string | null
+          is_operational?: boolean | null
+          last_inspection_date?: string | null
+          last_maintenance_date?: string | null
+          maintenance_due_date?: string | null
+          mileage_km?: number | null
+          registration_expiry?: string | null
+          updated_at?: string
+          vehicle_condition?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_vehicle_status_delivery_staff_id_fkey"
+            columns: ["delivery_staff_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doctor_availability: {
         Row: {
           created_at: string
