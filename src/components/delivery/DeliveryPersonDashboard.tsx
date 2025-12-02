@@ -70,28 +70,37 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
   const updateStatusMutation = useUpdateDeliveryStatus();
   const updateOnlineStatusMutation = useUpdateOnlineStatus();
 
-  // Transform ratings array to RatingsData object
+  // Transform ratings array to RatingsData object with safe defaults
+  const ratingsArray = ratingsRaw || [];
+  const overallRating = ratingsArray.length > 0 
+    ? ratingsArray.reduce((acc: number, r: any) => acc + (r.overall_rating || 0), 0) / ratingsArray.length 
+    : 0;
+
   const ratings = {
-    overall: ratingsRaw && ratingsRaw.length > 0 
-      ? ratingsRaw.reduce((acc: number, r: any) => acc + r.overall_rating, 0) / ratingsRaw.length 
-      : 0,
-    totalReviews: ratingsRaw?.length || 0,
+    overall: overallRating,
+    totalReviews: ratingsArray.length,
     breakdown: {
-      5: ratingsRaw?.filter((r: any) => r.overall_rating === 5).length || 0,
-      4: ratingsRaw?.filter((r: any) => r.overall_rating === 4).length || 0,
-      3: ratingsRaw?.filter((r: any) => r.overall_rating === 3).length || 0,
-      2: ratingsRaw?.filter((r: any) => r.overall_rating === 2).length || 0,
-      1: ratingsRaw?.filter((r: any) => r.overall_rating === 1).length || 0,
+      5: ratingsArray.filter((r: any) => Math.floor(r.overall_rating) === 5).length,
+      4: ratingsArray.filter((r: any) => Math.floor(r.overall_rating) === 4).length,
+      3: ratingsArray.filter((r: any) => Math.floor(r.overall_rating) === 3).length,
+      2: ratingsArray.filter((r: any) => Math.floor(r.overall_rating) === 2).length,
+      1: ratingsArray.filter((r: any) => Math.floor(r.overall_rating) === 1).length,
     },
-    recentReviews: ratingsRaw?.slice(0, 10).map((r: any) => ({
+    recentReviews: ratingsArray.slice(0, 10).map((r: any) => ({
       id: r.id,
       customerName: 'Cliente',
-      rating: r.overall_rating,
+      rating: r.overall_rating || 0,
       comment: r.feedback || 'Sin comentarios',
       date: r.created_at,
-      deliveryType: 'Entrega'
-    })) || [],
-    badges: ratingsRaw && ratingsRaw.length > 20 ? ['Experimentado', 'Confiable'] : ratingsRaw && ratingsRaw.length > 10 ? ['Confiable'] : []
+      deliveryType: 'Entrega Médica'
+    })),
+    badges: overallRating >= 4.8 
+      ? ['⭐ Top Delivery', '🚀 Rápido', '💬 Excelente Comunicación', '🏆 Elite'] 
+      : overallRating >= 4.5 
+        ? ['⭐ Top Delivery', '🚀 Rápido', '💬 Excelente Comunicación']
+        : ratingsArray.length > 0 
+          ? ['✓ Delivery Activo']
+          : []
   };
 
   const getVehicleIcon = (vehicleType: string) => {
@@ -227,7 +236,7 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
                   <Star className="h-5 w-5 md:h-6 md:w-6" />
                   <div>
                     <p className="text-yellow-100 text-xs md:text-sm">Calificación</p>
-                    <p className="text-xl md:text-2xl font-bold">{profile.rating.toFixed(1)}</p>
+                    <p className="text-xl md:text-2xl font-bold">{(profile.rating || 0).toFixed(1)}</p>
                   </div>
                 </div>
               </CardContent>
