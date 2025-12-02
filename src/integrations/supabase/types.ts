@@ -156,7 +156,7 @@ export type Database = {
           created_at: string
           details: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           resource_id: string | null
           resource_type: string
           user_agent: string | null
@@ -167,7 +167,7 @@ export type Database = {
           created_at?: string
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource_id?: string | null
           resource_type: string
           user_agent?: string | null
@@ -178,7 +178,7 @@ export type Database = {
           created_at?: string
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource_id?: string | null
           resource_type?: string
           user_agent?: string | null
@@ -1189,7 +1189,7 @@ export type Database = {
           compliance_reason: string | null
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           new_values: Json | null
           old_values: Json | null
           performed_by: string | null
@@ -1203,7 +1203,7 @@ export type Database = {
           compliance_reason?: string | null
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
           performed_by?: string | null
@@ -1217,7 +1217,7 @@ export type Database = {
           compliance_reason?: string | null
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
           performed_by?: string | null
@@ -1304,7 +1304,7 @@ export type Database = {
           description: string
           device_info: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           resolution_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -1320,7 +1320,7 @@ export type Database = {
           description: string
           device_info?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resolution_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -1336,7 +1336,7 @@ export type Database = {
           description?: string
           device_info?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resolution_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -2271,7 +2271,7 @@ export type Database = {
           created_at: string | null
           details: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           session_id: string | null
           timestamp_in_call: number | null
           user_agent: string | null
@@ -2282,7 +2282,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           session_id?: string | null
           timestamp_in_call?: number | null
           user_agent?: string | null
@@ -2293,7 +2293,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           session_id?: string | null
           timestamp_in_call?: number | null
           user_agent?: string | null

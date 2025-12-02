@@ -60,7 +60,7 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
     activeDeliveries, 
     completedDeliveries,
     earnings,
-    ratings,
+    ratings: ratingsRaw,
     stats
   } = useProfessionalDelivery(deliveryPersonId);
 
@@ -69,6 +69,30 @@ export default function DeliveryPersonDashboard({ deliveryPersonId }: DeliveryPe
   const acceptDeliveryMutation = useAcceptDelivery();
   const updateStatusMutation = useUpdateDeliveryStatus();
   const updateOnlineStatusMutation = useUpdateOnlineStatus();
+
+  // Transform ratings array to RatingsData object
+  const ratings = {
+    overall: ratingsRaw && ratingsRaw.length > 0 
+      ? ratingsRaw.reduce((acc: number, r: any) => acc + r.overall_rating, 0) / ratingsRaw.length 
+      : 0,
+    totalReviews: ratingsRaw?.length || 0,
+    breakdown: {
+      5: ratingsRaw?.filter((r: any) => r.overall_rating === 5).length || 0,
+      4: ratingsRaw?.filter((r: any) => r.overall_rating === 4).length || 0,
+      3: ratingsRaw?.filter((r: any) => r.overall_rating === 3).length || 0,
+      2: ratingsRaw?.filter((r: any) => r.overall_rating === 2).length || 0,
+      1: ratingsRaw?.filter((r: any) => r.overall_rating === 1).length || 0,
+    },
+    recentReviews: ratingsRaw?.slice(0, 10).map((r: any) => ({
+      id: r.id,
+      customerName: 'Cliente',
+      rating: r.overall_rating,
+      comment: r.feedback || 'Sin comentarios',
+      date: r.created_at,
+      deliveryType: 'Entrega'
+    })) || [],
+    badges: ratingsRaw && ratingsRaw.length > 20 ? ['Experimentado', 'Confiable'] : ratingsRaw && ratingsRaw.length > 10 ? ['Confiable'] : []
+  };
 
   const getVehicleIcon = (vehicleType: string) => {
     switch (vehicleType) {

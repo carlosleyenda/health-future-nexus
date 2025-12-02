@@ -26,7 +26,19 @@ export class ProfessionalDeliveryService {
       return null;
     }
 
-    return data as DeliveryStaff;
+    if (!data) return null;
+    
+    // Transform the data to match DeliveryStaff type
+    const transformedData: DeliveryStaff = {
+      ...data,
+      current_location: data.current_location as { lat: number; lng: number; address?: string } | null,
+      emergency_contact: data.emergency_contact as { name: string; phone: string; relationship: string } | null,
+      bank_account_info: data.bank_account_info as { bank_name: string; account_number: string; account_holder: string; account_type: string } | null,
+      vehicle_type: data.vehicle_type as "bicycle" | "car" | "drone" | "motorcycle",
+      background_check_status: data.background_check_status as "pending" | "approved" | "rejected",
+    };
+    
+    return transformedData;
   }
 
   // Get delivery services for staff
